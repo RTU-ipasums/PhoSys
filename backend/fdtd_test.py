@@ -8,8 +8,8 @@ import fdtd.backend as bd
 
 ZMAX = 1
 
-#fdtd.set_backend("numpy")
-fdtd.set_backend("torch.float32")
+fdtd.set_backend("numpy")
+#fdtd.set_backend("torch.float32")
 
 
 def visualize(

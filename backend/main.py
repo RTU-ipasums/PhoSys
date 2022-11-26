@@ -13,5 +13,6 @@ def getTest():
     return json.dumps(test_fdtd())
     #return json.dumps(processJson(inJson))
 
-if __name__ == '__main__':
-    api.run()
+if __name__ == "__main__":
+    from waitress import serve
+    serve(api, host="0.0.0.0", port=5000)
