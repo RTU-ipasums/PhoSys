@@ -47,6 +47,7 @@ function getFigure() {
       })
       .then ( drawObj => {
         console.log(drawObj);
+        document.getElementById("fig_main").innerHTML = "";
         mpld3.draw_figure("fig_main", drawObj);
       })
 }

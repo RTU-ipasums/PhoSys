@@ -1,3 +1,5 @@
+import matplotlib as mpl
+mpl.use('svg')  # or whatever other backend that you want
 import matplotlib.pyplot as plt
 
 import fdtd
@@ -6,10 +8,9 @@ import fdtd.backend as bd
 
 ZMAX = 1
 
-fdtd.set_backend("numpy")
+#fdtd.set_backend("numpy")
+fdtd.set_backend("torch.float32")
 
-WAVELENGTH = 1550e-9
-SPEED_LIGHT: float = 299_792_458.0  # [m/s] speed of light
 
 def visualize(
     grid,
@@ -47,6 +48,13 @@ def visualize(
         save: save frames in a folder
         folder: path to folder to save frames
     """
+
+    fig = plt.figure()
+    plt.figure().clear()
+    plt.close()
+    plt.cla()
+    plt.clf()
+
     if norm not in ("linear", "lin", "log"):
         raise ValueError("Color map normalization should be 'linear' or 'log'.")
     # imports (placed here to circumvent circular imports)
@@ -308,24 +316,39 @@ def visualize(
     return plt.gcf()
 
 def processJson(inJson):
+    try:
+        WAVELENGTH = inJson['wavelength']
+    except KeyError:
+        WAVELENGTH = 1550e-9
+
     grid = fdtd.Grid(
-        (2.5e-5, 1.5e-5, 1),
+        (inJson['xBound'], inJson['yBound'], ZMAX),#(2.5e-5, 1.5e-5, 1),
         grid_spacing=0.1 * WAVELENGTH,
         permittivity=1.0,
         permeability=1.0,
     )
+    
+    grid[0, :, :] = fdtd.PeriodicBoundary(name="xbounds")
+    grid[:, 0, :] = fdtd.PeriodicBoundary(name="ybounds")
+    grid[:, :, 0] = fdtd.PeriodicBoundary(name="zbounds")
 
     for obj in inJson['objects']:
         match obj['name'].key.split('_')[0]:
             case 'object':
-                grid[obj.value.scaleX*obj.value.width, obj.value.scaleY*obj.value.height, 0:ZMAX] = fdtd.AnisotropicObject(permittivity=2.5, name=obj['name'].key)
-           # case ''
+                grid[obj['x']:obj['x']+obj['scaleX']*obj['width'], obj['y']+obj['scaleY']*obj['height'], 0:ZMAX] = fdtd.AnisotropicObject(permittivity=2.5, name=obj['name'])
+            case 'linesource':
+                grid[obj['points'][0]:obj['points'][2], obj['points'][1]:obj['points'][3], 0] = fdtd.LineSource(period=WAVELENGTH / SPEED_LIGHT, name=obj['name'])
+            case 'pointsource':
+                grid[100, 60, 0] = fdtd.PointSource(period=WAVELENGTH / SPEED_LIGHT, name=obj['name'])
 
+
+    grid.run(50, progress_bar=False)
     mpld3.fig_to_dict(visualize(grid, z=0))
 
 def test_fdtd():
 
-
+    WAVELENGTH = 1550e-9
+    SPEED_LIGHT: float = 299_792_458.0  # [m/s] speed of light
     grid = fdtd.Grid(
         (2.5e-5, 1.5e-5, 1),
         grid_spacing=0.1 * WAVELENGTH,
@@ -352,6 +375,8 @@ def test_fdtd():
 
     grid[11:32, 30:84, 0:1] = fdtd.AnisotropicObject(permittivity=2.5, name="object")
 
+    grid[12e-6, :, 0] = fdtd.LineDetector(name="detector")
+
     grid.run(50, progress_bar=False)
 
     '''fig, axes = plt.subplots(2, 3, squeeze=False)
@@ -369,10 +394,10 @@ def test_fdtd():
     )
 
     m = max(abs(fields.min().item()), abs(fields.max().item()))
-
+    
     for ax, field, title in zip(axes.ravel(), fields, titles):
         ax.set_axis_off()
         ax.set_title(title)
         ax.imshow(bd.numpy(field), vmin=-m, vmax=m, cmap="RdBu")'''
 
-    return mpld3.fig_to_dict(visualize(grid, z=0))
+    return mpld3.fig_to_dict(visualize(grid, z=0, show=False))
