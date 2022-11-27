@@ -25,7 +25,7 @@ export default {
           <span class="u-i-text04"><span>object</span></span>
           <img alt="NewPiskel1107" src="/playground_assets/newpiskel1107-1uh4-200h.png" class="u-i-new-piskel1" />
         </div>
-        <div class="u-i-lightbulbicon">
+        <div @click="this.$refs.childcomp1.addCircle()" class="u-i-lightbulbicon">
           <span class="u-i-text06"><span>lightbulb</span></span>
           <img alt="NewPiskel2196" src="/playground_assets/newpiskel2196-3eug-200h.png" class="u-i-new-piskel21" />
         </div>

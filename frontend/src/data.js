@@ -16,5 +16,19 @@ export const data = reactive({
         //   name: 'object_1',
         //   draggable: true,
         // }
+      ],
+      circles:[
+        // {
+        //   rotation: 0,
+        //   x: 10,
+        //   y: 10,
+        //   width: 100,
+        //   height: 100,
+        //   scaleX: 1,
+        //   scaleY: 1,
+        //   fill: 'red',
+        //   name: 'pointsource_1',
+        //   draggable: true,
+        // }
       ]
 })

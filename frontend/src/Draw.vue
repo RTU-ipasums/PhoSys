@@ -50,13 +50,12 @@ export default {
         height: height,
       },
       data,
-      lines:[],
       selectedShapeName: ''
     };
   },
   methods: {
     handleDragend(e) {
-      const rect = this.data.rectangles.find(
+      const rect = this.data.rectangles.concat(this.data.circles).find(
         (r) => r.name === this.selectedShapeName
       );
       rect.x = e.target.x();
@@ -66,7 +65,7 @@ export default {
     handleTransformEnd(e) {
       // shape is transformed, let us save new attrs back to the node
       // find element in our state
-      const rect = this.data.rectangles.find(
+      const rect = this.data.rectangles.concat(this.data.circles).find(
         (r) => r.name === this.selectedShapeName
       );
       // update the state
@@ -95,7 +94,7 @@ export default {
 
       // find clicked rect by its name
       const name = e.target.name();
-      const rect = this.data.rectangles.find((r) => r.name === name);
+      const rect = this.data.rectangles.concat(this.data.circles).find((r) => r.name === name);
       if (rect) {
         this.selectedShapeName = name;
       } else {
@@ -138,6 +137,23 @@ export default {
         name: `object_${this.currentShapeId}`,
         draggable: true,
       })
+    },
+    addCircle(){
+      console.log(this.data.circles)
+      this.currentShapeId++;
+      this.data.circles.push({
+        rotation: 0,
+        x: 150,
+        y: 150,
+        width: 50,
+        height: 50,
+        scaleX: 1,
+        scaleY: 1,
+        fill: 'blue',
+        opacity: 0.5,
+        name: `pointsource_${this.currentShapeId}`,
+        draggable: true,
+      })
     }
   },
   mounted() {
@@ -172,12 +188,12 @@ body {
           :config="item"
           @transformend="handleTransformEnd"
         ></v-rect>
-        <v-line
-          v-for="item in lines"
+        <v-circle
+          v-for="item in data.circles"
           :key="item.id"
           :config="item"
           @transformend="handleTransformEnd">
-        </v-line>
+        </v-circle>
         <v-transformer ref="transformer" />
       </v-layer>
     </v-stage>
