@@ -96,7 +96,7 @@ export default {
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   font-style: Regular;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: 400;
   line-height: normal;
   font-stretch: normal;
@@ -157,7 +157,7 @@ export default {
   align-self: auto;
   font-style: Regular;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: 400;
   line-height: normal;
   font-stretch: normal;
@@ -196,7 +196,7 @@ export default {
   align-self: auto;
   font-style: Regular;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: 400;
   line-height: normal;
   font-stretch: normal;
@@ -243,7 +243,7 @@ export default {
   align-self: auto;
   font-style: Regular;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: 400;
   line-height: normal;
   font-stretch: normal;
@@ -298,7 +298,7 @@ export default {
   align-self: center;
   font-style: Regular;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: 400;
   line-height: normal;
   font-stretch: normal;
@@ -338,7 +338,7 @@ export default {
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   font-style: Regular;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: 400;
   line-height: normal;
   font-stretch: normal;

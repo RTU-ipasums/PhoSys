@@ -133,7 +133,8 @@ export default {
         height: 100,
         scaleX: 1,
         scaleY: 1,
-        fill: 'green',
+        fill: 'red',
+        opacity: 0.3,
         name: `object_${this.currentShapeId}`,
         draggable: true,
       })
