@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "bootstrap": "^5.2.3",
-    "vue": "^3.2.45"
+    "konva": "^8.3.14",
+    "vue": "^3.2.45",
+    "vue-konva": "^3.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.2.0",
