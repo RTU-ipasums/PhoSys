@@ -11,6 +11,8 @@ ZMAX = 1
 fdtd.set_backend("numpy")
 #fdtd.set_backend("torch.float32")
 
+WAVELENGTH = 1550e-9
+SPEED_LIGHT: float = 299_792_458.0
 
 def visualize(
     grid,
@@ -347,8 +349,6 @@ def processJson(inJson):
 
 def test_fdtd():
 
-    WAVELENGTH = 1550e-9
-    SPEED_LIGHT: float = 299_792_458.0  # [m/s] speed of light
     grid = fdtd.Grid(
         (2.5e-5, 1.5e-5, 1),
         grid_spacing=0.1 * WAVELENGTH,
