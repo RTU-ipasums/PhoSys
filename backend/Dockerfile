@@ -20,7 +20,7 @@ COPY . /usr/src/app
 #RUN conda create -y -n "phosys" python=3.10.8
 RUN conda env create -f env.yml
 RUN conda init bash
-RUN source ~/.bashrc
+SHELL ["/bin/bash", "-c"] 
 RUN conda activate phosys
 RUN conda env update -n phosys --file env.yaml
 
