@@ -355,10 +355,12 @@ def processJson(inJson):
 
     grid.run(50, progress_bar=False)
     
+    plt.autoscale() 
     fig = visualize(grid, z=0)
     figSize = fig.get_size_inches()*fig.dpi
     fig.set_figwidth(inJson['xBounds']/figSize[0]*fig.get_size_inches()[0])
     fig.set_figheight(inJson['yBounds']/figSize[1]*fig.get_size_inches()[1])
+
 
     return mpld3.fig_to_dict(fig)
 
