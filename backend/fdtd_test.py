@@ -328,28 +328,39 @@ def processJson(inJson):
         xOut, yOut = 500, 500
 
     grid = fdtd.Grid(
-        (inJson['xBound'], inJson['yBound'], ZMAX),#(2.5e-5, 1.5e-5, 1),
+        (inJson['xBounds'], inJson['yBounds'], ZMAX),#(2.5e-5, 1.5e-5, 1),
         grid_spacing=0.1 * WAVELENGTH,
         permittivity=1.0,
         permeability=1.0,
     )
     
-    grid[0, :, :] = fdtd.PeriodicBoundary(name="xbounds")
-    grid[:, 0, :] = fdtd.PeriodicBoundary(name="ybounds")
+    #grid[0, :, :] = fdtd.PeriodicBoundary(name="xbounds")
+    #grid[0:50, :, :] = fdtd.PML(name="pml_xlow")
+    #grid[-50:, :, :] = fdtd.PML(name="pml_xhigh")
+
+    #grid[:, 0, :] = fdtd.PeriodicBoundary(name="ybounds")
+    #grid[:, 0:50, :] = fdtd.PML(name="pml_ylow")
+    #rid[:, -50:, :] = fdtd.PML(name="pml_yhigh")
     grid[:, :, 0] = fdtd.PeriodicBoundary(name="zbounds")
 
-    for obj in inJson['objects']:
-        match obj['name'].key.split('_')[0]:
+    for obj in inJson['rectangles']+inJson['circles']:
+        match obj['name'].split('_')[0]:
             case 'object':
-                grid[obj['x']:obj['x']+obj['scaleX']*obj['width'], obj['y']+obj['scaleY']*obj['height'], 0:ZMAX] = fdtd.AnisotropicObject(permittivity=2.5, name=obj['name'])
+                grid[int(obj['x']):int(obj['x'])+int(obj['scaleX']*obj['width']), int(obj['y']):int(obj['y']+obj['scaleY']*obj['height']), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=2.5, name=obj['name'])
             case 'linesource':
-                grid[obj['points'][0]:obj['points'][2], obj['points'][1]:obj['points'][3], 0] = fdtd.LineSource(period=WAVELENGTH / SPEED_LIGHT, name=obj['name'])
+                grid[int(obj['points'][0]):int(obj['points'][2]), int(obj['points'][1]):int(obj['points'][3]), 0] = fdtd.LineSource(period=WAVELENGTH / SPEED_LIGHT, name=obj['name'])
             case 'pointsource':
-                grid[100, 60, 0] = fdtd.PointSource(period=WAVELENGTH / SPEED_LIGHT, name=obj['name'])
+                grid[int(obj['x']), int(obj['y']), 0] = fdtd.PointSource(period=WAVELENGTH / SPEED_LIGHT, amplitude=10.0, name=obj['name'])
 
 
     grid.run(50, progress_bar=False)
-    mpld3.fig_to_dict(visualize(grid, z=0))
+    
+    fig = visualize(grid, z=0)
+    figSize = fig.get_size_inches()*fig.dpi
+    fig.set_figwidth(inJson['xBounds']/figSize[0]*fig.get_size_inches()[0])
+    fig.set_figheight(inJson['yBounds']/figSize[1]*fig.get_size_inches()[1])
+
+    return mpld3.fig_to_dict(fig)
 
 def test_fdtd():
 
