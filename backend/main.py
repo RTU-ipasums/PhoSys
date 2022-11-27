@@ -16,4 +16,4 @@ def getTest():
 #api.run()
 if __name__ == "__main__":
     from waitress import serve
-    serve(api, host="127.0.0.1", port=5000)
+    serve(api, host="0.0.0.0", port=5000)
