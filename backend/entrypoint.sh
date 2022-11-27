@@ -2,4 +2,4 @@
 
 echo "Starting backend..."
 
-python main.py
+python3 main.py

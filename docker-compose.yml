@@ -19,7 +19,7 @@ services:
 
   phosys-nginx:
     build:
-      context: ./services/nginx
+      context: ./nginx
       dockerfile: Dockerfile
     restart: always
     ports:
@@ -28,7 +28,7 @@ services:
       - phosys-backend
     networks:
       - api_bridge
-      
+
 ##### Networks #####
 networks:
   api_bridge:

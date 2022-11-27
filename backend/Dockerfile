@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.12.0a2-bullseye
 
 RUN apt-get update && apt-get install -y apt-transport-https && \
     apt-get install -y libssl-dev libffi-dev gcc python3-dev musl-dev build-essential \
@@ -17,7 +17,8 @@ ENV PATH=$CONDA_DIR/bin:$PATH
 
 COPY . /usr/src/app
 
-RUN conda env update -n base --file env.yaml
-RUN conda activate
+RUN conda create -y -n "phosys" python=3.10.8
+RUN conda activate phosys
+RUN conda env update -n phosys --file env.yaml
 
 RUN chmod +x /usr/src/app/entrypoint.sh
