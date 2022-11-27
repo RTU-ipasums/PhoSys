@@ -17,9 +17,10 @@ ENV PATH=$CONDA_DIR/bin:$PATH
 
 COPY . /usr/src/app
 
-#RUN conda init bash
 #RUN conda create -y -n "phosys" python=3.10.8
 RUN conda env create -f env.yml
+RUN conda init bash
+RUN source ~/.bashrc
 RUN conda activate phosys
 RUN conda env update -n phosys --file env.yaml
 
