@@ -322,6 +322,10 @@ def processJson(inJson):
         WAVELENGTH = inJson['wavelength']
     except KeyError:
         WAVELENGTH = 1550e-9
+    try:
+        xOut, yOut = inJson['xOut'], inJson['yOut']
+    except KeyError:
+        xOut, yOut = 500, 500
 
     grid = fdtd.Grid(
         (inJson['xBound'], inJson['yBound'], ZMAX),#(2.5e-5, 1.5e-5, 1),
