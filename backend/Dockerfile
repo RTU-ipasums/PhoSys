@@ -20,8 +20,8 @@ COPY . /usr/src/app
 #RUN conda create -y -n "phosys" python=3.10.8
 RUN conda env create -f env.yml
 RUN conda init bash
-SHELL ["/bin/bash", "-c"] 
-RUN conda activate phosys
-RUN conda env update -n phosys --file env.yaml
+RUN exec bash && \
+    conda activate phosys \
+    conda env update -n phosys --file env.yaml
 
 RUN chmod +x /usr/src/app/entrypoint.sh

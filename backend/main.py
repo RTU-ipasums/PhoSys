@@ -13,7 +13,7 @@ def getTest():
     #return json.dumps(test_fdtd())
     res = processJson(inJson)
     return json.dumps(res)
-api.run()
-#if __name__ == "__main__":
-    #from waitress import serve
-    #serve(api, host="127.0.0.1", port=5000)
+#api.run()
+if __name__ == "__main__":
+    from waitress import serve
+    serve(api, host="127.0.0.1", port=5000)
