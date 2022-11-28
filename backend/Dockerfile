@@ -8,20 +8,11 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /usr/src/app
+COPY requirements.txt ./
 
-ENV CONDA_DIR /opt/conda
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh -O ~/miniconda.sh && \
-     /bin/bash ~/miniconda.sh -b -p /opt/conda
+RUN pip install --no-cache-dir --upgrade pip \
+  && pip install --no-cache-dir -r requirements.txt
 
-ENV PATH=$CONDA_DIR/bin:$PATH
-
-COPY . /usr/src/app
-
-#RUN conda create -y -n "phosys" python=3.10.8
-RUN conda env create -f env.yml
-RUN conda init bash
-RUN exec bash && \
-    conda activate phosys \
-    conda env update -n phosys --file env.yaml
+COPY . .
 
 RUN chmod +x /usr/src/app/entrypoint.sh
