@@ -1,7 +1,7 @@
-FROM python:3.12.0a2-bullseye
+FROM 3.10.8-bullseye
 
 RUN apt-get update && apt-get install -y apt-transport-https && \
-    apt-get install -y libssl-dev libffi-dev gcc python3-dev musl-dev build-essential \
+    apt-get install -y libssl-dev libffi-dev gcc python3-dev musl-dev build-essential gfortran \
     libpq-dev netcat-openbsd
 
 ENV PYTHONDONTWRITEBYTECODE 1
