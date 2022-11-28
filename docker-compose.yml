@@ -2,22 +2,22 @@ version: '3.7'
 
 services:
 
-  phosys-backend:
+  -backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     entrypoint: ['/usr/src/app/entrypoint.sh']
     volumes:
-      - phosys-backend-data:/usr/src/app
+      - backend-data:/usr/src/app
     ports:
       - 5001:5000
     environment:
-      - FLASK_ENV=development
+      - FLASK_ENV=production
     networks:
       - api_bridge
     restart: always
 
-  phosys-nginx:
+  nginx:
     build:
       context: ./nginx
       dockerfile: Dockerfile
@@ -25,7 +25,7 @@ services:
     ports:
       - 4433:443
     depends_on:
-      - phosys-backend
+      - backend
     networks:
       - api_bridge
 
@@ -36,4 +36,4 @@ networks:
 
 ##### Volumes #####
 volumes:
-  phosys-backend-data:
+  backend-data:

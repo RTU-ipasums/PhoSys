@@ -1,4 +1,4 @@
-FROM 3.10.8-bullseye
+FROM python:3.10-bullseye
 
 RUN apt-get update && apt-get install -y apt-transport-https && \
     apt-get install -y libssl-dev libffi-dev gcc python3-dev musl-dev build-essential gfortran \
