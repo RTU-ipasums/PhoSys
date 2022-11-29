@@ -6,7 +6,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(phosys.ovh www.phosys.ovh api.phosys.ovh www.api.phosys.ovh)
+domains=($1)#(phosys.ovh www.phosys.ovh api.phosys.ovh www.api.phosys.ovh)
 rsa_key_size=4096
 data_path="./data/certbot"
 email="" # Adding a valid address is strongly recommended
