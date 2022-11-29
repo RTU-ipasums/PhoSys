@@ -13,6 +13,8 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir --upgrade pip \
   && pip install --no-cache-dir -r requirements.txt
 
+RUN pip3 install uwsgi
 COPY . .
+COPY uwsgi.ini /etc/uwsgi/
 
 RUN chmod +x /usr/src/app/entrypoint.sh
