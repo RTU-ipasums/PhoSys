@@ -12,7 +12,6 @@ function mpld3_load_lib(url, callback) {
   };
   document.getElementsByTagName("head")[0].appendChild(s);
 }
-
 mpld3_load_lib("https://d3js.org/d3.v5.min.js", function () {
   mpld3_load_lib("https://mpld3.github.io/js/mpld3.v0.5.8.js", function () {  })
 })
@@ -22,7 +21,8 @@ function getFigure() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      rejectUnauthorized: false,
     },
     body: JSON.stringify(data)
   })
