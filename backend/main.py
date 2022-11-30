@@ -6,7 +6,7 @@ api = Flask(__name__)
 api.config['CORS_HEADERS'] = 'Content-Type'
 cors = CORS(api)
 
-@api.route('/api/gettest', methods=['POST'])
+@api.route('/gettest', methods=['POST'])
 @cross_origin()
 def getTest():
     inJson = request.json
@@ -15,5 +15,4 @@ def getTest():
     return json.dumps(res)
 #api.run()
 if __name__ == "__main__":
-    from waitress import serve
-    serve(api, host="0.0.0.0", port=5000)
+    api.run(host='0.0.0.0')
