@@ -2,45 +2,6 @@
 let width = 950;
 let height = 911;
 import {data} from './data.js'
-// export default {
-//   data() {
-//     return {
-//       list: [],
-//       objectId:0,
-//       dragItemId: null,
-//       configKonva: {
-//         width: width,
-//         height: height
-//       }
-//     };
-//   },
-//   methods: {
-//     handleDragstart(e) {
-//       // save drag element:
-//       this.dragItemId = e.target.id();
-//       // move current element to the top:
-//       const item = this.list.find(i => i.id === this.dragItemId);
-//       const index = this.list.indexOf(item);
-//       this.list.splice(index, 1);
-//       this.list.push(item);
-//     },
-//     handleDragend(e) {
-//       this.dragItemId = null;
-//     },
-//     addRect(){
-//       this.objectId++;
-//       this.list.push({
-//         id:this.objectId,
-//         x:150,
-//         y:150,
-//         width:50,
-//         height:50
-//       })
-//     }
-//   },
-//   mounted() {
-//   }
-// };
 export default {
   data() {
     return {
@@ -60,7 +21,6 @@ export default {
       );
       rect.x = e.target.x();
       rect.y = e.target.y();
-      //rect.fill = Konva.Util.getRandomColor();
     },
     handleTransformEnd(e) {
       // shape is transformed, let us save new attrs back to the node
