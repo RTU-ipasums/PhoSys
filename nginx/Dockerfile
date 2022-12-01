@@ -9,4 +9,5 @@ FROM nginx:1.15.9-alpine
 #RUN openssl dhparam -out dhparam.pem 1024
 WORKDIR /etc/nginx/conf.d
 RUN rm default.conf
+#RUN rm -rf .[^.]* ..?*
 COPY . .
