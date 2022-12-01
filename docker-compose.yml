@@ -8,7 +8,6 @@ services:
       dockerfile: Dockerfile
     entrypoint: ['/usr/src/app/entrypoint.sh']
     volumes:
-      - backend-data:/usr/src/app
     ports:
       - 5001:5000
     environment:
@@ -49,7 +48,3 @@ services:
 networks:
   api_bridge:
     driver: bridge
-
-##### Volumes #####
-volumes:
-  backend-data:
