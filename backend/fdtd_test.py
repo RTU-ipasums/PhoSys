@@ -362,7 +362,8 @@ def processJson(inJson):
     fig.set_figheight(inJson['yBounds']/figSize[1]*fig.get_size_inches()[1])
 
     outJson = mpld3.fig_to_dict(fig)
-    plt.pyplot.close()
+    fig.clear()
+    plt.close()
     return outJson
 
 def test_fdtd():
