@@ -120,7 +120,7 @@ export default {
       this.data.rectangles = this.data.rectangles.filter((r) => {
           return r.name !== this.selectedShapeName;
       });
-      this.data.circle = this.data.circles.filter((r) => {
+      this.data.circles = this.data.circles.filter((r) => {
           return r.name !== this.selectedShapeName;
       });
       this.selectedShapeName = '';
