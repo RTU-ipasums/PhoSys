@@ -7,7 +7,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     entrypoint: ['/usr/src/app/entrypoint.sh']
-    volumes:
     ports:
       - 5001:5000
     environment:
