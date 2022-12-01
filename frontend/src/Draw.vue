@@ -11,7 +11,11 @@ export default {
         height: height,
       },
       data,
-      selectedShapeName: ''
+      selectedShapeName: '',
+      Shapes: {
+        Rectangle: 0,
+        Circle: 1
+      }
     };
   },
   methods: {
@@ -111,6 +115,16 @@ export default {
         name: `pointsource_${this.currentShapeId}`,
         draggable: true,
       })
+    },
+    deleteShape(){
+      this.data.rectangles = this.data.rectangles.filter((r) => {
+          return r.name !== this.selectedShapeName;
+      });
+      this.data.circle = this.data.circles.filter((r) => {
+          return r.name !== this.selectedShapeName;
+      });
+      this.selectedShapeName = '';
+      this.updateTransformer();
     }
   },
   mounted() {
@@ -118,6 +132,12 @@ export default {
     height = document.querySelector('.u-i-leftarea').offsetHeight;
     this.data.xBounds=width;
     this.data.yBounds=height
+    window.addEventListener('keydown', e=>{
+      const key = e.key;
+      if (key === "Backspace" || key === "Delete") {
+        this.deleteShape();
+      }
+    });
   }
 };
 </script>
@@ -143,8 +163,8 @@ body {
           v-for="item in data.rectangles"
           :key="item.id"
           :config="item"
-          @transformend="handleTransformEnd"
-        ></v-rect>
+          @transformend="handleTransformEnd">
+        </v-rect>
         <v-circle
           v-for="item in data.circles"
           :key="item.id"
