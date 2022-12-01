@@ -3,4 +3,5 @@
 echo "Starting backend..."
 echo $(hostname -I)
 
-python3 main.py
+uwsgi --http :5000 --wsgi-file wsgi.py
+#python3 main.py
