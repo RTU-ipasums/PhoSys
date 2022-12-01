@@ -5,7 +5,7 @@ import {data} from './data.js'
 export default {
   data() {
     return {
-      currentShapeId: 2,
+      currentShapeId: 0,
       stageSize: {
         width: width,
         height: height,
@@ -16,26 +16,26 @@ export default {
   },
   methods: {
     handleDragend(e) {
-      const rect = this.data.rectangles.concat(this.data.circles).find(
-        (r) => r.name === this.selectedShapeName
-      );
-      rect.x = e.target.x();
-      rect.y = e.target.y();
+      this.data.rectangles.forEach(r => {
+        if(r.name === this.selectedShapeName){
+          r.x = e.target.x();
+          r.y = e.target.y();
+        }
+      });
+      this.data.circles.forEach(r => {
+        if(r.name === this.selectedShapeName){
+          r.x = e.target.x()+r.radius*r.scaleX;
+          r.y = e.target.y()+r.radius*r.scaleY;
+        }
+      });
     },
     handleTransformEnd(e) {
-      // shape is transformed, let us save new attrs back to the node
-      // find element in our state
-      const rect = this.data.rectangles.concat(this.data.circles).find(
-        (r) => r.name === this.selectedShapeName
-      );
-      // update the state
-      rect.x = e.target.x();
-      rect.y = e.target.y();
-      rect.scaleX = e.target.scaleX();
-      rect.scaleY = e.target.scaleY();
-
-      // change fill
-      //rect.fill = Konva.Util.getRandomColor();
+      this.data.rectangles.concat(this.data.circles).forEach(r => {
+        if(r.name === this.selectedShapeName){
+          r.scaleX = e.target.scaleX();
+          r.scaleY = e.target.scaleY();
+        }
+      });
     },
     handleStageMouseDown(e) {
       // clicked on stage - clear selection
@@ -44,14 +44,12 @@ export default {
         this.updateTransformer();
         return;
       }
-
       // clicked on transformer - do nothing
       const clickedOnTransformer =
         e.target.getParent().className === 'Transformer';
       if (clickedOnTransformer) {
         return;
       }
-
       // find clicked rect by its name
       const name = e.target.name();
       const rect = this.data.rectangles.concat(this.data.circles).find((r) => r.name === name);
@@ -105,8 +103,7 @@ export default {
         rotation: 0,
         x: 150,
         y: 150,
-        width: 30,
-        height: 30,
+        radius:15,
         scaleX: 1,
         scaleY: 1,
         fill: 'blue',
