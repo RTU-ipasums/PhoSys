@@ -1,7 +1,9 @@
 <script>
-let width = 950;
+let width = 500;
 let height = 911;
+import { computed } from 'vue'
 import {data} from './data.js'
+
 export default {
   data() {
     return {
@@ -128,10 +130,12 @@ export default {
     }
   },
   mounted() {
-    width=document.querySelector('.editor').offsetWidth;
-    height = document.querySelector('.canvas').offsetHeight;
-    this.data.xBounds=width;
-    this.data.yBounds=height
+    let stage = this.$refs.transformer.getNode().getStage();
+    stage.width(document.querySelector('.editor').offsetWidth);
+    stage.height(document.querySelector('.editor').offsetHeight);
+
+    this.data.xBounds=document.querySelector('.editor').offsetWidth;
+    this.data.yBounds=document.querySelector('.editor').offsetHeight;
     window.addEventListener('keydown', e=>{
       const key = e.key;
       if (key === "Backspace" || key === "Delete") {

@@ -29,7 +29,7 @@ export default {
     </div>
 
     <splitpanes>
-      <pane size="20%" class="grid-item properties">
+      <pane size="14" class="grid-item properties">
         <h1>Properties</h1>
       </pane>
 
@@ -88,6 +88,8 @@ export default {
   margin-left: auto;
   display: flex;
   flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
   position: relative;
   height: 100%;
   padding-right: 10px;
@@ -105,7 +107,7 @@ export default {
   font-size: 3em;
   border-radius: 10px;
   display: flex;
-  justify-content: center; /* align horizontal */
+  justify-content: center;
   align-items: center;
   background-color: #28FF00;
   position: relative;
