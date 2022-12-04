@@ -128,8 +128,8 @@ export default {
     }
   },
   mounted() {
-    width=document.querySelector('.u-i-leftarea').offsetWidth;
-    height = document.querySelector('.u-i-leftarea').offsetHeight;
+    width=document.querySelector('.editor').offsetWidth;
+    height = document.querySelector('.canvas').offsetHeight;
     this.data.xBounds=width;
     this.data.yBounds=height
     window.addEventListener('keydown', e=>{
