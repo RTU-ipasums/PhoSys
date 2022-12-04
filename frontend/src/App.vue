@@ -1,11 +1,16 @@
 <script>
 import Draw from './Draw.vue'
 import Result from './Result.vue'
+import { Splitpanes, Pane } from 'splitpanes'
+import 'splitpanes/dist/splitpanes.css'
+
 export default {
   name: 'UI',
   components: {
     Draw,
-    Result
+    Result,
+    Splitpanes, 
+    Pane
   }
 }
 </script>
@@ -23,42 +28,48 @@ export default {
       </div>
     </div>
 
-    <div class="grid-item editor" id="editor">
-      <Draw ref="draw"/>
-    </div>
+    <splitpanes>
+      <pane size="20%" class="grid-item properties">
+        <h1>Properties</h1>
+      </pane>
 
-    <div class="grid-item canvas" id="canvas">
-      <Result ref="result"/>
-    </div>
+      <pane class="grid-item editor" id="editor">
+        <Draw ref="draw"/>
+      </pane>
+
+      <pane class="grid-item canvas" id="canvas">
+        <Result ref="result"/>
+      </pane>
+    </splitpanes>
   </div>
 </template>
 
-<style scoped>
+<style>
 .u-i-container {
   height: 100vh;
   width: 100vw;
-  display: grid;
-  grid-template-rows: 100px 1fr;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 10px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
   background-color: rgba(167, 161, 161, 1);
 }
 
 .grid-item {
   background-color: rgba(255, 255, 255, 1);
   text-align: center;
-  padding: 20px;
+  padding: 20px 0;
 }
 
 .top-bar {
   padding: 5px;
-  grid-column: 1 / span 2;
   display: flex;
   flex-direction: row;
 }
 
+.properties {
+}
+
 .editor {
-  
 }
 
 .canvas {
@@ -89,11 +100,20 @@ export default {
 
 .run-button {
   cursor: pointer;
+  height: 60%;
   padding: 10px;
-  font-size: 2em;
+  font-size: 3em;
   border-radius: 10px;
-  background-color: rgb(43, 255, 0);
+  display: flex;
+  justify-content: center; /* align horizontal */
+  align-items: center;
+  background-color: #28FF00;
   position: relative;
   border: none;
+}
+
+.splitpanes__splitter {
+  min-width: 6px !important;
+  background: rgba(167, 161, 161, 1);
 }
 </style>
