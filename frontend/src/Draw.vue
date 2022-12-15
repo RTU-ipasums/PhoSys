@@ -1,7 +1,6 @@
 <script>
 let width = 500;
 let height = 911;
-import { computed } from 'vue'
 import {data} from './data.js'
 
 export default {
