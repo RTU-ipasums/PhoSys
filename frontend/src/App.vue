@@ -29,7 +29,7 @@ export default {
     </div>
 
     <splitpanes>
-      <pane size="14" class="grid-item properties">
+      <pane size="0" class="grid-item properties">
         <h1>Properties</h1>
       </pane>
 
