@@ -14,6 +14,13 @@ fdtd.set_backend("numpy")
 WAVELENGTH = 1550e-9
 SPEED_LIGHT: float = 299_792_458.0
 
+def gAt(inpt, default:str):
+    return str(inpt) if inpt else default
+def gAt(inpt, default:int):
+    return int(inpt) if inpt else default
+def gAt(inpt, default:float):
+    return float(inpt) if inpt else default
+
 def visualize(
     grid,
     x=None,
@@ -317,18 +324,22 @@ def visualize(
 
     return plt.gcf()
 
-def processJson(inJson):
-    try:
-        WAVELENGTH = inJson['wavelength']
-    except KeyError:
-        WAVELENGTH = 1550e-9
-    try:
-        xOut, yOut = inJson['xOut'], inJson['yOut']
-    except KeyError:
-        xOut, yOut = 500, 500
+class rectObj:
+    def __init__(self, o) -> None:
+        self.x1 = o.x
+        self.y1 = o.y
+        self.x2 = o.x+o.scaleX*o.width
+        self.y2 = o.y+o.scaleY*o.height
+        self.name = o.name
+    def addFdtd(self):
+        pass
+
+def processJson(o):
+    WAVELENGTH = gAt(o.wavelength, 1550e-9)
+    xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
 
     grid = fdtd.Grid(
-        (inJson['xBounds'], inJson['yBounds'], ZMAX),#(2.5e-5, 1.5e-5, 1),
+        (o.xBounds, o.yBounds, ZMAX),#(2.5e-5, 1.5e-5, 1),
         grid_spacing=0.1 * WAVELENGTH,
         permittivity=1.0,
         permeability=1.0,
@@ -343,9 +354,10 @@ def processJson(inJson):
     #rid[:, -50:, :] = fdtd.PML(name="pml_yhigh")
     grid[:, :, 0] = fdtd.PeriodicBoundary(name="zbounds")
 
-    for obj in inJson['rectangles']+inJson['circles']:
-        match obj['name'].split('_')[0]:
+    for obj in o.rectangles+o.circles:
+        match obj.name.split('_')[0]:
             case 'object':
+                testObj = rectObj(obj)
                 grid[int(obj['x']):int(obj['x'])+int(obj['scaleX']*obj['width']), int(obj['y']):int(obj['y']+obj['scaleY']*obj['height']), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=2.5, name=obj['name'])
             case 'linesource':
                 grid[int(obj['points'][0]):int(obj['points'][2]), int(obj['points'][1]):int(obj['points'][3]), 0] = fdtd.LineSource(period=WAVELENGTH / SPEED_LIGHT, name=obj['name'])
@@ -358,8 +370,8 @@ def processJson(inJson):
     plt.autoscale() 
     fig = visualize(grid, z=0)
     figSize = fig.get_size_inches()*fig.dpi
-    fig.set_figwidth(inJson['xBounds']/figSize[0]*fig.get_size_inches()[0])
-    fig.set_figheight(inJson['yBounds']/figSize[1]*fig.get_size_inches()[1])
+    fig.set_figwidth(o.xBounds/figSize[0]*fig.get_size_inches()[0])
+    fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
 
     outJson = mpld3.fig_to_dict(fig)
     fig.clear()

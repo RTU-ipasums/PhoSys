@@ -1,6 +1,7 @@
 from flask import Flask, json, request
 from flask_cors import CORS, cross_origin
 from fdtd_test import test_fdtd, processJson
+from munch import DefaultMunch
 
 api = Flask(__name__)
 api.config['CORS_HEADERS'] = 'Content-Type'
@@ -11,7 +12,7 @@ cors = CORS(api)
 def getTest():
     inJson = request.json
     #return json.dumps(test_fdtd())
-    res = processJson(inJson)
+    res = processJson(DefaultMunch.fromDict(inJson))
     return json.dumps(res)
 #api.run()
 if __name__ == "__main__":
