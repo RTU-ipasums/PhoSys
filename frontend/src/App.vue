@@ -66,12 +66,6 @@ export default {
   flex-direction: row;
 }
 
-.properties {
-}
-
-.editor {
-}
-
 .canvas {
   padding: 0px;
 }
