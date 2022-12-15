@@ -27,24 +27,37 @@ export default {
         <span class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▷ LAUNCH</span>
       </div>
     </div>
-
-    <splitpanes>
+    <splitpanes @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
       <pane size="0" class="grid-item properties">
         <h1>Properties</h1>
       </pane>
-
-      <pane class="grid-item editor" id="editor">
-        <Draw ref="draw"/>
+      <pane>
+        <div class="editor-canvas-container">
+          <div class="grid-item editor" id="editor" ref="flexeditor">
+            <Draw ref="draw"/>
+          </div>
+          <div class="grid-item canvas" id="canvas">
+            <Result ref="result" />
+          </div>
+        </div>
       </pane>
 
-      <pane class="grid-item canvas" id="canvas">
-        <Result ref="result"/>
-      </pane>
     </splitpanes>
   </div>
 </template>
 
 <style>
+.editor-canvas-container{
+  display:flex;
+  width:100%;
+  gap:6px;
+  height:100%;
+}
+.editor-canvas-container > *{
+  flex:1;
+  height:100%;
+  width:0;
+}
 .u-i-container {
   height: 100vh;
   width: 100vw;
