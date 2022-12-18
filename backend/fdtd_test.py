@@ -324,23 +324,60 @@ def visualize(
 
     return plt.gcf()
 
-class rectObj:
+class CanvasEl:
     def __init__(self, o) -> None:
+        self.name = o.name
+
+class PermObj(CanvasEl):
+    def __init__(self, o) -> None:
+        super(PermObj, self).__init__(o)
+        self.permittivity = gAt(o.permittivity, 2.5)
+class RectObj(PermObj):
+    def __init__(self, o) -> None:
+        super(RectObj, self).__init__(o)
         self.x1 = o.x
         self.y1 = o.y
         self.x2 = o.x+o.scaleX*o.width
         self.y2 = o.y+o.scaleY*o.height
-        self.name = o.name
-    def addFdtd(self):
-        pass
+    def addFdtd(self, grid):
+        grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=self.permittivity, name=self.name)
+
+class Linesource(CanvasEl):
+    def __init__(self, o) -> None:
+        super(Linesource, self).__init__(o)
+        self.x1 = o.points[0]
+        self.y1 = o.points[1]
+        self.x2 = o.points[2]
+        self.y2 = o.points[3]
+    def addFdtd(self, grid):
+        grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.LineSource(period=WAVELENGTH / SPEED_LIGHT, name=self.name)
+class Pointsource(CanvasEl):
+    def __init__(self, o) -> None:
+        super(Pointsource, self).__init__(o)
+        self.x = o.x
+        self.y = o.y
+        self.amplitude = gAt(o.amplitude, 10.0)
+    def addFdtd(self, grid):
+        grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=WAVELENGTH / SPEED_LIGHT, amplitude=self.amplitude, name=self.name)
+
+elementMapping = {
+    'object':RectObj,
+    'linesource':Linesource,
+    'pointsource':Pointsource
+}
 
 def processJson(o):
     WAVELENGTH = gAt(o.wavelength, 1550e-9)
     xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
+    resolution = gAt(o.resolution, 10)
+
+    elements = []
+    for obj in o.rectangles+o.circles:
+        elements.append( elementMapping[obj.name.split('_')[0]](obj) )
 
     grid = fdtd.Grid(
         (o.xBounds, o.yBounds, ZMAX),#(2.5e-5, 1.5e-5, 1),
-        grid_spacing=0.1 * WAVELENGTH,
+        grid_spacing=WAVELENGTH/resolution,
         permittivity=1.0,
         permeability=1.0,
     )
@@ -354,17 +391,7 @@ def processJson(o):
     #rid[:, -50:, :] = fdtd.PML(name="pml_yhigh")
     grid[:, :, 0] = fdtd.PeriodicBoundary(name="zbounds")
 
-    for obj in o.rectangles+o.circles:
-        match obj.name.split('_')[0]:
-            case 'object':
-                testObj = rectObj(obj)
-                grid[int(obj['x']):int(obj['x'])+int(obj['scaleX']*obj['width']), int(obj['y']):int(obj['y']+obj['scaleY']*obj['height']), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=2.5, name=obj['name'])
-            case 'linesource':
-                grid[int(obj['points'][0]):int(obj['points'][2]), int(obj['points'][1]):int(obj['points'][3]), 0] = fdtd.LineSource(period=WAVELENGTH / SPEED_LIGHT, name=obj['name'])
-            case 'pointsource':
-                grid[int(obj['x']), int(obj['y']), 0] = fdtd.PointSource(period=WAVELENGTH / SPEED_LIGHT, amplitude=10.0, name=obj['name'])
-
-
+    for i in elements: i.addFdtd(grid)
     grid.run(50, progress_bar=False)
     
     plt.autoscale() 
