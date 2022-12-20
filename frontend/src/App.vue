@@ -27,8 +27,8 @@ export default {
         <button class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
       </div>
     </div>
-    <splitpanes @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
-      <pane size="0" class="grid-item properties">
+    <splitpanes id="splitpanes" @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
+      <pane size="0" class="properties grid-item">
         <h1>Properties</h1>
       </pane>
       <pane>
@@ -53,6 +53,9 @@ export default {
   gap:6px;
   height:100%;
 }
+.grid-item{
+  background-color: rgba(255, 255, 255, 1);
+}
 .editor-canvas-container > *{
   flex:1;
   height:100%;
@@ -67,8 +70,8 @@ export default {
   background-color: rgba(167, 161, 161, 1);
 }
 
-.grid-item {
-  background-color: rgba(255, 255, 255, 1);
+.properties {
+
   text-align: center;
   padding: 20px 0;
 }
@@ -133,6 +136,9 @@ export default {
 }
 *{
   font-family: Helvetica, Arial;
+}
+#splitpanes{
+  overflow:auto;
 }
 .splitpanes__splitter {
   min-width: 6px !important;

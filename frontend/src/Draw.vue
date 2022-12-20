@@ -132,7 +132,7 @@ export default {
     }
   },
   mounted() {
-    this.updateSize(document.querySelector('.editor').offsetWidth, document.querySelector('.editor').offsetHeight);
+    this.updateSize(document.querySelector('#splitpanes').offsetWidth, document.querySelector('#splitpanes').offsetHeight);
     window.addEventListener('keydown', e=>{
       const key = e.key;
       if (key === "Backspace" || key === "Delete") {
