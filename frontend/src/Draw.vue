@@ -61,7 +61,6 @@ export default {
     },
     updateTransformer() {
       // here we need to manually attach or detach Transformer node
-      console.log(this.$refs);
       const transformerNode = this.$refs.transformer.getNode();
       const stage = transformerNode.getStage();
       const { selectedShapeName } = this;
@@ -80,7 +79,6 @@ export default {
       }
     },
     addRect(){
-      console.log(this.data.rectangles)
       this.currentShapeId++;
       this.data.rectangles.push({
         rotation: 0,
