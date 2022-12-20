@@ -1,6 +1,4 @@
 <script>
-let width = 500;
-let height = 911;
 import {data} from './data.js'
 
 export default {

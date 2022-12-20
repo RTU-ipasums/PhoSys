@@ -24,7 +24,7 @@ export default {
         <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource" alt="point lightsource" src="/playground_assets/newpiskel2196-3eug-200h.png"/>
       </div>
       <div class="action-buttons">
-        <span class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▷ LAUNCH</span>
+        <button class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
       </div>
     </div>
     <splitpanes @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
@@ -109,18 +109,31 @@ export default {
 
 .run-button {
   cursor: pointer;
-  height: 60%;
+  font-weight: bold;
   padding: 10px;
   font-size: 3em;
   border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #28FF00;
-  position: relative;
-  border: none;
+  background-color: #7dff71;
+  outline:4px solid #21d211;
+  border:none;
 }
-
+.run-button:hover{
+  background-color: #57ef49;
+  outline-color: #20b512;
+}
+.run-button:active{
+  background-color: #20b512;
+  outline-color:#158e09;
+}
+.run-button:focus{
+  outline:4px solid #21d211;
+}
+*{
+  font-family: Helvetica, Arial;
+}
 .splitpanes__splitter {
   min-width: 6px !important;
   background: rgba(167, 161, 161, 1);
