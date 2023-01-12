@@ -1,16 +1,10 @@
 <script>
-let width = 500;
-let height = 911;
 import {data} from './data.js'
 
 export default {
   data() {
     return {
       currentShapeId: 0,
-      stageSize: {
-        width: width,
-        height: height,
-      },
       data,
       selectedShapeName: '',
       Shapes: {
@@ -85,7 +79,6 @@ export default {
       }
     },
     addRect(){
-      console.log(this.data.rectangles)
       this.currentShapeId++;
       this.data.rectangles.push({
         rotation: 0,
@@ -102,7 +95,7 @@ export default {
       })
     },
     addCircle(){
-      console.log(this.data.circles)
+      
       this.currentShapeId++;
       this.data.circles.push({
         rotation: 0,
@@ -126,15 +119,18 @@ export default {
       });
       this.selectedShapeName = '';
       this.updateTransformer();
+    },
+    updateSize(x, y){
+      let stage = this.$refs.transformer.getNode().getStage();
+      stage.width(x);
+      stage.height(y);
+
+      this.data.xBounds=x;
+      this.data.yBounds=y;
     }
   },
   mounted() {
-    let stage = this.$refs.transformer.getNode().getStage();
-    stage.width(document.querySelector('.editor').offsetWidth);
-    stage.height(document.querySelector('.editor').offsetHeight);
-
-    this.data.xBounds=document.querySelector('.editor').offsetWidth;
-    this.data.yBounds=document.querySelector('.editor').offsetHeight;
+    this.updateSize(document.querySelector('#splitpanes').offsetWidth, document.querySelector('#splitpanes').offsetHeight);
     window.addEventListener('keydown', e=>{
       const key = e.key;
       if (key === "Backspace" || key === "Delete") {
@@ -156,7 +152,6 @@ body {
   <div>
     <v-stage
       ref="stage"
-      :config="stageSize"
       @mousedown="handleStageMouseDown"
       @touchstart="handleStageMouseDown"
       @dragend="handleDragend"
