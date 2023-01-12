@@ -315,8 +315,8 @@ def visualize(
     plt.imshow(bd.numpy(grid_energy), cmap=cmap, interpolation="sinc", norm=cmap_norm)
 
     # finalize the plot
-    plt.ylabel(xlabel)
-    plt.xlabel(ylabel)
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
     plt.ylim(Nx, -1)
     plt.xlim(-1, Ny)
     plt.figlegend()
