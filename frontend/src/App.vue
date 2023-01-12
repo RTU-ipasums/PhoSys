@@ -77,6 +77,7 @@ export default {
 }
 
 .top-bar {
+  height: 50px;
   padding: 5px;
   display: flex;
   flex-direction: row;
@@ -90,8 +91,9 @@ export default {
   display: flex;
   flex-direction: row;
   position: relative;
-  height: 100%;
+
   padding-right: 10px;
+  gap:10px;
 }
 
 .action-buttons {
@@ -102,39 +104,37 @@ export default {
   align-items: center;
   position: relative;
   height: 100%;
-  padding-right: 10px;
 }
 
 .bar-button {
   cursor: pointer;
-  padding: 10px;
   max-height: 100%;
   max-width: 100%;
 }
 
 .run-button {
+  max-height: 100%;
   cursor: pointer;
   font-weight: bold;
   padding: 10px;
-  font-size: 3em;
+  font-size: 1em;
   border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #7dff71;
-  outline:4px solid #21d211;
-  border:none;
+  border:4px solid #21d211;
 }
 .run-button:hover{
   background-color: #57ef49;
-  outline-color: #20b512;
+  border-color: #20b512;
 }
 .run-button:active{
   background-color: #20b512;
-  outline-color:#158e09;
+  border-color:#158e09;
 }
 .run-button:focus{
-  outline:4px solid #21d211;
+  border:4px solid #21d211;
 }
 *{
   font-family: Helvetica, Arial;
