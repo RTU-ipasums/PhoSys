@@ -108,6 +108,8 @@ export default {
 .bar-button {
   cursor: pointer;
   padding: 10px;
+  max-height: 100%;
+  max-width: 100%;
 }
 
 .run-button {
