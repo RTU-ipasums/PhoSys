@@ -17,7 +17,7 @@ mpld3_load_lib("https://d3js.org/d3.v5.min.js", function () {
 })
 function getFigure() {
   console.log(JSON.stringify(data));
-  fetch("https://phosys.ovh/gettest", {//http://127.0.0.1:5000/gettest
+  fetch("https://api.phosys.ovh/gettest", {//http://127.0.0.1:5000/gettest
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
