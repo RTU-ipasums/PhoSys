@@ -16,6 +16,7 @@ export const data = reactive({
         //   name: 'object_1',
         //   draggable: true,
         // }
+        
       ],
       circles:[
         // {

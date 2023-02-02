@@ -15,6 +15,17 @@ export default {
     };
   },
   methods: {
+    //mobile
+    globalTransform(func){
+      let stage=this.$refs.transformer.getNode().getStage();
+      let a = stage.position();
+      let b = stage.scale();
+      stage.scale({x:1,y:1});
+      stage.position({x:0,y:0});
+      func()
+      stage.scale(b);
+      stage.position(a);
+    },
     handleTouch(e){
       e.evt.preventDefault();
       var touch1 = e.evt.touches[0];
@@ -37,16 +48,16 @@ export default {
           y: touch2.clientY
         };
   
-        if (!lastCenter) {
-          lastCenter = getCenter(p1, p2);
+        if (!this.lastCenter) {
+          this.lastCenter = getCenter(p1, p2);
           return;
         }
         var newCenter = getCenter(p1, p2);
   
         var dist = getDistance(p1, p2);
   
-        if (!lastDist) {
-          lastDist = dist;
+        if (!this.lastDist) {
+          this.lastDist = dist;
         }
   
         // local coordinates of center point
@@ -55,14 +66,14 @@ export default {
           y: (newCenter.y - stage.y()) / stage.scaleX()
         };
   
-        var scale = stage.scaleX() * (dist / lastDist);
+        var scale = stage.scaleX() * (dist / this.lastDist);
   
         stage.scaleX(scale);
         stage.scaleY(scale);
   
         // calculate new position of the stage
-        var dx = newCenter.x - lastCenter.x;
-        var dy = newCenter.y - lastCenter.y;
+        var dx = newCenter.x - this.lastCenter.x;
+        var dy = newCenter.y - this.lastCenter.y;
   
         var newPos = {
           x: newCenter.x - pointTo.x * scale + dx,
@@ -72,13 +83,13 @@ export default {
         stage.position(newPos);
         stage.batchDraw();
   
-        lastDist = dist;
-        lastCenter = newCenter;
+        this.lastDist = dist;
+        this.lastCenter = newCenter;
       }
     },
     handleTouchEnd(e){
-      lastCenter = null;
-      lastDist = 0;
+      this.lastCenter = null;
+      this.lastDist = 0;
     },
     zoomStage(event) {
       event.evt.preventDefault();
@@ -105,14 +116,18 @@ export default {
     handleDragend(e) {
       this.data.rectangles.forEach(r => {
         if(r.name === this.selectedShapeName){
-          r.x = e.target.x();
-          r.y = e.target.y();
+          this.globalTransform(()=>{
+            r.x = e.target.x();
+            r.y = e.target.y();
+          })
         }
       });
       this.data.circles.forEach(r => {
         if(r.name === this.selectedShapeName){
-          r.x = e.target.x()+r.radius*r.scaleX;
-          r.y = e.target.y()+r.radius*r.scaleY;
+          this.globalTransform(()=>{
+            r.x = e.target.x()+r.radius*r.scaleX;
+            r.y = e.target.y()+r.radius*r.scaleY;
+          })
         }
       });
     },
@@ -211,11 +226,13 @@ export default {
       let stage = this.$refs.transformer.getNode().getStage();
       stage.width(x);
       stage.height(y);
-      this.data.xBounds=x;
-      this.data.yBounds=y;
     }
   },
   mounted() {
+    //todo fix hard coded size
+    // todo limit shape dragging to simulation canvas
+    this.data.xBounds=500;
+    this.data.yBounds=500;
     this.updateSize(document.querySelector('#splitpanes').offsetWidth, document.querySelector('#splitpanes').offsetHeight);
     window.addEventListener('keydown', e=>{
       const key = e.key;
@@ -247,6 +264,15 @@ body {
       @wheel="zoomStage"
     >
       <v-layer ref="layer">
+        <v-rect :config="{
+          x: 0,
+          y: 0,
+          width: 500,
+          height: 500,
+          opacity: 0.1,
+          fill: 'gray'
+        }"
+        />
         <v-rect
           v-for="item in data.rectangles"
           :key="item.id"

@@ -28,7 +28,7 @@ export default {
       </div>
     </div>
     <splitpanes id="splitpanes" @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
-      <pane size="0" class="properties grid-item">
+      <pane size="20" class="properties grid-item">
         <h1>Properties</h1>
       </pane>
       <pane>
