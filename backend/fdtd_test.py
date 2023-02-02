@@ -155,7 +155,7 @@ def visualize(
             elif z is not None:
                 _x = [source.x[0], source.x[-1]]
                 _y = [source.y[0], source.y[-1]]
-            plt.plot(_y, _x, lw=3, color=srccolor)
+            plt.plot(_x, _y, lw=3, color=srccolor)
         elif isinstance(source, PointSource):
             if x is not None:
                 _x = source.y
@@ -166,7 +166,7 @@ def visualize(
             elif z is not None:
                 _x = source.x
                 _y = source.y
-            plt.plot(_y - 0.5, _x - 0.5, lw=3, marker="o", color=srccolor)
+            plt.plot(_x - 0.5, _y - 0.5, lw=3, marker="o", color=srccolor)
             grid_energy[_x, _y] = 0  # do not visualize energy at location of source
         elif isinstance(source, PlaneSource):
             if x is not None:
@@ -203,9 +203,9 @@ def visualize(
                     else slice(source.y.start, source.y.start)
                 )
             patch = ptc.Rectangle(
-                xy=(_y.start - 0.5, _x.start - 0.5),
-                width=_y.stop - _y.start,
-                height=_x.stop - _x.start,
+                xy=(_x.start - 0.5, _y.start - 0.5),
+                width=_x.stop - _x.start,
+                height=_y.stop - _y.start,
                 linewidth=0,
                 edgecolor="none",
                 facecolor=srccolor,
@@ -227,30 +227,30 @@ def visualize(
         if detector.__class__.__name__ == "BlockDetector":
             # BlockDetector
             plt.plot(
-                [_y[0], _y[1], _y[1], _y[0], _y[0]],
                 [_x[0], _x[0], _x[1], _x[1], _x[0]],
+                [_y[0], _y[1], _y[1], _y[0], _y[0]],
                 lw=3,
                 color=detcolor,
             )
         else:
             # LineDetector
-            plt.plot(_y, _x, lw=3, color=detcolor)
+            plt.plot(_x, _y, lw=3, color=detcolor)
 
     # Boundaries
     for boundary in grid.boundaries:
         if isinstance(boundary, pbx):
             _x = [-0.5, -0.5, float("nan"), Nx - 0.5, Nx - 0.5]
             _y = [-0.5, Ny - 0.5, float("nan"), -0.5, Ny - 0.5]
-            plt.plot(_y, _x, color=pbcolor, linewidth=3)
+            plt.plot(_x, _y, color=pbcolor, linewidth=3)
         elif isinstance(boundary, pby):
             _x = [-0.5, Nx - 0.5, float("nan"), -0.5, Nx - 0.5]
             _y = [-0.5, -0.5, float("nan"), Ny - 0.5, Ny - 0.5]
-            plt.plot(_y, _x, color=pbcolor, linewidth=3)
+            plt.plot(_x, _y, color=pbcolor, linewidth=3)
         elif isinstance(boundary, pmlyl):
             patch = ptc.Rectangle(
                 xy=(-0.5, -0.5),
                 width=boundary.thickness,
-                height=Nx,
+                height=Ny,
                 linewidth=0,
                 edgecolor="none",
                 facecolor=pmlcolor,
@@ -259,7 +259,7 @@ def visualize(
         elif isinstance(boundary, pmlxl):
             patch = ptc.Rectangle(
                 xy=(-0.5, -0.5),
-                width=Ny,
+                width=Nx,
                 height=boundary.thickness,
                 linewidth=0,
                 edgecolor="none",
@@ -268,9 +268,9 @@ def visualize(
             plt.gca().add_patch(patch)
         elif isinstance(boundary, pmlyh):
             patch = ptc.Rectangle(
-                xy=(Ny - 0.5 - boundary.thickness, -0.5),
+                xy=(Nx - 0.5 - boundary.thickness, -0.5),
                 width=boundary.thickness,
-                height=Nx,
+                height=Ny,
                 linewidth=0,
                 edgecolor="none",
                 facecolor=pmlcolor,
@@ -278,8 +278,8 @@ def visualize(
             plt.gca().add_patch(patch)
         elif isinstance(boundary, pmlxh):
             patch = ptc.Rectangle(
-                xy=(-0.5, Nx - boundary.thickness - 0.5),
-                width=Ny,
+                xy=(-0.5, Ny - boundary.thickness - 0.5),
+                width=Nx,
                 height=boundary.thickness,
                 linewidth=0,
                 edgecolor="none",
@@ -299,9 +299,9 @@ def visualize(
             _y = (obj.y.start, obj.y.stop)
 
         patch = ptc.Rectangle(
-            xy=(min(_y) - 0.5, min(_x) - 0.5),
-            width=max(_y) - min(_y),
-            height=max(_x) - min(_x),
+            xy=(min(_x) - 0.5, min(_y) - 0.5),
+            width=max(_x) - min(_x),
+            height=max(_y) - min(_y),
             linewidth=0,
             edgecolor="none",
             facecolor=objcolor,
@@ -317,8 +317,8 @@ def visualize(
     # finalize the plot
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
-    plt.ylim(Nx, -1)
-    plt.xlim(-1, Ny)
+    plt.ylim(Ny, -1)
+    plt.xlim(-1, Nx)
     plt.figlegend()
     plt.tight_layout()
 
@@ -392,10 +392,12 @@ def processJson(o):
     grid[:, :, 0] = fdtd.PeriodicBoundary(name="zbounds")
 
     for i in elements: i.addFdtd(grid)
+    #grid.step()
     grid.run(50, progress_bar=False)
     
     plt.autoscale() 
     fig = visualize(grid, z=0)
+
     figSize = fig.get_size_inches()*fig.dpi
     fig.set_figwidth(o.xBounds/figSize[0]*fig.get_size_inches()[0])
     fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
