@@ -442,6 +442,8 @@ def processJson(o):
     fig.set_figwidth(o.xBounds/figSize[0]*fig.get_size_inches()[0])
     fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
 
+    plugins.clear(fig)
+    plugins.connect(fig, plugins.BoxZoom())
     outJson = mpld3.fig_to_dict(fig)
     fig.clear()
     plt.close()

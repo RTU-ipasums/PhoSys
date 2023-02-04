@@ -5,6 +5,9 @@ from fdtd_test import test_fdtd, processJson
 from munch import DefaultMunch
 
 api = Flask(__name__)
+if api.debug:
+    from werkzeug.middleware.profiler import ProfilerMiddleware
+    api.wsgi_app = ProfilerMiddleware(api.wsgi_app, sort_by=('tottime',), restrictions=(15,),)
 api.config["SESSION_PERMANENT"] = False
 api.config["SESSION_TYPE"] = "filesystem"
 api.config['CORS_HEADERS'] = 'Content-Type'
@@ -15,8 +18,8 @@ cors = CORS(api)
 @cross_origin()
 def getTest():
     inJson = request.json
-    #return json.dumps(test_fdtd())
     res = processJson(DefaultMunch.fromDict(inJson))
+    #return json.dumps(test_fdtd())
     return json.dumps(res)
 #api.run()
 if __name__ == "__main__":
