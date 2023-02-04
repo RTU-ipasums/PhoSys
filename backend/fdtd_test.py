@@ -314,7 +314,7 @@ def visualize(
     cmap_norm = None
     if norm == "log":
         cmap_norm = LogNorm(vmin=1e-4, vmax=grid_energy.max() + 1e-4)
-    plt.imshow(bd.numpy(grid_energy), cmap=cmap, interpolation="sinc", norm=cmap_norm)
+    plt.imshow(bd.numpy(grid_energy).transpose(), cmap=cmap, interpolation="sinc", norm=cmap_norm)
 
     # finalize the plot
     plt.ylabel(ylabel)
@@ -331,37 +331,30 @@ class AnimView(plugins.PluginBase):
     mpld3.register_plugin("animview", AnimViewPlugin);
     AnimViewPlugin.prototype = Object.create(mpld3.Plugin.prototype);
     AnimViewPlugin.prototype.constructor = AnimViewPlugin;
-    AnimViewPlugin.prototype.requiredProps = ["idframes", "data"];
+    AnimViewPlugin.prototype.requiredProps = ["data"];
     AnimViewPlugin.prototype.defaultProps = {}
     function AnimViewPlugin(fig, props){
         mpld3.Plugin.call(this, fig, props);
     };
 
     AnimViewPlugin.prototype.draw = function(){
-      var frames = mpld3.get_element(this.props.idframes);
-      var data = this.props.data;
-
-      function mouseover(d, i){
-        line.data = data[i];
-        line.elements().transition()
-            .attr("d", line.datafunc(line.data))
-            .style("stroke", this.style.fill);
-      }
-      frames.elements().on("mouseover", mouseover);
+        console.log(this.props + "---");
+        var data = this.props.data;
     };
+
+    var source = new EventSource("/stream");
+    source.addEventListener('greeting', function(event) {
+        var data = JSON.parse(event.data);
+        console.log("The server says " + data.message);
+    }, false);
+    source.addEventListener('error', function(event) {
+        console.error("Failed to connect to event stream.");
+    }, false);
     """
 
-    def __init__(self, points, line, linedata):
-        if isinstance(points, plt.lines.Line2D):
-            suffix = "pts"
-        else:
-            suffix = None
-
-        self.dict_ = {"type": "linkedview",
-                      "idpts": utils.get_id(points, suffix),
-                      "idline": utils.get_id(line),
-                      "data": linedata}
-
+    def __init__(self, data):
+        self.dict_ = {"type": "animview",
+                      "data": data}
 
 class CanvasEl:
     def __init__(self, o) -> None:
@@ -432,7 +425,7 @@ def processJson(o):
 
     for i in elements: i.addFdtd(grid)
     #grid.step()
-    grid.run(50, progress_bar=False)
+    grid.run(5, progress_bar=False)
     
     plt.autoscale() 
     fig = visualize(grid, z=0)
@@ -443,7 +436,7 @@ def processJson(o):
     fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
 
     plugins.clear(fig)
-    plugins.connect(fig, plugins.BoxZoom())
+    plugins.connect(fig, plugins.Zoom(button=False), AnimView("1"))
     outJson = mpld3.fig_to_dict(fig)
     fig.clear()
     plt.close()
@@ -479,7 +472,7 @@ def test_fdtd():
 
     grid[12e-6, :, 0] = fdtd.LineDetector(name="detector")
 
-    grid.run(50, progress_bar=False)
+    grid.run(10, progress_bar=False)
 
     '''fig, axes = plt.subplots(2, 3, squeeze=False)
     titles = ["Ex: xy", "Ey: xy", "Ez: xy", "Hx: xy", "Hy: xy", "Hz: xy"]
