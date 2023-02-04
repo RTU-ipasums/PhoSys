@@ -1,9 +1,11 @@
 import matplotlib as mpl
 mpl.use('svg')  # or whatever other backend that you want
 import matplotlib.pyplot as plt
+from main import session
 
-import fdtd
+import fdtd, sys
 import mpld3
+from mpld3 import plugins, utils
 import fdtd.backend as bd
 
 ZMAX = 1
@@ -324,6 +326,43 @@ def visualize(
 
     return plt.gcf()
 
+class AnimView(plugins.PluginBase):
+    JAVASCRIPT = """
+    mpld3.register_plugin("animview", AnimViewPlugin);
+    AnimViewPlugin.prototype = Object.create(mpld3.Plugin.prototype);
+    AnimViewPlugin.prototype.constructor = AnimViewPlugin;
+    AnimViewPlugin.prototype.requiredProps = ["idframes", "data"];
+    AnimViewPlugin.prototype.defaultProps = {}
+    function AnimViewPlugin(fig, props){
+        mpld3.Plugin.call(this, fig, props);
+    };
+
+    AnimViewPlugin.prototype.draw = function(){
+      var frames = mpld3.get_element(this.props.idframes);
+      var data = this.props.data;
+
+      function mouseover(d, i){
+        line.data = data[i];
+        line.elements().transition()
+            .attr("d", line.datafunc(line.data))
+            .style("stroke", this.style.fill);
+      }
+      frames.elements().on("mouseover", mouseover);
+    };
+    """
+
+    def __init__(self, points, line, linedata):
+        if isinstance(points, plt.lines.Line2D):
+            suffix = "pts"
+        else:
+            suffix = None
+
+        self.dict_ = {"type": "linkedview",
+                      "idpts": utils.get_id(points, suffix),
+                      "idline": utils.get_id(line),
+                      "data": linedata}
+
+
 class CanvasEl:
     def __init__(self, o) -> None:
         self.name = o.name
@@ -398,6 +437,7 @@ def processJson(o):
     plt.autoscale() 
     fig = visualize(grid, z=0)
 
+    session['grid'] = grid
     figSize = fig.get_size_inches()*fig.dpi
     fig.set_figwidth(o.xBounds/figSize[0]*fig.get_size_inches()[0])
     fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
