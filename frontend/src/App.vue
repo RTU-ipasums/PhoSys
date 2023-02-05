@@ -25,6 +25,7 @@ export default {
       </div>
       <div class="action-buttons">
         <button class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
+        <input @input="event => this.$refs.result.frames.frameIdx = event.target.value"/>
       </div>
     </div>
     <splitpanes id="splitpanes" @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">

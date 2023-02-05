@@ -400,7 +400,7 @@ def processJson(o):
 
     for i in elements: i.addFdtd(grid)
     #grid.step()
-    grid.run(2, progress_bar=False)
+    grid.run(30, progress_bar=False)
     
     plt.autoscale() 
     fig, img = visualize(grid, z=0)
