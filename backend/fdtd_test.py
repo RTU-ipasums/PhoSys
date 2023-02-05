@@ -314,7 +314,7 @@ def visualize(
     cmap_norm = None
     if norm == "log":
         cmap_norm = LogNorm(vmin=1e-4, vmax=grid_energy.max() + 1e-4)
-    plt.imshow(bd.numpy(grid_energy).transpose(), cmap=cmap, interpolation="sinc", norm=cmap_norm)
+    img = plt.imshow(bd.numpy(grid_energy).transpose(), cmap=cmap, interpolation="sinc", norm=cmap_norm)
 
     # finalize the plot
     plt.ylabel(ylabel)
@@ -324,37 +324,12 @@ def visualize(
     plt.figlegend()
     plt.tight_layout()
 
-    return plt.gcf()
+    return plt.gcf(), img
 
 class AnimView(plugins.PluginBase):
-    JAVASCRIPT = """
-    mpld3.register_plugin("animview", AnimViewPlugin);
-    AnimViewPlugin.prototype = Object.create(mpld3.Plugin.prototype);
-    AnimViewPlugin.prototype.constructor = AnimViewPlugin;
-    AnimViewPlugin.prototype.requiredProps = ["data"];
-    AnimViewPlugin.prototype.defaultProps = {}
-    function AnimViewPlugin(fig, props){
-        mpld3.Plugin.call(this, fig, props);
-    };
-
-    AnimViewPlugin.prototype.draw = function(){
-        console.log(this.props + "---");
-        var data = this.props.data;
-    };
-
-    var source = new EventSource("/stream");
-    source.addEventListener('greeting', function(event) {
-        var data = JSON.parse(event.data);
-        console.log("The server says " + data.message);
-    }, false);
-    source.addEventListener('error', function(event) {
-        console.error("Failed to connect to event stream.");
-    }, false);
-    """
-
-    def __init__(self, data):
+    def __init__(self, img):
         self.dict_ = {"type": "animview",
-                      "data": data}
+                      "idimg": utils.get_id(img)}
 
 class CanvasEl:
     def __init__(self, o) -> None:
@@ -425,10 +400,10 @@ def processJson(o):
 
     for i in elements: i.addFdtd(grid)
     #grid.step()
-    grid.run(5, progress_bar=False)
+    grid.run(2, progress_bar=False)
     
     plt.autoscale() 
-    fig = visualize(grid, z=0)
+    fig, img = visualize(grid, z=0)
 
     session['grid'] = grid
     figSize = fig.get_size_inches()*fig.dpi
@@ -436,7 +411,7 @@ def processJson(o):
     fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
 
     plugins.clear(fig)
-    plugins.connect(fig, plugins.Zoom(button=False), AnimView("1"))
+    plugins.connect(fig, plugins.Zoom(button=False), AnimView(img))
     outJson = mpld3.fig_to_dict(fig)
     fig.clear()
     plt.close()
