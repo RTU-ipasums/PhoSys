@@ -1,3 +1,4 @@
+from unicodedata import name
 import matplotlib as mpl
 mpl.use('svg')  # or whatever other backend that you want
 import matplotlib.pyplot as plt
@@ -7,6 +8,8 @@ import fdtd, sys
 import mpld3
 from mpld3 import plugins, utils
 import fdtd.backend as bd
+from flask_socketio import SocketIO, send, emit
+import io, base64
 
 ZMAX = 1
 
@@ -117,7 +120,7 @@ def visualize(
     plt.plot([], lw=7, color=objcolor, label="Objects")
     plt.plot([], lw=7, color=pmlcolor, label="PML")
     plt.plot([], lw=3, color=pbcolor, label="Periodic Boundaries")
-    plt.plot([], lw=3, color=srccolor, label="Sources")
+    #plt.plot([], lw=3, color=srccolor, label="Sources") #temp
     plt.plot([], lw=3, color=detcolor, label="Detectors")
 
     # Grid energy
@@ -145,7 +148,7 @@ def visualize(
         grid_energy = grid_energy[:, :, z]
     else:
         raise ValueError("Visualization only works for 2D grids")
-
+    
     for source in grid.sources:
         if isinstance(source, LineSource):
             if x is not None:
@@ -157,7 +160,7 @@ def visualize(
             elif z is not None:
                 _x = [source.x[0], source.x[-1]]
                 _y = [source.y[0], source.y[-1]]
-            plt.plot(_x, _y, lw=3, color=srccolor)
+            plt.plot(_x, _y, lw=1, color=srccolor)
         elif isinstance(source, PointSource):
             if x is not None:
                 _x = source.y
@@ -168,7 +171,7 @@ def visualize(
             elif z is not None:
                 _x = source.x
                 _y = source.y
-            plt.plot(_x - 0.5, _y - 0.5, lw=3, marker="o", color=srccolor)
+            plt.plot(_x - 0.5, _y - 0.5, lw=1, marker="o", color=srccolor)
             grid_energy[_x, _y] = 0  # do not visualize energy at location of source
         elif isinstance(source, PlaneSource):
             if x is not None:
@@ -213,7 +216,7 @@ def visualize(
                 facecolor=srccolor,
             )
             plt.gca().add_patch(patch)
-
+    
     # Detector
     for detector in grid.detectors:
         if x is not None:
@@ -373,10 +376,18 @@ elementMapping = {
     'pointsource':Pointsource
 }
 
+def stepGrid(grid):
+    grid.step()
+    vv = io.BytesIO()
+    plt.imsave(vv, bd.numpy(bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]).transpose(), cmap="Blues", format='png')
+    vv.seek(0)
+    return base64.b64encode(vv.read())
+
 def processJson(o):
     WAVELENGTH = gAt(o.wavelength, 1550e-9)
     xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
     resolution = gAt(o.resolution, 10)
+    frameCount = gAt(o.frameCount, 15)
 
     elements = []
     for obj in o.rectangles+o.circles:
@@ -400,10 +411,13 @@ def processJson(o):
 
     for i in elements: i.addFdtd(grid)
     #grid.step()
-    grid.run(30, progress_bar=False)
-    
+    grid.run(1, progress_bar=False)
+
     plt.autoscale() 
     fig, img = visualize(grid, z=0)
+
+    #Thread(target=stepGrid, args=[grid, 30]).start()
+    #stepGrid(grid, 30)
 
     session['grid'] = grid
     figSize = fig.get_size_inches()*fig.dpi
@@ -415,7 +429,7 @@ def processJson(o):
     outJson = mpld3.fig_to_dict(fig)
     fig.clear()
     plt.close()
-    return outJson
+    return outJson, grid, frameCount-1
 
 def test_fdtd():
 
