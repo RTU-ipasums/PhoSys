@@ -1,6 +1,7 @@
 <script>
 import Draw from './Draw.vue'
 import Result from './Result.vue'
+import Properties from './Properties.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 
@@ -10,6 +11,7 @@ export default {
     Draw,
     Result,
     Splitpanes, 
+    Properties,
     Pane
   }
 }
@@ -29,7 +31,7 @@ export default {
     </div>
     <splitpanes id="splitpanes" @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
       <pane size="20" class="properties grid-item">
-        <h1>Properties</h1>
+        <Properties/>
       </pane>
       <pane>
         <div class="editor-canvas-container">
@@ -73,7 +75,7 @@ export default {
 .properties {
 
   text-align: center;
-  padding: 20px 0;
+  padding: 10px 20px;
 }
 
 .top-bar {
@@ -91,7 +93,6 @@ export default {
   display: flex;
   flex-direction: row;
   position: relative;
-
   padding-right: 10px;
   gap:10px;
 }

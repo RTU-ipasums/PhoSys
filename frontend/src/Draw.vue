@@ -15,7 +15,7 @@ export default {
     };
   },
   methods: {
-    //mobile
+    
     globalTransform(func){
       let stage=this.$refs.transformer.getNode().getStage();
       let a = stage.position();
@@ -26,6 +26,7 @@ export default {
       stage.scale(b);
       stage.position(a);
     },
+    //mobile
     handleTouch(e){
       e.evt.preventDefault();
       var touch1 = e.evt.touches[0];
