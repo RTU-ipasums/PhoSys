@@ -229,13 +229,6 @@ export default {
   }
 };
 </script>
-
-<style>
-body {
-  margin: 0;
-  padding: 0;
-}
-</style>
 <template>
   <!-- export addrect, import RECT ARRAY from other files -->
   <div>

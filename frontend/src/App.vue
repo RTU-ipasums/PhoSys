@@ -54,6 +54,12 @@ export default {
 </template>
 
 <style>
+
+body {
+  margin: 0;
+  padding: 0;
+  color:#2c3e50;
+}
 .editor-canvas-container{
   display:flex;
   width:100%;
