@@ -4,6 +4,9 @@ import { data } from './data.js'
 import { io } from 'socket.io-client';
 import * as d3 from "d3";
 import * as mpld3 from 'mpld3';
+
+var socket = io();
+
 var frames = {
   imgObjI: null,
   frameIdxI: 0,
@@ -34,7 +37,7 @@ var frames = {
     }
   },
   get frameIdx() {
-    return this.frameIdxI;
+    return this.frameIdxI+1;
   },
   reset: function() {
     this.framesC = [null]
@@ -43,7 +46,7 @@ var frames = {
   push: function(frame) {
     this.framesC.push(frame);
     if (this.framesC.length-2 == this.frameIdxI) {
-      this.frameIdx = this.frameIdx+1;
+      this.frameIdx+=1;
     }
   }
 }
@@ -65,7 +68,8 @@ AnimViewPlugin.prototype.draw = function(){
 
 function getFigure() {
   console.log(JSON.stringify(data));
-  const socket = io(import.meta.env.VITE_BACKEND_URL);
+  socket.close();
+  socket = io(import.meta.env.VITE_BACKEND_URL);
 
   socket.on("connect", () => {
     socket.emit("sim_data", data)

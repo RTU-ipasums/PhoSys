@@ -1,5 +1,6 @@
 from unicodedata import name
 import matplotlib as mpl
+from matplotlib.colors import FuncNorm
 mpl.use('svg')  # or whatever other backend that you want
 import matplotlib.pyplot as plt
 from main import session
@@ -341,7 +342,7 @@ class CanvasEl:
 class PermObj(CanvasEl):
     def __init__(self, o) -> None:
         super(PermObj, self).__init__(o)
-        self.permittivity = gAt(o.permittivity, 2.5)
+        self.permittivity = gAt(o.permittivity, 1)
 class RectObj(PermObj):
     def __init__(self, o) -> None:
         super(RectObj, self).__init__(o)
@@ -379,15 +380,16 @@ elementMapping = {
 def stepGrid(grid):
     grid.step()
     vv = io.BytesIO()
-    plt.imsave(vv, bd.numpy(bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]).transpose(), cmap="Blues", format='png')
+    grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]
+    plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap="Blues", format='png', vmin=1e-4, vmax=100)#TODO
     vv.seek(0)
     return base64.b64encode(vv.read())
 
 def processJson(o):
     WAVELENGTH = gAt(o.wavelength, 1550e-9)
     xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
-    resolution = gAt(o.resolution, 10)
-    frameCount = gAt(o.frameCount, 15)
+    resolution = gAt(o.resolution, 15)
+    frameCount = gAt(o.frameCount, 100)
 
     elements = []
     for obj in o.rectangles+o.circles:
@@ -396,8 +398,8 @@ def processJson(o):
     grid = fdtd.Grid(
         (o.xBounds, o.yBounds, ZMAX),#(2.5e-5, 1.5e-5, 1),
         grid_spacing=WAVELENGTH/resolution,
-        permittivity=1.0,
-        permeability=1.0,
+        permittivity=5,
+        permeability=1,
     )
     
     #grid[0, :, :] = fdtd.PeriodicBoundary(name="xbounds")
@@ -411,7 +413,7 @@ def processJson(o):
 
     for i in elements: i.addFdtd(grid)
     #grid.step()
-    grid.run(1, progress_bar=False)
+    grid.run(30, progress_bar=False)
 
     plt.autoscale() 
     fig, img = visualize(grid, z=0)
