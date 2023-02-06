@@ -33,8 +33,8 @@ export default {
           alt="point lightsource" src="/playground_assets/light.png" />
       </div>
       <div class="action-buttons">
-        <button class="run-button" @click="this.$refs.result.getFigure()"
-          title="Start simulation">▶&#xFE0E;LAUNCH</button>
+        <button class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▶&#xFE0E;
+          LAUNCH</button>
       </div>
     </div>
     <splitpanes id="splitpanes"
@@ -58,10 +58,20 @@ export default {
 </template>
 
 <style>
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  margin: 0;
+  position: relative;
+  font-weight: normal;
+}
+
 body {
   margin: 0;
   padding: 0;
   color: #2c3e50;
+  line-height: 1.6;
 }
 
 .editor-canvas-container {
