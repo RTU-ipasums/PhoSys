@@ -9,13 +9,13 @@ export default {
   components: {
     Draw,
     Result,
-    Splitpanes, 
+    Splitpanes,
     Properties,
     Pane
   },
-  methods:{
-    getShape(){
-      if(this.$refs.draw) return this.$refs.draw.selectedShapeObject;
+  methods: {
+    getShape() {
+      if (this.$refs.draw) return this.$refs.draw.selectedShapeObject;
       return '';
     }
   }
@@ -26,22 +26,26 @@ export default {
   <div class="u-i-container">
     <div class="grid-item top-bar">
       <div class="tool-buttons">
-        <img class="bar-button" title="Open from file" alt="open" src="/playground_assets/folder1232-10tn-200w.png"/>
-        <img class="bar-button" @click="this.$refs.draw.addRect()" title="Add object" alt="object" src="/playground_assets/newpiskel1107-1uh4-200h.png"/>
-        <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource" alt="point lightsource" src="/playground_assets/newpiskel2196-3eug-200h.png"/>
+        <img class="bar-button" title="Open from file" alt="open" src="/playground_assets/folder.png" />
+        <img class="bar-button" @click="this.$refs.draw.addRect()" title="Add object" alt="object"
+          src="/playground_assets/object.png" />
+        <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource"
+          alt="point lightsource" src="/playground_assets/light.png" />
       </div>
       <div class="action-buttons">
-        <button class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
+        <button class="run-button" @click="this.$refs.result.getFigure()"
+          title="Start simulation">▶&#xFE0E;LAUNCH</button>
       </div>
     </div>
-    <splitpanes id="splitpanes" @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
+    <splitpanes id="splitpanes"
+      @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
       <pane size="20" class="properties grid-item">
-        <Properties :selectedShape="this.getShape()"/>
+        <Properties :selectedShape="this.getShape()" />
       </pane>
       <pane>
         <div class="editor-canvas-container">
           <div class="grid-item editor" id="editor" ref="flexeditor">
-            <Draw ref="draw"/>
+            <Draw ref="draw" />
           </div>
           <div class="grid-item canvas" id="canvas">
             <Result ref="result" />
@@ -54,20 +58,23 @@ export default {
 </template>
 
 <style>
-.editor-canvas-container{
-  display:flex;
-  width:100%;
-  gap:6px;
-  height:100%;
+.editor-canvas-container {
+  display: flex;
+  width: 100%;
+  gap: 6px;
+  height: 100%;
 }
-.grid-item{
+
+.grid-item {
   background-color: rgba(255, 255, 255, 1);
 }
-.editor-canvas-container > *{
-  flex:1;
-  height:100%;
-  width:0;
+
+.editor-canvas-container>* {
+  flex: 1;
+  height: 100%;
+  width: 0;
 }
+
 .u-i-container {
   height: 100vh;
   width: 100vw;
@@ -99,7 +106,7 @@ export default {
   flex-direction: row;
   position: relative;
   padding-right: 10px;
-  gap:10px;
+  gap: 10px;
 }
 
 .action-buttons {
@@ -129,25 +136,31 @@ export default {
   justify-content: center;
   align-items: center;
   background-color: #7dff71;
-  border:4px solid #21d211;
+  border: 4px solid #21d211;
 }
-.run-button:hover{
+
+.run-button:hover {
   background-color: #57ef49;
   border-color: #20b512;
 }
-.run-button:active{
+
+.run-button:active {
   background-color: #20b512;
-  border-color:#158e09;
+  border-color: #158e09;
 }
-.run-button:focus{
-  border:4px solid #21d211;
+
+.run-button:focus {
+  border: 4px solid #21d211;
 }
-*{
+
+* {
   font-family: Helvetica, Arial;
 }
-#splitpanes{
-  overflow:auto;
+
+#splitpanes {
+  overflow: auto;
 }
+
 .splitpanes__splitter {
   min-width: 6px !important;
   background: rgba(167, 161, 161, 1);
