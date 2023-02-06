@@ -6,7 +6,7 @@ export default {
     return {
       currentShapeId: 0,
       data,
-      selectedShapeName: '',
+      selectedShapeObject:null,
       lastCenter:null,
       lastDist:0,
       stageConfig:{
@@ -115,35 +115,30 @@ export default {
       stage.batchDraw();
     },
     handleDragend(e) {
-      this.data.rectangles.forEach(r => {
-        if(r.name === this.selectedShapeName){
-          this.globalTransform(()=>{
-            r.x = e.target.x();
-            r.y = e.target.y();
+      if(!this.selectedShapeObject)return;
+      if(this.selectedShapeObject.name.split('_')[0]==="object"){
+        this.globalTransform(()=>{
+          this.selectedShapeObject.x = e.target.x();
+          this.selectedShapeObject.y = e.target.y();
+        })
+      }
+      else if(this.selectedShapeObject.name.split('_')[0]==="pointsource"){
+        this.globalTransform(()=>{
+            this.selectedShapeObject.x = e.target.x()+this.selectedShapeObject.radius*this.selectedShapeObject.scaleX;
+            this.selectedShapeObject.y = e.target.y()+this.selectedShapeObject.radius*this.selectedShapeObject.scaleY;
           })
-        }
-      });
-      this.data.circles.forEach(r => {
-        if(r.name === this.selectedShapeName){
-          this.globalTransform(()=>{
-            r.x = e.target.x()+r.radius*r.scaleX;
-            r.y = e.target.y()+r.radius*r.scaleY;
-          })
-        }
-      });
+      }
     },
     handleTransformEnd(e) {
-      this.data.rectangles.concat(this.data.circles).forEach(r => {
-        if(r.name === this.selectedShapeName){
-          r.scaleX = e.target.scaleX();
-          r.scaleY = e.target.scaleY();
-        }
-      });
+      if(this.selectedShapeObject){
+        this.selectedShapeObject.scaleX = e.target.scaleX();
+        this.selectedShapeObject.scaleY = e.target.scaleY();
+      }
     },
     handleStageMouseDown(e) {
       // clicked on stage - clear selection
       if (e.target === e.target.getStage()) {
-        this.selectedShapeName = '';
+        this.selectedShapeObject='';
         this.updateTransformer();
         return;
       }
@@ -153,23 +148,18 @@ export default {
       if (clickedOnTransformer) {
         return;
       }
-      // find clicked rect by its name
+      // find clicked object by its name
       const name = e.target.name();
-      const rect = this.data.rectangles.concat(this.data.circles).find((r) => r.name === name);
-      if (rect) {
-        this.selectedShapeName = name;
-      } else {
-        this.selectedShapeName = '';
-      }
+      this.selectedShapeObject=this.data.rectangles.concat(this.data.circles).find((r) => r.name === name);;
       this.updateTransformer();
     },
     updateTransformer() {
       // here we need to manually attach or detach Transformer node
       const transformerNode = this.$refs.transformer.getNode();
       const stage = transformerNode.getStage();
-      const { selectedShapeName } = this;
-
-      const selectedNode = stage.findOne('.' + selectedShapeName);
+      let name='';
+      if(this.selectedShapeObject)name=this.selectedShapeObject.name;
+      const selectedNode = stage.findOne('.' + name);
       // do nothing if selected node is already attached
       if (selectedNode === transformerNode.node()) {
         return;
@@ -214,13 +204,8 @@ export default {
       })
     },
     deleteShape(){
-      this.data.rectangles = this.data.rectangles.filter((r) => {
-          return r.name !== this.selectedShapeName;
-      });
-      this.data.circles = this.data.circles.filter((r) => {
-          return r.name !== this.selectedShapeName;
-      });
-      this.selectedShapeName = '';
+      delete this.selectedShapeObject
+      this.selectedShapeObject = null;
       this.updateTransformer();
     },
     updateSize(x, y){
