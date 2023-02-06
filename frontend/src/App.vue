@@ -14,8 +14,8 @@ export default {
     Pane
   },
   methods:{
-    getShapeName(){
-      if(this.$refs.draw) return this.$refs.draw.selectedShapeName;
+    getShape(){
+      if(this.$refs.draw) return this.$refs.draw.selectedShapeObject;
       return '';
     }
   }
@@ -36,7 +36,7 @@ export default {
     </div>
     <splitpanes id="splitpanes" @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
       <pane size="20" class="properties grid-item">
-        <Properties :selectedShape="this.getShapeName()"/>
+        <Properties :selectedShape="this.getShape()"/>
       </pane>
       <pane>
         <div class="editor-canvas-container">

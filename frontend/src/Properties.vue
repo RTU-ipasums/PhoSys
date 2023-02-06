@@ -35,9 +35,8 @@ export default {
     props: ['selectedShape'],
     computed:{
         getRelevantProperties(){
-            let name=this.selectedShape;
-            if(name==='')name="global";
-            else name=name.split('_')[0];
+            let name="global";
+            if(this.selectedShape)name=this.selectedShape.name.split('_')[0];
             return this.properties[`${name}`];
         }
     }
