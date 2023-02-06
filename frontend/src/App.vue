@@ -6,13 +6,18 @@ import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 
 export default {
-  name: 'UI',
   components: {
     Draw,
     Result,
     Splitpanes, 
     Properties,
     Pane
+  },
+  methods:{
+    getShapeName(){
+      if(this.$refs.draw) return this.$refs.draw.selectedShapeName;
+      return '';
+    }
   }
 }
 </script>
@@ -31,7 +36,7 @@ export default {
     </div>
     <splitpanes id="splitpanes" @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
       <pane size="20" class="properties grid-item">
-        <Properties/>
+        <Properties :selectedShape="this.getShapeName()"/>
       </pane>
       <pane>
         <div class="editor-canvas-container">
