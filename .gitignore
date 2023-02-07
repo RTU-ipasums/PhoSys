@@ -1,3 +1,8 @@
 *.key
 *.crt
 *.pem
+
+flask_session/
+__pycache__/
+*.pyc
+logs/

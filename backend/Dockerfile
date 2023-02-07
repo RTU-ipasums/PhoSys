@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir --upgrade pip \
   && pip install --no-cache-dir -r requirements.txt
 
 RUN pip3 install uwsgi
+#RUN rm -rf .[^.]* ..?*
 COPY . .
 COPY uwsgi.ini /etc/uwsgi/
 

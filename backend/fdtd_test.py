@@ -1,10 +1,16 @@
+from unicodedata import name
 import matplotlib as mpl
+from matplotlib.colors import FuncNorm
 mpl.use('svg')  # or whatever other backend that you want
 import matplotlib.pyplot as plt
+from main import session
 
-import fdtd
+import fdtd, sys
 import mpld3
+from mpld3 import plugins, utils
 import fdtd.backend as bd
+from flask_socketio import SocketIO, send, emit
+import io, base64
 
 ZMAX = 1
 
@@ -13,6 +19,13 @@ fdtd.set_backend("numpy")
 
 WAVELENGTH = 1550e-9
 SPEED_LIGHT: float = 299_792_458.0
+
+def gAt(inpt, default:str):
+    return str(inpt) if inpt else default
+def gAt(inpt, default:int):
+    return int(inpt) if inpt else default
+def gAt(inpt, default:float):
+    return float(inpt) if inpt else default
 
 def visualize(
     grid,
@@ -108,7 +121,7 @@ def visualize(
     plt.plot([], lw=7, color=objcolor, label="Objects")
     plt.plot([], lw=7, color=pmlcolor, label="PML")
     plt.plot([], lw=3, color=pbcolor, label="Periodic Boundaries")
-    plt.plot([], lw=3, color=srccolor, label="Sources")
+    #plt.plot([], lw=3, color=srccolor, label="Sources") #temp
     plt.plot([], lw=3, color=detcolor, label="Detectors")
 
     # Grid energy
@@ -136,7 +149,7 @@ def visualize(
         grid_energy = grid_energy[:, :, z]
     else:
         raise ValueError("Visualization only works for 2D grids")
-
+    
     for source in grid.sources:
         if isinstance(source, LineSource):
             if x is not None:
@@ -148,7 +161,7 @@ def visualize(
             elif z is not None:
                 _x = [source.x[0], source.x[-1]]
                 _y = [source.y[0], source.y[-1]]
-            plt.plot(_y, _x, lw=3, color=srccolor)
+            plt.plot(_x, _y, lw=1, color=srccolor)
         elif isinstance(source, PointSource):
             if x is not None:
                 _x = source.y
@@ -159,7 +172,7 @@ def visualize(
             elif z is not None:
                 _x = source.x
                 _y = source.y
-            plt.plot(_y - 0.5, _x - 0.5, lw=3, marker="o", color=srccolor)
+            plt.plot(_x - 0.5, _y - 0.5, lw=1, marker="o", color=srccolor)
             grid_energy[_x, _y] = 0  # do not visualize energy at location of source
         elif isinstance(source, PlaneSource):
             if x is not None:
@@ -196,15 +209,15 @@ def visualize(
                     else slice(source.y.start, source.y.start)
                 )
             patch = ptc.Rectangle(
-                xy=(_y.start - 0.5, _x.start - 0.5),
-                width=_y.stop - _y.start,
-                height=_x.stop - _x.start,
+                xy=(_x.start - 0.5, _y.start - 0.5),
+                width=_x.stop - _x.start,
+                height=_y.stop - _y.start,
                 linewidth=0,
                 edgecolor="none",
                 facecolor=srccolor,
             )
             plt.gca().add_patch(patch)
-
+    
     # Detector
     for detector in grid.detectors:
         if x is not None:
@@ -220,30 +233,30 @@ def visualize(
         if detector.__class__.__name__ == "BlockDetector":
             # BlockDetector
             plt.plot(
-                [_y[0], _y[1], _y[1], _y[0], _y[0]],
                 [_x[0], _x[0], _x[1], _x[1], _x[0]],
+                [_y[0], _y[1], _y[1], _y[0], _y[0]],
                 lw=3,
                 color=detcolor,
             )
         else:
             # LineDetector
-            plt.plot(_y, _x, lw=3, color=detcolor)
+            plt.plot(_x, _y, lw=3, color=detcolor)
 
     # Boundaries
     for boundary in grid.boundaries:
         if isinstance(boundary, pbx):
             _x = [-0.5, -0.5, float("nan"), Nx - 0.5, Nx - 0.5]
             _y = [-0.5, Ny - 0.5, float("nan"), -0.5, Ny - 0.5]
-            plt.plot(_y, _x, color=pbcolor, linewidth=3)
+            plt.plot(_x, _y, color=pbcolor, linewidth=3)
         elif isinstance(boundary, pby):
             _x = [-0.5, Nx - 0.5, float("nan"), -0.5, Nx - 0.5]
             _y = [-0.5, -0.5, float("nan"), Ny - 0.5, Ny - 0.5]
-            plt.plot(_y, _x, color=pbcolor, linewidth=3)
+            plt.plot(_x, _y, color=pbcolor, linewidth=3)
         elif isinstance(boundary, pmlyl):
             patch = ptc.Rectangle(
                 xy=(-0.5, -0.5),
                 width=boundary.thickness,
-                height=Nx,
+                height=Ny,
                 linewidth=0,
                 edgecolor="none",
                 facecolor=pmlcolor,
@@ -252,7 +265,7 @@ def visualize(
         elif isinstance(boundary, pmlxl):
             patch = ptc.Rectangle(
                 xy=(-0.5, -0.5),
-                width=Ny,
+                width=Nx,
                 height=boundary.thickness,
                 linewidth=0,
                 edgecolor="none",
@@ -261,9 +274,9 @@ def visualize(
             plt.gca().add_patch(patch)
         elif isinstance(boundary, pmlyh):
             patch = ptc.Rectangle(
-                xy=(Ny - 0.5 - boundary.thickness, -0.5),
+                xy=(Nx - 0.5 - boundary.thickness, -0.5),
                 width=boundary.thickness,
-                height=Nx,
+                height=Ny,
                 linewidth=0,
                 edgecolor="none",
                 facecolor=pmlcolor,
@@ -271,8 +284,8 @@ def visualize(
             plt.gca().add_patch(patch)
         elif isinstance(boundary, pmlxh):
             patch = ptc.Rectangle(
-                xy=(-0.5, Nx - boundary.thickness - 0.5),
-                width=Ny,
+                xy=(-0.5, Ny - boundary.thickness - 0.5),
+                width=Nx,
                 height=boundary.thickness,
                 linewidth=0,
                 edgecolor="none",
@@ -292,9 +305,9 @@ def visualize(
             _y = (obj.y.start, obj.y.stop)
 
         patch = ptc.Rectangle(
-            xy=(min(_y) - 0.5, min(_x) - 0.5),
-            width=max(_y) - min(_y),
-            height=max(_x) - min(_x),
+            xy=(min(_x) - 0.5, min(_y) - 0.5),
+            width=max(_x) - min(_x),
+            height=max(_y) - min(_y),
             linewidth=0,
             edgecolor="none",
             facecolor=objcolor,
@@ -305,33 +318,88 @@ def visualize(
     cmap_norm = None
     if norm == "log":
         cmap_norm = LogNorm(vmin=1e-4, vmax=grid_energy.max() + 1e-4)
-    plt.imshow(bd.numpy(grid_energy), cmap=cmap, interpolation="sinc", norm=cmap_norm)
+    img = plt.imshow(bd.numpy(grid_energy).transpose(), cmap=cmap, interpolation="sinc", norm=cmap_norm)
 
     # finalize the plot
-    plt.ylabel(xlabel)
-    plt.xlabel(ylabel)
-    plt.ylim(Nx, -1)
-    plt.xlim(-1, Ny)
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
+    plt.ylim(Ny, -1)
+    plt.xlim(-1, Nx)
     plt.figlegend()
     plt.tight_layout()
 
-    return plt.gcf()
+    return plt.gcf(), img
 
-def processJson(inJson):
-    try:
-        WAVELENGTH = inJson['wavelength']
-    except KeyError:
-        WAVELENGTH = 1550e-9
-    try:
-        xOut, yOut = inJson['xOut'], inJson['yOut']
-    except KeyError:
-        xOut, yOut = 500, 500
+class AnimView(plugins.PluginBase):
+    def __init__(self, img):
+        self.dict_ = {"type": "animview",
+                      "idimg": utils.get_id(img)}
+
+class CanvasEl:
+    def __init__(self, o) -> None:
+        self.name = o.name
+
+class PermObj(CanvasEl):
+    def __init__(self, o) -> None:
+        super(PermObj, self).__init__(o)
+        self.permittivity = gAt(o.permittivity, 1)
+class RectObj(PermObj):
+    def __init__(self, o) -> None:
+        super(RectObj, self).__init__(o)
+        self.x1 = o.x
+        self.y1 = o.y
+        self.x2 = o.x+o.scaleX*o.width
+        self.y2 = o.y+o.scaleY*o.height
+    def addFdtd(self, grid):
+        grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=self.permittivity, name=self.name)
+
+class Linesource(CanvasEl):
+    def __init__(self, o) -> None:
+        super(Linesource, self).__init__(o)
+        self.x1 = o.points[0]
+        self.y1 = o.points[1]
+        self.x2 = o.points[2]
+        self.y2 = o.points[3]
+    def addFdtd(self, grid):
+        grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.LineSource(period=WAVELENGTH / SPEED_LIGHT, name=self.name)
+class Pointsource(CanvasEl):
+    def __init__(self, o) -> None:
+        super(Pointsource, self).__init__(o)
+        self.x = o.x
+        self.y = o.y
+        self.amplitude = gAt(o.amplitude, 10.0)
+    def addFdtd(self, grid):
+        grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=WAVELENGTH / SPEED_LIGHT, amplitude=self.amplitude, name=self.name)
+
+elementMapping = {
+    'object':RectObj,
+    'linesource':Linesource,
+    'pointsource':Pointsource
+}
+
+def stepGrid(grid):
+    grid.step()
+    vv = io.BytesIO()
+    grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]
+    plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap="Blues", format='png', vmin=1e-4, vmax=100)#TODO
+    vv.seek(0)
+    return base64.b64encode(vv.read())
+
+def processJson(o):
+    WAVELENGTH = gAt(o.wavelength, 1550e-9)
+    xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
+    resolution = gAt(o.resolution, 15)
+    frameCount = gAt(o.frameCount, 100)
+
+    elements = []
+    for obj in o.rectangles+o.circles:
+        elements.append( elementMapping[obj.name.split('_')[0]](obj) )
 
     grid = fdtd.Grid(
-        (inJson['xBounds'], inJson['yBounds'], ZMAX),#(2.5e-5, 1.5e-5, 1),
-        grid_spacing=0.1 * WAVELENGTH,
-        permittivity=1.0,
-        permeability=1.0,
+        (o.xBounds, o.yBounds, ZMAX),#(2.5e-5, 1.5e-5, 1),
+        grid_spacing=WAVELENGTH/resolution,
+        permittivity=5,
+        permeability=1,
     )
     
     #grid[0, :, :] = fdtd.PeriodicBoundary(name="xbounds")
@@ -343,26 +411,27 @@ def processJson(inJson):
     #rid[:, -50:, :] = fdtd.PML(name="pml_yhigh")
     grid[:, :, 0] = fdtd.PeriodicBoundary(name="zbounds")
 
-    for obj in inJson['rectangles']+inJson['circles']:
-        match obj['name'].split('_')[0]:
-            case 'object':
-                grid[int(obj['x']):int(obj['x'])+int(obj['scaleX']*obj['width']), int(obj['y']):int(obj['y']+obj['scaleY']*obj['height']), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=2.5, name=obj['name'])
-            case 'linesource':
-                grid[int(obj['points'][0]):int(obj['points'][2]), int(obj['points'][1]):int(obj['points'][3]), 0] = fdtd.LineSource(period=WAVELENGTH / SPEED_LIGHT, name=obj['name'])
-            case 'pointsource':
-                grid[int(obj['x']), int(obj['y']), 0] = fdtd.PointSource(period=WAVELENGTH / SPEED_LIGHT, amplitude=10.0, name=obj['name'])
+    for i in elements: i.addFdtd(grid)
+    #grid.step()
+    grid.run(30, progress_bar=False)
 
-
-    grid.run(50, progress_bar=False)
-    
     plt.autoscale() 
-    fig = visualize(grid, z=0)
+    fig, img = visualize(grid, z=0)
+
+    #Thread(target=stepGrid, args=[grid, 30]).start()
+    #stepGrid(grid, 30)
+
+    session['grid'] = grid
     figSize = fig.get_size_inches()*fig.dpi
-    fig.set_figwidth(inJson['xBounds']/figSize[0]*fig.get_size_inches()[0])
-    fig.set_figheight(inJson['yBounds']/figSize[1]*fig.get_size_inches()[1])
+    fig.set_figwidth(o.xBounds/figSize[0]*fig.get_size_inches()[0])
+    fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
 
-
-    return mpld3.fig_to_dict(fig)
+    plugins.clear(fig)
+    plugins.connect(fig, plugins.Zoom(button=False), AnimView(img))
+    outJson = mpld3.fig_to_dict(fig)
+    fig.clear()
+    plt.close()
+    return outJson, grid, frameCount-1
 
 def test_fdtd():
 
@@ -394,7 +463,7 @@ def test_fdtd():
 
     grid[12e-6, :, 0] = fdtd.LineDetector(name="detector")
 
-    grid.run(50, progress_bar=False)
+    grid.run(10, progress_bar=False)
 
     '''fig, axes = plt.subplots(2, 3, squeeze=False)
     titles = ["Ex: xy", "Ey: xy", "Ez: xy", "Hx: xy", "Hy: xy", "Hz: xy"]
