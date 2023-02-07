@@ -1,16 +1,23 @@
 <script>
 import Draw from './Draw.vue'
 import Result from './Result.vue'
+import Properties from './Properties.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 
 export default {
-  name: 'UI',
   components: {
     Draw,
     Result,
-    Splitpanes, 
+    Splitpanes,
+    Properties,
     Pane
+  },
+  methods: {
+    getShape() {
+      if (this.$refs.draw) return this.$refs.draw.selectedShapeObject;
+      return '';
+    }
   }
 }
 </script>
@@ -19,23 +26,26 @@ export default {
   <div class="u-i-container">
     <div class="grid-item top-bar">
       <div class="tool-buttons">
-        <img class="bar-button" title="Open from file" alt="open" src="/playground_assets/folder1232-10tn-200w.png"/>
-        <img class="bar-button" @click="this.$refs.draw.addRect()" title="Add object" alt="object" src="/playground_assets/newpiskel1107-1uh4-200h.png"/>
-        <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource" alt="point lightsource" src="/playground_assets/newpiskel2196-3eug-200h.png"/>
+        <img class="bar-button" title="Open from file" alt="open" src="/playground_assets/folder.png" />
+        <img class="bar-button" @click="this.$refs.draw.addRect()" title="Add object" alt="object"
+          src="/playground_assets/object.png" />
+        <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource"
+          alt="point lightsource" src="/playground_assets/light.png" />
       </div>
       <div class="action-buttons">
         <button class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
         <input @input="event => this.$refs.result.frames.frameIdx = event.target.value"/>
       </div>
     </div>
-    <splitpanes id="splitpanes" @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
-      <pane size="0" class="properties grid-item">
-        <h1>Properties</h1>
+    <splitpanes id="splitpanes"
+      @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
+      <pane size="20" class="properties grid-item">
+        <Properties :selectedShape="this.getShape()" />
       </pane>
       <pane>
         <div class="editor-canvas-container">
           <div class="grid-item editor" id="editor" ref="flexeditor">
-            <Draw ref="draw"/>
+            <Draw ref="draw" />
           </div>
           <div class="grid-item canvas" id="canvas">
             <Result ref="result" />
@@ -48,20 +58,39 @@ export default {
 </template>
 
 <style>
-.editor-canvas-container{
-  display:flex;
-  width:100%;
-  gap:6px;
-  height:100%;
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  margin: 0;
+  position: relative;
+  font-weight: normal;
 }
-.grid-item{
+
+body {
+  margin: 0;
+  padding: 0;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+.editor-canvas-container {
+  display: flex;
+  width: 100%;
+  gap: 6px;
+  height: 100%;
+}
+
+.grid-item {
   background-color: rgba(255, 255, 255, 1);
 }
-.editor-canvas-container > *{
-  flex:1;
-  height:100%;
-  width:0;
+
+.editor-canvas-container>* {
+  flex: 1;
+  height: 100%;
+  width: 0;
 }
+
 .u-i-container {
   height: 100vh;
   width: 100vw;
@@ -74,10 +103,11 @@ export default {
 .properties {
 
   text-align: center;
-  padding: 20px 0;
+  padding: 10px 20px;
 }
 
 .top-bar {
+  height: 50px;
   padding: 5px;
   display: flex;
   flex-direction: row;
@@ -91,8 +121,8 @@ export default {
   display: flex;
   flex-direction: row;
   position: relative;
-  height: 100%;
   padding-right: 10px;
+  gap: 10px;
 }
 
 .action-buttons {
@@ -103,46 +133,50 @@ export default {
   align-items: center;
   position: relative;
   height: 100%;
-  padding-right: 10px;
 }
 
 .bar-button {
   cursor: pointer;
-  padding: 10px;
   max-height: 100%;
   max-width: 100%;
 }
 
 .run-button {
+  max-height: 100%;
   cursor: pointer;
   font-weight: bold;
   padding: 10px;
-  font-size: 3em;
+  font-size: 1em;
   border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #7dff71;
-  outline:4px solid #21d211;
-  border:none;
+  border: 4px solid #21d211;
 }
-.run-button:hover{
+
+.run-button:hover {
   background-color: #57ef49;
-  outline-color: #20b512;
+  border-color: #20b512;
 }
-.run-button:active{
+
+.run-button:active {
   background-color: #20b512;
-  outline-color:#158e09;
+  border-color: #158e09;
 }
-.run-button:focus{
-  outline:4px solid #21d211;
+
+.run-button:focus {
+  border: 4px solid #21d211;
 }
-*{
+
+* {
   font-family: Helvetica, Arial;
 }
-#splitpanes{
-  overflow:auto;
+
+#splitpanes {
+  overflow: auto;
 }
+
 .splitpanes__splitter {
   min-width: 6px !important;
   background: rgba(167, 161, 161, 1);

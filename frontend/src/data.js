@@ -6,16 +6,17 @@ export const data = reactive({
     rectangles: [
         // {
         //   rotation: 0,
-        //   x: 10,
+        //   x: 5,
         //   y: 10,
         //   width: 100,
-        //   height: 100,
+        //   height: 150,
         //   scaleX: 1,
-        //   scaleY: 1,
+        //   scaleY: 2,
         //   fill: 'red',
         //   name: 'object_1',
         //   draggable: true,
         // }
+        
       ],
       circles:[
         // {

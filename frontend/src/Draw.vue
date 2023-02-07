@@ -1,45 +1,144 @@
 <script>
 import {data} from './data.js'
-
+import {getCenter,getDistance,isTouchEnabled,scaleBy} from './util.js'
 export default {
   data() {
     return {
       currentShapeId: 0,
       data,
-      selectedShapeName: '',
-      Shapes: {
-        Rectangle: 0,
-        Circle: 1
+      selectedShapeObject:null,
+      lastCenter:null,
+      lastDist:0,
+      stageConfig:{
+        draggable:!isTouchEnabled()
       }
     };
   },
   methods: {
+    
+    globalTransform(func){
+      let stage=this.$refs.transformer.getNode().getStage();
+      let a = stage.position();
+      let b = stage.scale();
+      stage.scale({x:1,y:1});
+      stage.position({x:0,y:0});
+      func()
+      stage.scale(b);
+      stage.position(a);
+    },
+    //mobile
+    handleTouch(e){
+      e.evt.preventDefault();
+      var touch1 = e.evt.touches[0];
+      var touch2 = e.evt.touches[1];
+      const stage = this.$refs.transformer.getNode().getStage();
+      if (stage == null) {
+        return;
+      }
+      if (touch1 && touch2) {
+        if (stage.isDragging()) {
+          stage.stopDrag();
+        }
+  
+        var p1 = {
+          x: touch1.clientX,
+          y: touch1.clientY
+        };
+        var p2 = {
+          x: touch2.clientX,
+          y: touch2.clientY
+        };
+  
+        if (!this.lastCenter) {
+          this.lastCenter = getCenter(p1, p2);
+          return;
+        }
+        var newCenter = getCenter(p1, p2);
+  
+        var dist = getDistance(p1, p2);
+  
+        if (!this.lastDist) {
+          this.lastDist = dist;
+        }
+  
+        // local coordinates of center point
+        var pointTo = {
+          x: (newCenter.x - stage.x()) / stage.scaleX(),
+          y: (newCenter.y - stage.y()) / stage.scaleX()
+        };
+  
+        var scale = stage.scaleX() * (dist / this.lastDist);
+  
+        stage.scaleX(scale);
+        stage.scaleY(scale);
+  
+        // calculate new position of the stage
+        var dx = newCenter.x - this.lastCenter.x;
+        var dy = newCenter.y - this.lastCenter.y;
+  
+        var newPos = {
+          x: newCenter.x - pointTo.x * scale + dx,
+          y: newCenter.y - pointTo.y * scale + dy
+        };
+  
+        stage.position(newPos);
+        stage.batchDraw();
+  
+        this.lastDist = dist;
+        this.lastCenter = newCenter;
+      }
+    },
+    handleTouchEnd(e){
+      this.lastCenter = null;
+      this.lastDist = 0;
+    },
+    zoomStage(event) {
+      event.evt.preventDefault();
+      const stage = this.$refs.transformer.getNode().getStage();
+      if (stage == null) {
+        return;
+      }
+      
+      const oldScale = stage.scaleX();
+      const { x: pointerX, y: pointerY } = stage.getPointerPosition();
+      const mousePointTo = {
+        x: (pointerX - stage.x()) / oldScale,
+        y: (pointerY - stage.y()) / oldScale,
+      };
+      const newScale = event.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
+      stage.scale({ x: newScale, y: newScale });
+      const newPos = {
+        x: pointerX - mousePointTo.x * newScale,
+        y: pointerY - mousePointTo.y * newScale,
+      }
+      stage.position(newPos);
+      stage.batchDraw();
+    },
     handleDragend(e) {
-      this.data.rectangles.forEach(r => {
-        if(r.name === this.selectedShapeName){
-          r.x = e.target.x();
-          r.y = e.target.y();
-        }
-      });
-      this.data.circles.forEach(r => {
-        if(r.name === this.selectedShapeName){
-          r.x = e.target.x()+r.radius*r.scaleX;
-          r.y = e.target.y()+r.radius*r.scaleY;
-        }
-      });
+      if(!this.selectedShapeObject)return;
+      if(this.selectedShapeObject.name.split('_')[0]==="object"){
+        this.globalTransform(()=>{
+          this.selectedShapeObject.x = e.target.x();
+          this.selectedShapeObject.y = e.target.y();
+        })
+      }
+      else if(this.selectedShapeObject.name.split('_')[0]==="pointsource"){
+        this.globalTransform(()=>{
+            this.selectedShapeObject.x = e.target.x()+this.selectedShapeObject.radius*this.selectedShapeObject.scaleX;
+            this.selectedShapeObject.y = e.target.y()+this.selectedShapeObject.radius*this.selectedShapeObject.scaleY;
+          })
+      }
     },
     handleTransformEnd(e) {
-      this.data.rectangles.concat(this.data.circles).forEach(r => {
-        if(r.name === this.selectedShapeName){
-          r.scaleX = e.target.scaleX();
-          r.scaleY = e.target.scaleY();
-        }
-      });
+      if(this.selectedShapeObject){
+        this.selectedShapeObject.scaleX = e.target.scaleX();
+        this.selectedShapeObject.scaleY = e.target.scaleY();
+      }
     },
     handleStageMouseDown(e) {
       // clicked on stage - clear selection
       if (e.target === e.target.getStage()) {
-        this.selectedShapeName = '';
+        this.selectedShapeObject='';
         this.updateTransformer();
         return;
       }
@@ -49,23 +148,18 @@ export default {
       if (clickedOnTransformer) {
         return;
       }
-      // find clicked rect by its name
+      // find clicked object by its name
       const name = e.target.name();
-      const rect = this.data.rectangles.concat(this.data.circles).find((r) => r.name === name);
-      if (rect) {
-        this.selectedShapeName = name;
-      } else {
-        this.selectedShapeName = '';
-      }
+      this.selectedShapeObject=this.data.rectangles.concat(this.data.circles).find((r) => r.name === name);;
       this.updateTransformer();
     },
     updateTransformer() {
       // here we need to manually attach or detach Transformer node
       const transformerNode = this.$refs.transformer.getNode();
       const stage = transformerNode.getStage();
-      const { selectedShapeName } = this;
-
-      const selectedNode = stage.findOne('.' + selectedShapeName);
+      let name='';
+      if(this.selectedShapeObject)name=this.selectedShapeObject.name;
+      const selectedNode = stage.findOne('.' + name);
       // do nothing if selected node is already attached
       if (selectedNode === transformerNode.node()) {
         return;
@@ -95,7 +189,6 @@ export default {
       })
     },
     addCircle(){
-      
       this.currentShapeId++;
       this.data.circles.push({
         rotation: 0,
@@ -111,25 +204,21 @@ export default {
       })
     },
     deleteShape(){
-      this.data.rectangles = this.data.rectangles.filter((r) => {
-          return r.name !== this.selectedShapeName;
-      });
-      this.data.circles = this.data.circles.filter((r) => {
-          return r.name !== this.selectedShapeName;
-      });
-      this.selectedShapeName = '';
+      delete this.selectedShapeObject
+      this.selectedShapeObject = null;
       this.updateTransformer();
     },
     updateSize(x, y){
       let stage = this.$refs.transformer.getNode().getStage();
       stage.width(x);
       stage.height(y);
-
-      this.data.xBounds=x;
-      this.data.yBounds=y;
     }
   },
   mounted() {
+    //todo fix hard coded size
+    // todo limit shape dragging to simulation canvas
+    this.data.xBounds=500;
+    this.data.yBounds=500;
     this.updateSize(document.querySelector('#splitpanes').offsetWidth, document.querySelector('#splitpanes').offsetHeight);
     window.addEventListener('keydown', e=>{
       const key = e.key;
@@ -140,23 +229,29 @@ export default {
   }
 };
 </script>
-
-<style>
-body {
-  margin: 0;
-  padding: 0;
-}
-</style>
 <template>
   <!-- export addrect, import RECT ARRAY from other files -->
   <div>
     <v-stage
       ref="stage"
+      :config="stageConfig"
       @mousedown="handleStageMouseDown"
       @touchstart="handleStageMouseDown"
       @dragend="handleDragend"
+      @touchmove="handleTouch"
+      @touchend="handleTouchEnd"
+      @wheel="zoomStage"
     >
       <v-layer ref="layer">
+        <v-rect :config="{
+          x: 0,
+          y: 0,
+          width: 500,
+          height: 500,
+          opacity: 0.1,
+          fill: 'gray'
+        }"
+        />
         <v-rect
           v-for="item in data.rectangles"
           :key="item.id"
