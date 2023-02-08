@@ -34,6 +34,9 @@ services:
       - "8800:80"
       - "4433:443"
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    environment:
+      - SERVER_DOMAIN=phosys.ovh
+      - FRONTEND_URL=https://phosys.pages.dev
 
   certbot:
     image: certbot/certbot

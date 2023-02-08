@@ -6,7 +6,13 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=($1)#(phosys.ovh www.phosys.ovh api.phosys.ovh www.api.phosys.ovh)
+if [ "$1" = "" ]
+then
+  echo "Usage: $0 example.org"
+  exit
+fi
+
+domains=("$1" "www.$1" "api.$1" "www.api.$1")
 rsa_key_size=4096
 data_path="./data/certbot"
 email="" # Adding a valid address is strongly recommended
