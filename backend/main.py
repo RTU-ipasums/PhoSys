@@ -34,6 +34,22 @@ def handl_sim(inJson):
             gevent.sleep(0.01)
 
     gevent.spawn(sendStep)
+    session['grid'] = grid
+    return 'OK'
+
+@socketio.on('generate_frames')
+@cross_origin()
+def generate_frames(count):
+    grid = session.get('grid')
+
+    @copy_current_request_context
+    def sendStep():
+        for i in range(count):
+            emit('frame', stepGrid(grid).decode())
+            gevent.sleep(0.01)
+
+    gevent.spawn(sendStep)
+    session['grid'] = grid
     return 'OK'
 
 @api.route('/gettest', methods=['POST'])

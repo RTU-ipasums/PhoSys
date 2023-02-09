@@ -3,7 +3,6 @@ import matplotlib as mpl
 from matplotlib.colors import FuncNorm
 mpl.use('svg')  # or whatever other backend that you want
 import matplotlib.pyplot as plt
-from main import session
 
 import fdtd, sys
 import mpld3
@@ -421,7 +420,6 @@ def processJson(o):
     #Thread(target=stepGrid, args=[grid, 30]).start()
     #stepGrid(grid, 30)
 
-    session['grid'] = grid
     figSize = fig.get_size_inches()*fig.dpi
     fig.set_figwidth(o.xBounds/figSize[0]*fig.get_size_inches()[0])
     fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
