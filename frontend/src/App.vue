@@ -54,8 +54,8 @@ export default {
           alt="point lightsource" src="/playground_assets/light.png" />
       </div>
       <div class="action-buttons">
-        <button class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▶&#xFE0E;
-          LAUNCH</button>
+        <button class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
+        <input @input="event => this.$refs.result.frames.frameIdx = event.target.value"/>
       </div>
     </div>
     <splitpanes id="splitpanes"

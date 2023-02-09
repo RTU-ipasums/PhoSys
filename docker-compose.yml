@@ -6,9 +6,9 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    #depends_on:
+    #  - cache
     entrypoint: ['/usr/src/app/entrypoint.sh']
-    volumes:
-      - backend-data:/usr/src/app
     ports:
       - 5001:5000
     environment:
@@ -45,11 +45,23 @@ services:
       - ./data/certbot/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
+#  cache:
+#    image: redis:6.2-alpine
+#    restart: always
+#    networks:
+#      - api_bridge
+#    ports:
+#      - '6379:6379'
+#    command: redis-server --save 20 1 --loglevel warning
+#    volumes: 
+#      - cache:/data
+
 ##### Networks #####
 networks:
   api_bridge:
     driver: bridge
 
 ##### Volumes #####
-volumes:
-  backend-data:
+#volumes:
+#  cache:
+#    driver: local
