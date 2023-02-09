@@ -3,6 +3,7 @@ import { reactive } from 'vue'
 export const data = reactive({
     xBounds:null,
     yBounds:null,
+    propertyTitle:"Global settings",
     properties:[
     {
         propertyName:"Framecount",

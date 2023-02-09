@@ -15,7 +15,6 @@ export default {
     };
   },
   methods: {
-    
     globalTransform(func){
       let stage=this.$refs.transformer.getNode().getStage();
       let a = stage.position();
@@ -185,7 +184,9 @@ export default {
         fill: 'red',
         opacity: 0.3,
         name: `object_${this.currentShapeId}`,
+        perfectDrawEnabled:false,
         draggable: true,
+        propertyTitle:"Rectangle object",
         properties:[  
         {
           propertyName:"Permittivity",
@@ -209,7 +210,9 @@ export default {
         fill: 'blue',
         opacity: 0.5,
         name: `pointsource_${this.currentShapeId}`,
+        perfectDrawEnabled:false,
         draggable: true,
+        propertyTitle:"Point source light",
         properties:[{
           propertyName:"Wavelength",
           units:"nm",
@@ -261,11 +264,9 @@ export default {
     // todo limit shape dragging to simulation canvas
     this.data.xBounds=500;
     this.data.yBounds=500;
-    this.updateSize(document.querySelector('#splitpanes').offsetWidth, document.querySelector('#splitpanes').offsetHeight);
     window.addEventListener('keydown', e=>{
       const key = e.key;
       if (key === "Delete") {
-        
         this.deleteShape();
       }
     });
@@ -292,7 +293,8 @@ export default {
           width: 500,
           height: 500,
           opacity: 0.1,
-          fill: 'gray'
+          fill: 'gray',
+          perfectDrawEnabled:false
         }"
         />
         <v-rect

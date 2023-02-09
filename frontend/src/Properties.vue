@@ -12,6 +12,11 @@ export default {
             let props=this.data.properties;
             if(this.selectedShape)props=this.selectedShape.properties;
             return props;
+        },
+        getPropertyTitle(){
+            let title=this.data.propertyTitle;
+            if(this.selectedShape)title=this.selectedShape.propertyTitle;
+            return title;
         }
     }
 };
@@ -23,7 +28,10 @@ export default {
 <style>
 </style>
 <template>
-    <h1>Properties</h1>
+    <div class="header">
+        <h1>Properties</h1>
+        <div>{{ getPropertyTitle }}</div>
+    </div>
     <div v-for="property in getRelevantProperties" class="property">
         <div>{{ property.propertyName }}</div>
         <div class="propertydata">
@@ -33,7 +41,7 @@ export default {
     </div>
 </template>
 <style scoped>
-    h1{
+    .header{
         padding-bottom: 15px;
         border-bottom: 1px solid rgba(167, 161, 161, 1);
     }

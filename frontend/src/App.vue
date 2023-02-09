@@ -34,11 +34,23 @@ export default {
     Properties,
     Pane
   },
+  data(){
+    return {
+      isMounted: false,
+      sizeObserver:null
+    }
+  },
   methods: {
     getShape() {
-      if (this.$refs.draw) return this.$refs.draw.selectedShapeObject;
-      return '';
+      if (!this.isMounted) return;
+      return this.$refs.draw.selectedShapeObject;
     }
+  },
+  mounted(){
+    this.isMounted=true;
+    this.sizeObserver = new ResizeObserver(()=>{
+      this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth,this.$refs.flexeditor.offsetHeight);
+    }).observe(this.$refs.flexeditor);
   }
 }
 </script>
@@ -58,8 +70,8 @@ export default {
         <input @input="event => this.$refs.result.frames.frameIdx = event.target.value"/>
       </div>
     </div>
-    <splitpanes id="splitpanes"
-      @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
+    
+    <splitpanes id="splitpanes">
       <pane size="20" class="properties grid-item">
         <Properties :selectedShape="this.getShape()" />
       </pane>
