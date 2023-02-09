@@ -30,7 +30,6 @@ def handl_sim(inJson):
     @copy_current_request_context
     def sendStep():
         for i in range(count):
-            print(i)
             emit('frame', stepGrid(grid).decode())
             gevent.sleep(0.01)
 

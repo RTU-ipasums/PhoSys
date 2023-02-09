@@ -17,37 +17,6 @@ services:
       - api_bridge
     restart: always
 
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    restart: always
-    volumes:
-#      - ./data/nginx:/etc/nginx/conf.d
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-    depends_on:
-      - backend
-    networks:
-      - api_bridge
-    ports:
-      - "8800:80"
-      - "4433:443"
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-    environment:
-      - SERVER_DOMAIN=phosys.ovh
-      - FRONTEND_URL=https://phosys.pages.dev
-
-  certbot:
-    image: certbot/certbot
-    restart: unless-stopped
-    networks:
-      - api_bridge
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-
 #  cache:
 #    image: redis:6.2-alpine
 #    restart: always
