@@ -3,6 +3,26 @@ import { reactive } from 'vue'
 export const data = reactive({
     xBounds:null,
     yBounds:null,
+    properties:[
+    {
+        propertyName:"Framecount",
+        min:1,
+        max:10000,
+        value:0
+    },
+    {
+        propertyName:"Permittivity",
+        min:0,
+        max:100,
+        value:0
+    },
+    {
+        propertyName:"Permiability",
+        min:0,
+        max:100,
+        value:0
+    }
+    ],
     rectangles: [
         // {
         //   rotation: 0,
