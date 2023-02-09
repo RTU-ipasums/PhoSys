@@ -240,9 +240,13 @@ export default {
       })
     },
     deleteShape(){
-      console.log(this.data);
-      this.selectedShapeObject=undefined;
-      console.log(this.data);
+      //Is there a more efficient way?
+      this.data.rectangles = this.data.rectangles.filter((r) => {
+          return r.name !== this.selectedShapeObject.name;
+      });
+      this.data.circles = this.data.circles.filter((r) => {
+          return r.name !== this.selectedShapeObject.name;
+      });
       this.selectedShapeObject = null;
       this.updateTransformer();
     },
@@ -260,7 +264,7 @@ export default {
     this.updateSize(document.querySelector('#splitpanes').offsetWidth, document.querySelector('#splitpanes').offsetHeight);
     window.addEventListener('keydown', e=>{
       const key = e.key;
-      if (key === "Backspace" || key === "Delete") {
+      if (key === "Delete") {
         
         this.deleteShape();
       }
