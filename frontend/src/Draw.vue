@@ -130,6 +130,8 @@ export default {
     },
     handleTransformEnd(e) {
       if(this.selectedShapeObject){
+        this.selectedShapeObject.x = e.target.x();
+        this.selectedShapeObject.y = e.target.y();
         this.selectedShapeObject.scaleX = e.target.scaleX();
         this.selectedShapeObject.scaleY = e.target.scaleY();
       }
