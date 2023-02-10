@@ -15,7 +15,6 @@ export default {
     };
   },
   methods: {
-    
     globalTransform(func){
       let stage=this.$refs.transformer.getNode().getStage();
       let a = stage.position();
@@ -131,6 +130,8 @@ export default {
     },
     handleTransformEnd(e) {
       if(this.selectedShapeObject){
+        this.selectedShapeObject.x = e.target.x();
+        this.selectedShapeObject.y = e.target.y();
         this.selectedShapeObject.scaleX = e.target.scaleX();
         this.selectedShapeObject.scaleY = e.target.scaleY();
       }
@@ -138,7 +139,7 @@ export default {
     handleStageMouseDown(e) {
       // clicked on stage - clear selection
       if (e.target === e.target.getStage()) {
-        this.selectedShapeObject='';
+        this.selectedShapeObject=null;
         this.updateTransformer();
         return;
       }
@@ -150,7 +151,7 @@ export default {
       }
       // find clicked object by its name
       const name = e.target.name();
-      this.selectedShapeObject=this.data.rectangles.concat(this.data.circles).find((r) => r.name === name);;
+      this.selectedShapeObject=this.data.rectangles.concat(this.data.circles).find((r) => r.name === name);
       this.updateTransformer();
     },
     updateTransformer() {
@@ -185,7 +186,18 @@ export default {
         fill: 'red',
         opacity: 0.3,
         name: `object_${this.currentShapeId}`,
+        perfectDrawEnabled:false,
         draggable: true,
+        propertyTitle:"Rectangle object",
+        properties:[  
+        {
+          propertyName:"Permittivity",
+          units:"su",
+          min:0,
+          max:100,
+          value:0
+        }     
+        ]
       })
     },
     addCircle(){
@@ -200,11 +212,46 @@ export default {
         fill: 'blue',
         opacity: 0.5,
         name: `pointsource_${this.currentShapeId}`,
+        perfectDrawEnabled:false,
         draggable: true,
+        propertyTitle:"Point source light",
+        properties:[{
+          propertyName:"Wavelength",
+          units:"nm",
+          min:100,
+          max:1600,
+          _value:1.5e-6,
+          set value(x){
+            this._value=x/1e9;
+          },
+          get value(){
+            return this._value*1e9;
+          }
+        },
+        {
+          propertyName:"Amplitude",
+          units:"su",
+          min:1,
+          max:100,
+          value:10
+        },
+        {
+          propertyName:"Phase shift",
+          units:"°",
+          min:0,
+          value:0
+        }
+      ]
       })
     },
     deleteShape(){
-      delete this.selectedShapeObject
+      //Is there a more efficient way?
+      this.data.rectangles = this.data.rectangles.filter((r) => {
+          return r.name !== this.selectedShapeObject.name;
+      });
+      this.data.circles = this.data.circles.filter((r) => {
+          return r.name !== this.selectedShapeObject.name;
+      });
       this.selectedShapeObject = null;
       this.updateTransformer();
     },
@@ -219,10 +266,9 @@ export default {
     // todo limit shape dragging to simulation canvas
     this.data.xBounds=500;
     this.data.yBounds=500;
-    this.updateSize(document.querySelector('#splitpanes').offsetWidth, document.querySelector('#splitpanes').offsetHeight);
     window.addEventListener('keydown', e=>{
       const key = e.key;
-      if (key === "Backspace" || key === "Delete") {
+      if (key === "Delete") {
         this.deleteShape();
       }
     });
@@ -249,7 +295,8 @@ export default {
           width: 500,
           height: 500,
           opacity: 0.1,
-          fill: 'gray'
+          fill: 'gray',
+          perfectDrawEnabled:false
         }"
         />
         <v-rect

@@ -1,43 +1,22 @@
 <script>
+import {data} from './data.js'
 export default {
     data(){
         return{
-            properties:{
-                global: [{
-                    propertyName:"globalProperty1",
-                    value:0
-                },
-                {
-                    propertyName:"globalProperty2",
-                    value:0
-                }],
-                pointsource: 
-                [{
-                    propertyName:"pointsourceProperty1",
-                    value:0
-                },
-                {
-                    propertyName:"pointsourceProperty2",
-                    value:0
-                }],
-                object:
-                [{
-                    propertyName:"objectProperty1",
-                    value:0
-                },
-                {
-                    propertyName:"objectProperty2",
-                    value:0
-                }]
-            }
+            data
         };
     },
     props: ['selectedShape'],
     computed:{
         getRelevantProperties(){
-            let name="global";
-            if(this.selectedShape)name=this.selectedShape.name.split('_')[0];
-            return this.properties[`${name}`];
+            let props=this.data.properties;
+            if(this.selectedShape)props=this.selectedShape.properties;
+            return props;
+        },
+        getPropertyTitle(){
+            let title=this.data.propertyTitle;
+            if(this.selectedShape)title=this.selectedShape.propertyTitle;
+            return title;
         }
     }
 };
@@ -49,17 +28,20 @@ export default {
 <style>
 </style>
 <template>
-    <h1>Properties</h1>
-    <div v-for="property in getRelevantProperties" class="property">
+    <div class="header">
+        <h1>Properties</h1>
+        <div>{{ getPropertyTitle }}</div>
+    </div>
+    <div v-for="property in getRelevantProperties" :key="property" class="property">
         <div>{{ property.propertyName }}</div>
         <div class="propertydata">
-            <input class="propertyrange" type="range" v-model="property.value" min="0" max="100">
-            <input class="propertytext" type="number" v-model.number="property.value" min="0" max="100">
+            <input class="propertyrange" type="range" v-model="property.value" :min="property.min" :max="property.max">
+            <input class="propertytext" type="number" v-model.number="property.value" :min="property.min" :max="property.max">
         </div>
     </div>
 </template>
 <style scoped>
-    h1{
+    .header{
         padding-bottom: 15px;
         border-bottom: 1px solid rgba(167, 161, 161, 1);
     }

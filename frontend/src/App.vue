@@ -4,7 +4,28 @@ import Result from './Result.vue'
 import Properties from './Properties.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
-
+//todo
+//arrow key change position by one unit
+//pause/ play button
+//frame window
+//permittivity
+//1-100
+//permiability
+//1-100
+//properties:
+//global
+//frame count
+//1-10000
+//pointsource:
+//wavelength
+//100-1600nm
+//amplitude
+//1-100
+//phase shift
+//0-360 degrees
+//object:
+//permittivity
+//1-100
 export default {
   components: {
     Draw,
@@ -13,11 +34,23 @@ export default {
     Properties,
     Pane
   },
+  data(){
+    return {
+      isMounted: false,
+      sizeObserver:null
+    }
+  },
   methods: {
     getShape() {
-      if (this.$refs.draw) return this.$refs.draw.selectedShapeObject;
-      return '';
+      if (!this.isMounted) return;
+      return this.$refs.draw.selectedShapeObject;
     }
+  },
+  mounted(){
+    this.isMounted=true;
+    this.sizeObserver = new ResizeObserver(()=>{
+      this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth,this.$refs.flexeditor.offsetHeight);
+    }).observe(this.$refs.flexeditor);
   }
 }
 </script>
@@ -37,8 +70,8 @@ export default {
         <input :value="1" @input="event => this.$refs.result.frames.frameIdx = event.target.value"/>
       </div>
     </div>
-    <splitpanes id="splitpanes"
-      @resized="this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight)">
+    
+    <splitpanes id="splitpanes">
       <pane size="20" class="properties grid-item">
         <Properties :selectedShape="this.getShape()" />
       </pane>
