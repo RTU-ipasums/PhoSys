@@ -1,6 +1,7 @@
 <script>
 import Draw from './Draw.vue'
 import Result from './Result.vue'
+import { frames, getFigure } from './result.js'
 import Properties from './Properties.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
@@ -36,6 +37,8 @@ export default {
   },
   data(){
     return {
+      frames,
+      getFigure,
       isMounted: false,
       sizeObserver:null
     }
@@ -66,8 +69,8 @@ export default {
           alt="point lightsource" src="/playground_assets/light.png" />
       </div>
       <div class="action-buttons">
-        <button class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
-        <input :value="1" @input="event => this.$refs.result.frames.frameIdx = event.target.value"/>
+        <button class="run-button" @click="getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
+        <input v-model.lazy.number="frames.frameNum" type="number"/>
       </div>
     </div>
     
