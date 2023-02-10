@@ -9,7 +9,7 @@ export const data = reactive({
         propertyName:"Framecount",
         min:1,
         max:10000,
-        value:0
+        value:1000
     },
     {
         propertyName:"Permittivity",

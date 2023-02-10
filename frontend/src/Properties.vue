@@ -32,7 +32,7 @@ export default {
         <h1>Properties</h1>
         <div>{{ getPropertyTitle }}</div>
     </div>
-    <div v-for="property in getRelevantProperties" class="property">
+    <div v-for="property in getRelevantProperties" :key="property" class="property">
         <div>{{ property.propertyName }}</div>
         <div class="propertydata">
             <input class="propertyrange" type="range" v-model="property.value" :min="property.min" :max="property.max">
