@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { reactive } from 'vue'
 import { data } from './data.js'
 import io from 'socket.io-client';
@@ -8,11 +8,15 @@ import * as mpld3 from 'mpld3';
 export var socket = ref(io());
 var frameIdx = 0;
 var imgObj = null;
-var framesC = [null];
+var generating = false;
+export var framesC = reactive ([null]);
 
 export const frames = reactive( {
     frameNum: 1,
-    set frameNum(val) {
+    playing: false,
+    loop: false,
+    fps: 30,
+    set frameNum(val) {// sets active frame
         if (framesC[0] != null) {
             frameIdx = val-1;
             if (framesC.length >= val) {
@@ -20,7 +24,7 @@ export const frames = reactive( {
               
               imgObj.image._groups[0][0].setAttribute("href", "data:image/png;base64," + imgObj.props.data);
             }
-            else if (framesC.length < val) {
+            else if (framesC.length < val) {// requests aditional frames if out of bounds
                 this.frameNum = framesC.length;
               socket.value.emit('generate_frames', val-framesC.length );
             }
@@ -33,22 +37,49 @@ export const frames = reactive( {
         },
     get frameNum() {
         return frameIdx+1;
+    },
+    nextFrame: function() {
+      if (frameIdx+1 < framesC.length) {
+        this.frameNum = frameIdx+2;
+      }
+      else {
+        clearInterval(this.advanceInterval)
+        this.playing = false;
+      }
+    },
+    previousFrame: function() {
+      this.frameNum = frameIdx;
+    },
+    startStop: function() {
+      generating = false;
+      this.playing = !this.playing;
+      if (this.playing) {
+        if (frameIdx+1 == framesC.length) {
+          console.log('Generating!!')
+          generating = true;
+          socket.value.emit('generate_frames', 1);
+        }
+        else {
+          this.advanceInterval = setInterval(this.nextFrame.bind(this), 1000/this.fps); 
+        }
+      }
+      else { clearInterval(this.advanceInterval); }
     }
 } 
 )
 
 export function resetResult() {
-    framesC = [null];
+    framesC = reactive( [null] );
     frameIdx = 0;
 }
-export function pushFrame(frame) {
+export function pushFrame(frame) {// adds new frame to the buffer
     framesC.push(frame);
     if (framesC.length-2 == frameIdx) {
         frames.frameNum = frameIdx+2;
     }
 }
 
-mpld3.register_plugin("animview", AnimViewPlugin);
+mpld3.register_plugin("animview", AnimViewPlugin);// chooses object to be animated
 AnimViewPlugin.prototype = Object.create(mpld3.Plugin.prototype);
 AnimViewPlugin.prototype.constructor = AnimViewPlugin;
 AnimViewPlugin.prototype.requiredProps = ["idimg"];
@@ -64,7 +95,7 @@ AnimViewPlugin.prototype.draw = function(){
   framesC[0] = imgobjT.props.data;
 };
 
-export function getFigure() {
+export function getFigure() {// request initial canvas from backend
     console.log(JSON.stringify(data));
     socket.value.close();
     socket = ref(io(import.meta.env.VITE_BACKEND_URL));
@@ -81,6 +112,7 @@ export function getFigure() {
     socket.value.on("frame", (imgdata) => {
       console.log("Got frame!!");
       pushFrame(imgdata);
+      if (generating) { socket.value.emit('generate_frames', 1); }
     });
   
   }
