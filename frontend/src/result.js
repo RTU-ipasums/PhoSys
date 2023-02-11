@@ -50,6 +50,12 @@ export const frames = reactive( {
     previousFrame: function() {
       this.frameNum = frameIdx;
     },
+    firstFrame: function() {
+      this.frameNum = 1;
+    },
+    lastFrame: function() {
+      this.frameNum = framesC.length;
+    },
     startStop: function() {
       generating = false;
       this.playing = !this.playing;
