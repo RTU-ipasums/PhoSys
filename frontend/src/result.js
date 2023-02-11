@@ -9,13 +9,17 @@ export var socket = ref(io());
 var frameIdx = 0;
 var imgObj = null;
 var generating = false;
-export var framesC = reactive ([null]);
+var framesC = [null];
+var framecount = 1;
 
 export const frames = reactive( {
     frameNum: 1,
     playing: false,
     loop: false,
     fps: 30,
+    get maxFrame() {
+      return Math.max(framecount, framesC.length)//Math.max(framesC.length, data.properties.find(item => item.propertyName === "Framecount").value);
+    },
     set frameNum(val) {// sets active frame
         if (framesC[0] != null) {
             frameIdx = val-1;
@@ -75,7 +79,7 @@ export const frames = reactive( {
 )
 
 export function resetResult() {
-    framesC = reactive( [null] );
+    framesC = [null];
     frameIdx = 0;
 }
 export function pushFrame(frame) {// adds new frame to the buffer
@@ -103,6 +107,7 @@ AnimViewPlugin.prototype.draw = function(){
 
 export function getFigure() {// request initial canvas from backend
     console.log(JSON.stringify(data));
+    framecount = data.properties.find(item => item.propertyName === "Framecount").value;
     socket.value.close();
     socket = ref(io(import.meta.env.VITE_BACKEND_URL));
   

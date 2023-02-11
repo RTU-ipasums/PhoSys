@@ -1,5 +1,5 @@
 <script>
-import { frames, framesC } from './result.js'
+import { frames } from './result.js'
 
 var fps = 30;
 
@@ -7,7 +7,6 @@ export default {
     data(){
         return {
             frames,
-            framesC,
             fps
         }
     },
@@ -16,7 +15,7 @@ export default {
 
 <template>
     <div class="seekBar">
-        <input type="range" min="1" v-model.number="frames.frameNum" class="slider"><!--TODO add max-->
+        <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum" class="slider"><!--TODO add max-->
         <div class="controls">
             <div class="center-buttons">
                 <button @click="frames.firstFrame">⏮</button>
