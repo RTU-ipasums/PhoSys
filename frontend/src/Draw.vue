@@ -239,6 +239,7 @@ export default {
           propertyName:"Phase shift",
           units:"°",
           min:0,
+          max:360,
           value:0
         }
       ]

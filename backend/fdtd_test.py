@@ -11,6 +11,7 @@ from mpld3 import plugins, utils
 import fdtd.backend as bd
 from flask_socketio import SocketIO, send, emit
 import io, base64
+import math
 
 ZMAX = 1
 
@@ -366,7 +367,7 @@ class CanvasEl:
                 propVal = next(x for x in self.properties if x.propertyName.lower() == propObj.name )['value']
             except StopIteration:
                 propVal = None
-            setattr(self, prop, gAt(propVal, propObj.default, min=propObj.min, max=propObj.max))
+            setattr(self, prop.replace(' ', '_'), gAt(propVal, propObj.default, min=propObj.min, max=propObj.max))
 
 class GlobalObj(CanvasEl):
     def __init__(self, o) -> None:
@@ -389,9 +390,10 @@ class RectObj(PermObj):
 
 class Source(CanvasEl):
     def __init__(self, o) -> None:
-        self.reqProps = ['amplitude', 'wavelength']
+        self.reqProps = ['amplitude', 'wavelength', 'phase shift']
         super(Source, self).__init__(o)
         self.wavelength = self.wavelength*1e-9#TODO wavelength in SI
+        self.phase_shift = math.radians(self.phase_shift)
 class Linesource(Source):
     def __init__(self, o) -> None:
         super(Linesource, self).__init__(o)
@@ -400,14 +402,14 @@ class Linesource(Source):
         self.x2 = o.points[2]
         self.y2 = o.points[3]
     def addFdtd(self, grid):
-        grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.LineSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, name=self.name)
+        grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.LineSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 class Pointsource(Source):
     def __init__(self, o) -> None:
         super(Pointsource, self).__init__(o)
         self.x = o.x
         self.y = o.y
     def addFdtd(self, grid):
-        grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, name=self.name)
+        grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 
 elementMapping = {
     'object':RectObj,
