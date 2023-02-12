@@ -340,10 +340,10 @@ class Property:
         self.default = default
 
 properties = {
-    'framecount': [0, 10000, int(100)],
+    'framecount': [0, 10000, int(200)],
     'permittivity': [0,None,1.],
     'permiability': [0,None,1.],
-    'wavelength': [0,None,500],#temp
+    'wavelength': [0,None,1500],#temp
     'amplitude': [0,None,10.],
     'phase shift': [0,360,0.],
     'resolution': [1, 30, int(15)],

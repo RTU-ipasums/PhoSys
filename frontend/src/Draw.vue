@@ -195,7 +195,7 @@ export default {
           units:"su",
           min:0,
           max:100,
-          value:0
+          value:25
         }     
         ]
       })

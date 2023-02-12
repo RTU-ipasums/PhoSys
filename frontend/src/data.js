@@ -9,19 +9,19 @@ export const data = reactive({
         propertyName:"Framecount",
         min:1,
         max:10000,
-        value:1000
+        value:200
     },
     {
         propertyName:"Permittivity",
         min:0,
         max:100,
-        value:0
+        value:5
     },
     {
         propertyName:"Permiability",
         min:0,
         max:100,
-        value:0
+        value:1
     }
     ],
     rectangles: [
