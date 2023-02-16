@@ -1,3 +1,4 @@
+from types import NoneType
 from unicodedata import name
 import matplotlib as mpl
 from matplotlib.colors import FuncNorm
@@ -10,6 +11,7 @@ from mpld3 import plugins, utils
 import fdtd.backend as bd
 from flask_socketio import SocketIO, send, emit
 import io, base64
+import math
 
 ZMAX = 1
 
@@ -21,10 +23,12 @@ SPEED_LIGHT: float = 299_792_458.0
 
 def gAt(inpt, default:str):
     return str(inpt) if inpt else default
-def gAt(inpt, default:int):
-    return int(inpt) if inpt else default
-def gAt(inpt, default:float):
-    return float(inpt) if inpt else default
+def gAt(inpt, default:float, min=None, max=None):
+    if (inpt==None): return default
+    conv = type(default)(inpt)
+    if (min!=None) and (conv < min): return default
+    if (max!=None) and (conv > max) : return default
+    return conv if inpt else default
 
 def visualize(
     grid,
@@ -329,6 +333,25 @@ def visualize(
 
     return plt.gcf(), img
 
+class Property:
+    def __init__(self, name, min, max, default) -> None:
+        self.name = name
+        self.min = min
+        self.max = max
+        self.default = default
+
+properties = {
+    'framecount': [0, 10000, int(200)],
+    'permittivity': [0,None,1.],
+    'permiability': [0,None,1.],
+    'wavelength': [0,None,1500],#temp
+    'amplitude': [0,None,10.],
+    'phase shift': [0,360,0.],
+    'resolution': [1, 30, int(15)],
+}
+for propKey, propValue in properties.items():
+    properties[propKey] = Property(propKey, *propValue)
+
 class AnimView(plugins.PluginBase):
     def __init__(self, img):
         self.dict_ = {"type": "animview",
@@ -337,11 +360,24 @@ class AnimView(plugins.PluginBase):
 class CanvasEl:
     def __init__(self, o) -> None:
         self.name = o.name
+        self.properties = o.properties
+        for prop in self.reqProps: 
+            propObj = properties[prop]
+            try:
+                propVal = next(x for x in self.properties if x.propertyName.lower() == propObj.name )['value']
+            except StopIteration:
+                propVal = None
+            setattr(self, prop.replace(' ', '_'), gAt(propVal, propObj.default, min=propObj.min, max=propObj.max))
+
+class GlobalObj(CanvasEl):
+    def __init__(self, o) -> None:
+        self.reqProps = ['framecount', 'permittivity', 'permiability', 'resolution']
+        super(GlobalObj, self).__init__(o)
 
 class PermObj(CanvasEl):
     def __init__(self, o) -> None:
+        self.reqProps = ['permittivity']
         super(PermObj, self).__init__(o)
-        self.permittivity = gAt(o.permittivity, 1)
 class RectObj(PermObj):
     def __init__(self, o) -> None:
         super(RectObj, self).__init__(o)
@@ -352,7 +388,13 @@ class RectObj(PermObj):
     def addFdtd(self, grid):
         grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=self.permittivity, name=self.name)
 
-class Linesource(CanvasEl):
+class Source(CanvasEl):
+    def __init__(self, o) -> None:
+        self.reqProps = ['amplitude', 'wavelength', 'phase shift']
+        super(Source, self).__init__(o)
+        self.wavelength = self.wavelength*1e-9#TODO wavelength in SI
+        self.phase_shift = math.radians(self.phase_shift)
+class Linesource(Source):
     def __init__(self, o) -> None:
         super(Linesource, self).__init__(o)
         self.x1 = o.points[0]
@@ -360,15 +402,14 @@ class Linesource(CanvasEl):
         self.x2 = o.points[2]
         self.y2 = o.points[3]
     def addFdtd(self, grid):
-        grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.LineSource(period=WAVELENGTH / SPEED_LIGHT, name=self.name)
-class Pointsource(CanvasEl):
+        grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.LineSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
+class Pointsource(Source):
     def __init__(self, o) -> None:
         super(Pointsource, self).__init__(o)
         self.x = o.x
         self.y = o.y
-        self.amplitude = gAt(o.amplitude, 10.0)
     def addFdtd(self, grid):
-        grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=WAVELENGTH / SPEED_LIGHT, amplitude=self.amplitude, name=self.name)
+        grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 
 elementMapping = {
     'object':RectObj,
@@ -385,20 +426,20 @@ def stepGrid(grid):
     return base64.b64encode(vv.read())
 
 def processJson(o):
-    WAVELENGTH = gAt(o.wavelength, 1550e-9)
+    globalObj = GlobalObj(o)
+    #WAVELENGTH = gAt(o.wavelength, 1550e-9)
     xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
-    resolution = gAt(o.resolution, 15)
-    frameCount = gAt(o.frameCount, 100)
+    #resolution = gAt(o.resolution, 15)
+    #frameCount = gAt(o.frameCount, 100)
 
     elements = []
     for obj in o.rectangles+o.circles:
         elements.append( elementMapping[obj.name.split('_')[0]](obj) )
-
     grid = fdtd.Grid(
         (o.xBounds, o.yBounds, ZMAX),#(2.5e-5, 1.5e-5, 1),
-        grid_spacing=WAVELENGTH/resolution,
-        permittivity=5,
-        permeability=1,
+        grid_spacing=WAVELENGTH/globalObj.resolution,
+        permittivity=globalObj.permittivity,
+        permeability=globalObj.permiability,
     )
     
     #grid[0, :, :] = fdtd.PeriodicBoundary(name="xbounds")
@@ -412,7 +453,7 @@ def processJson(o):
 
     for i in elements: i.addFdtd(grid)
     #grid.step()
-    grid.run(30, progress_bar=False)
+    grid.run(1, progress_bar=False)
 
     plt.autoscale() 
     fig, img = visualize(grid, z=0)
@@ -429,7 +470,7 @@ def processJson(o):
     outJson = mpld3.fig_to_dict(fig)
     fig.clear()
     plt.close()
-    return outJson, grid, frameCount-1
+    return outJson, grid, globalObj.framecount-1
 
 def test_fdtd():
 

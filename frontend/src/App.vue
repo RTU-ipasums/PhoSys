@@ -1,6 +1,8 @@
 <script>
 import Draw from './Draw.vue'
 import Result from './Result.vue'
+import { getFigure } from './result.js'
+import SeekBar from './SeekBar.vue'
 import Properties from './Properties.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
@@ -30,12 +32,14 @@ export default {
   components: {
     Draw,
     Result,
+    SeekBar,
     Splitpanes,
     Properties,
     Pane
   },
   data(){
     return {
+      getFigure,
       isMounted: false,
       sizeObserver:null
     }
@@ -66,8 +70,7 @@ export default {
           alt="point lightsource" src="/playground_assets/light.png" />
       </div>
       <div class="action-buttons">
-        <button class="run-button" @click="this.$refs.result.getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
-        <input :value="1" @input="event => this.$refs.result.frames.frameIdx = event.target.value"/>
+        <button class="run-button" @click="getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
       </div>
     </div>
     
@@ -87,6 +90,8 @@ export default {
       </pane>
 
     </splitpanes>
+
+    <SeekBar/>
   </div>
 </template>
 

@@ -195,7 +195,7 @@ export default {
           units:"su",
           min:0,
           max:100,
-          value:0
+          value:25
         }     
         ]
       })
@@ -216,7 +216,7 @@ export default {
         draggable: true,
         propertyTitle:"Point source light",
         properties:[{
-          propertyName:"Wavelength",
+          propertyName:"Wavelength, nm",
           units:"nm",
           min:100,
           max:1600,
@@ -236,9 +236,10 @@ export default {
           value:10
         },
         {
-          propertyName:"Phase shift",
+          propertyName:"Phase shift, degrees",
           units:"°",
           min:0,
+          max:180,
           value:0
         }
       ]
