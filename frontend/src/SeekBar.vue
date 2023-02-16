@@ -15,57 +15,73 @@ export default {
 
 <template>
     <div class="seekBar">
-        <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum" class="slider"><!--TODO add max-->
+        <div class="seek-container">
+            <input v-model.lazy.number="frames.frameNum" type="number"/>
+            <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum" class="slider"><!--TODO add max-->
+            <input :value="frames.frameMax" @input="setMaxFrame" type="number"/>
+        </div>
         <div class="controls">
-            <div class="center-buttons">
-                <button @click="frames.firstFrame"><i class="fa-solid fa-backward-step"></i></button>
-                <button @click="frames.previousFrame"><i class="fa-solid fa-caret-left"></i></button>
-                <button @click="frames.startStop" style="font-size: 25px;" class="fa-solid" :class="frames.playing ? 'fa-pause' : 'fa-play'"></button>
-                <button @click="frames.nextFrame"><i class="fa-solid fa-caret-right"></i></button>
-                <button @click="frames.lastFrame"><i class="fa-solid fa-forward-step"></i></button>
+            <div class="left-options">
+                <div class="control">
+                    <div>FPS</div>
+                    <input v-model.lazy.number="frames.fps" type="number"/>
+                </div>
+                
             </div>
-            <div class="right-options">
-                <input v-model.lazy.number="frames.frameNum" type="number"/>
-                <input v-model.lazy.number="frames.fps" type="number"/>
+            <div class="center-buttons">
+                <i @click="frames.firstFrame" class="fa-solid fa-backward-step"></i>
+                <i @click="frames.previousFrame" class="fa-solid fa-caret-left"></i>
+                <i @click="frames.startStop" class="fa-solid" :class="frames.playing ? 'fa-pause' : 'fa-play'"></i>
+                <i @click="frames.nextFrame" class="fa-solid fa-caret-right"></i>
+                <i @click="frames.lastFrame" class="fa-solid fa-forward-step"></i>
             </div>
         </div>
     </div>
 </template>
 
 <style scoped>
-    .seekBar {
-        display: block;
+    .seekBar{
+        padding:5px 10px;
     }
-    input.slider {
-        width: 100%;
+    .controls{
+        display: grid;
+        grid-template-columns: 1fr repeat(3, auto) 1fr;
+        grid-column-gap: 5px;
+        justify-items: center;
+        align-items: center;
     }
-    .controls {
-        height: 50px;
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
+    .left-options{
+        width:100%;
+        
+        display:flex;
+        grid-column-start: 1;
     }
-    .controls > * {
-        display: flex;
-        margin: 1px;
-        padding: 5px;
+    .center-buttons{
+        display:flex;
+        gap:10px;
+        grid-column-start: 2;
+        align-items: center;
     }
-    .center-buttons {
-        flex: 0 1 auto;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+    .center-buttons > *{
+        width:30px;
+        height:30px;
+        font-size:30px;
+        text-align: center;
+        transition:0.4s;
     }
-    .center-buttons > * {
-        font-size: 20px;
+    .center-buttons > *:hover{
+        background-color: #2c3e50;
+        color:white;
     }
-    .right-options {
-        flex: 0 1 auto;
-        margin-left: auto;
+    .seek-container{
+        display:flex;
+        margin-bottom: 10px;
     }
-    .right-options > * {
-        width: 70px;
-        height: 10px;
-        padding: 10px;
+    .control{
+        display:flex;
     }
+    .slider{
+        flex:1;
+    }
+
 </style>
