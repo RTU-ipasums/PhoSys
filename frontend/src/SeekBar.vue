@@ -18,11 +18,11 @@ export default {
         <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum" class="slider"><!--TODO add max-->
         <div class="controls">
             <div class="center-buttons">
-                <button @click="frames.firstFrame">⏮</button>
-                <button @click="frames.previousFrame">⏴</button>
-                <button @click="frames.startStop" style="font-size: 25px;">{{ frames.playing?'⏸':'►' }}</button>
-                <button @click="frames.nextFrame">⏵</button>
-                <button @click="frames.lastFrame">⏭</button>
+                <button @click="frames.firstFrame"><i class="fa-solid fa-backward-step"></i></button>
+                <button @click="frames.previousFrame"><i class="fa-solid fa-caret-left"></i></button>
+                <button @click="frames.startStop" style="font-size: 25px;" class="fa-solid" :class="frames.playing ? 'fa-pause' : 'fa-play'"></button>
+                <button @click="frames.nextFrame"><i class="fa-solid fa-caret-right"></i></button>
+                <button @click="frames.lastFrame"><i class="fa-solid fa-forward-step"></i></button>
             </div>
             <div class="right-options">
                 <input v-model.lazy.number="frames.frameNum" type="number"/>
