@@ -29,7 +29,8 @@ export const frames = reactive( {
               imgObj.image._groups[0][0].setAttribute("href", "data:image/png;base64," + imgObj.props.data);
             }
             else if (framesC.length < val) {// requests aditional frames if out of bounds
-                this.frameNum = framesC.length;
+              this.frameNum = framesC.length;
+              framecount = val;
               socket.value.emit('generate_frames', val-framesC.length );
             }
             else {
