@@ -11,38 +11,45 @@ export default {
 </script>
 
 <template>
-    <div class="seekBar">
-        <div class="seek-container">
-            <input v-model.lazy.number="frames.frameNum" type="number" />
-            <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum"
-                class="slider"><!--TODO add max-->
-            <input :value="frames.frameMax" @input="setMaxFrame" type="number" />
-        </div>
-        <div class="controls">
-            <div class="left-options">
-                <div class="control">
-                    <label for="fps-input">FPS</label>
-                    <input v-model.lazy.number="frames.fps" id="fps-input" type="number" />
+    <div class="container">
+        <div class="seekBar">
+            <div class="seek-container">
+                <input v-model.lazy.number="frames.frameNum" type="number" />
+                <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum"
+                    class="slider"><!--TODO add max-->
+                <input :value="frames.frameMax" @input="setMaxFrame" type="number" />
+            </div>
+            <div class="controls">
+                <div class="left-options">
+                    <div class="control">
+                        <label for="fps-input">FPS</label>
+                        <input v-model.lazy.number="frames.fps" id="fps-input" type="number" />
+                    </div>
+
+                </div>
+                <div class="center-buttons">
+                    <i @click="frames.firstFrame" class="fa-solid fa-backward-step"></i>
+                    <i @click="frames.previousFrame" class="fa-solid fa-caret-left"></i>
+                    <i @click="frames.startStop" class="fa-solid" :class="frames.playing ? 'fa-pause' : 'fa-play'"></i>
+                    <i @click="frames.nextFrame" class="fa-solid fa-caret-right"></i>
+                    <i @click="frames.lastFrame" class="fa-solid fa-forward-step"></i>
+                </div>
+                <div class="loader-container">
+                    <div class="loader"></div>
+                    <div class="loading-text">Generating frames</div>
                 </div>
 
             </div>
-            <div class="center-buttons">
-                <i @click="frames.firstFrame" class="fa-solid fa-backward-step"></i>
-                <i @click="frames.previousFrame" class="fa-solid fa-caret-left"></i>
-                <i @click="frames.startStop" class="fa-solid" :class="frames.playing ? 'fa-pause' : 'fa-play'"></i>
-                <i @click="frames.nextFrame" class="fa-solid fa-caret-right"></i>
-                <i @click="frames.lastFrame" class="fa-solid fa-forward-step"></i>
-            </div>
-            <div class="loader-container">
-                <div class="loader"></div>
-                <div class="loading-text">Generating frames</div>
-            </div>
-
         </div>
     </div>
 </template>
 
 <style scoped>
+.container {
+    background-color: rgb(184, 184, 184);
+    width: 100%;
+}
+
 .loader-container {
 
     display: flex;
@@ -124,6 +131,7 @@ input[type=number]:focus {
     max-width: 1000px;
     width: 100%;
     margin: 0 auto;
+
 }
 
 .controls {

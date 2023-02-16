@@ -37,11 +37,11 @@ export default {
     Properties,
     Pane
   },
-  data(){
+  data() {
     return {
       getFigure,
       isMounted: false,
-      sizeObserver:null
+      sizeObserver: null
     }
   },
   methods: {
@@ -50,10 +50,10 @@ export default {
       return this.$refs.draw.selectedShapeObject;
     }
   },
-  mounted(){
-    this.isMounted=true;
-    this.sizeObserver = new ResizeObserver(()=>{
-      this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth,this.$refs.flexeditor.offsetHeight);
+  mounted() {
+    this.isMounted = true;
+    this.sizeObserver = new ResizeObserver(() => {
+      this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight);
     }).observe(this.$refs.flexeditor);
   }
 }
@@ -73,7 +73,7 @@ export default {
         <button class="run-button" @click="getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
       </div>
     </div>
-    
+
     <splitpanes id="splitpanes">
       <pane size="20" class="properties grid-item">
         <Properties :selectedShape="this.getShape()" />
@@ -85,13 +85,14 @@ export default {
           </div>
           <div class="grid-item canvas" id="canvas">
             <Result ref="result" />
+            <SeekBar />
           </div>
         </div>
       </pane>
 
     </splitpanes>
 
-    <SeekBar/>
+
   </div>
 </template>
 
@@ -152,6 +153,9 @@ body {
 
 .canvas {
   padding: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .tool-buttons {
