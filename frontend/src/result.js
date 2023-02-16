@@ -4,6 +4,7 @@ import { data } from './data.js'
 import io from 'socket.io-client';
 import * as d3 from "d3";
 import * as mpld3 from 'mpld3';
+import './interactive-legend';
 
 export var socket = ref(io());
 var frameIdx = 0;
