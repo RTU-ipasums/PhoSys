@@ -17,7 +17,7 @@ export default {
                 <input v-model.lazy.number="frames.frameNum" type="number" />
                 <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum"
                     class="slider"><!--TODO add max-->
-                <input :value="frames.frameMax" @input="setMaxFrame" type="number" />
+                <input v-model.lazy.number="frames.maxFrame" type="number" />
             </div>
             <div class="controls">
                 <div class="left-options">

@@ -20,6 +20,13 @@ export const frames = reactive({
   get maxFrame() {
     return Math.max(framecount, framesC.length)//Math.max(framesC.length, data.properties.find(item => item.propertyName === "Framecount").value);
   },
+  set maxFrame(val){
+    if (framesC.length < val) {// requests aditional frames if out of bounds
+      this.frameNum = framesC.length;
+      framecount = val;
+      socket.value.emit('generate_frames', val - framesC.length);
+    }
+  },
   set frameNum(val) {// sets active frame
     if (framesC[0] != null) {
       frameIdx = val - 1;
@@ -28,10 +35,11 @@ export const frames = reactive({
 
         imgObj.image._groups[0][0].setAttribute("href", "data:image/png;base64," + imgObj.props.data);
       }
-      else if (framesC.length < val) {// requests aditional frames if out of bounds
+      else if (framesC.length < val) {
         this.frameNum = framesC.length;
-        framecount = val;
-        socket.value.emit('generate_frames', val - framesC.length);
+      }
+      else if (val < 1) {
+        this.frameNum = 1;
       }
       else {
         console.warn("Error setting frame!")
