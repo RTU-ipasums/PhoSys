@@ -52,6 +52,7 @@ export default {
   },
   mounted() {
     this.isMounted = true;
+    //Todo: throttle resizing to improve performance (ex. resize every second, or after no new resize events have been recieved for the past 0.4s)
     this.sizeObserver = new ResizeObserver(() => {
       this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight);
     }).observe(this.$refs.flexeditor);
@@ -63,14 +64,16 @@ export default {
   <div class="u-i-container">
     <div class="grid-item top-bar">
       <div class="tool-buttons">
+        <img class="logo" title="Phosys" alt="logo" src="/playground_assets/logo.png" />
         <img class="bar-button" title="Open from file" alt="open" src="/playground_assets/folder.png" />
         <img class="bar-button" @click="this.$refs.draw.addRect()" title="Add object" alt="object"
           src="/playground_assets/object.png" />
-        <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource"
-          alt="point lightsource" src="/playground_assets/light.png" />
+        <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource" alt="point lightsource"
+          src="/playground_assets/light.png" />
       </div>
       <div class="action-buttons">
-        <button class="run-button" @click="getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
+        <button class="run-button" @click="getFigure()" title="Start simulation"><i class="fa-solid fa-play"
+            data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
       </div>
     </div>
 
@@ -105,6 +108,11 @@ export default {
   position: relative;
 }
 
+.logo {
+  border-right: 2px solid gray;
+  padding-right: 10px;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -134,7 +142,7 @@ body {
   width: 100vw;
   display: flex;
   flex-direction: column;
-  row-gap: 10px;
+  row-gap: 6px;
   background-color: rgba(167, 161, 161, 1);
 }
 
@@ -144,12 +152,7 @@ body {
   padding: 10px 20px;
 }
 
-.top-bar {
-  height: 50px;
-  padding: 5px;
-  display: flex;
-  flex-direction: row;
-}
+
 
 .canvas {
   padding: 0px;
@@ -182,12 +185,21 @@ body {
   max-width: 100%;
 }
 
+.top-bar {
+  height: 56px;
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+}
+
 .run-button {
+  height: 100%;
+  white-space: nowrap;
   max-height: 100%;
   cursor: pointer;
   font-weight: bold;
   padding: 10px;
-  font-size: 1em;
+  font-size: 1.1em;
   border-radius: 10px;
   display: flex;
   justify-content: center;

@@ -34,7 +34,7 @@ export default {
                     <i @click="frames.nextFrame" class="fa-solid fa-caret-right"></i>
                     <i @click="frames.lastFrame" class="fa-solid fa-forward-step"></i>
                 </div>
-                <div class="loader-container" :style="{'visibility':(frames.genActive ? 'visible' : 'hidden')}">
+                <div class="loader-container" :style="{ 'visibility': (frames.genActive ? 'visible' : 'hidden') }">
                     <div class="loader"></div>
                     <div class="loading-text">Generating frames</div>
                 </div>
@@ -131,7 +131,6 @@ input[type=number]:focus {
     max-width: 1000px;
     width: 100%;
     margin: 0 auto;
-
 }
 
 .controls {
