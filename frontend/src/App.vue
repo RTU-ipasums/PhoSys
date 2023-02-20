@@ -54,7 +54,6 @@ export default {
     saveSimulationData() {
       const data = JSON.stringify(this.data);
       const filename = 'PhosysSave.json';
-
       const blob = new Blob([data], { type: 'text/json' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -63,6 +62,25 @@ export default {
       link.click();
       window.URL.revokeObjectURL(url);
       link.remove();
+    },
+    openSimulationData() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+          const data = JSON.parse(reader.result);
+          console.log(JSON.parse(JSON.stringify(this.data)));
+          //this.data=data doesn't work
+          Object.assign(this.data, data);
+          console.log(JSON.parse(JSON.stringify(this.data)));
+        });
+        reader.readAsText(file);
+      });
+      input.click();
+      input.remove();
     }
   },
   mounted() {
@@ -80,7 +98,9 @@ export default {
     <div class="grid-item top-bar">
       <div class="tool-buttons">
         <img class="logo" title="Phosys" alt="logo" src="/playground_assets/logo.png" />
-        <img class="bar-button" @click="saveSimulationData()" title="Open from file" alt="open"
+        <img class="bar-button" @click="saveSimulationData()" title="Save simulation to file" alt="open"
+          src="/playground_assets/save.png" />
+        <img class="bar-button" @click="openSimulationData()" title="Open simulation from file" alt="open"
           src="/playground_assets/folder.png" />
         <img class="bar-button" @click="this.$refs.draw.addRect()" title="Add object" alt="object"
           src="/playground_assets/object.png" />
