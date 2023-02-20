@@ -8,7 +8,6 @@ import * as mpld3 from 'mpld3';
 export var socket = ref(io());
 var frameIdx = 0;
 var imgObj = null;
-var generating = false;
 var framesC = [null];
 var framecount = 1;
 
@@ -16,7 +15,12 @@ export const frames = reactive({
   frameNum: 1,
   playing: false,
   loop: false,
+  generating: false,
   fps: 30,
+  genActive: false,
+  get genActive() {
+    return framecount>framesC.length || this.generating;
+  },
   get maxFrame() {
     return Math.max(framecount, framesC.length)//Math.max(framesC.length, data.properties.find(item => item.propertyName === "Framecount").value);
   },
@@ -70,12 +74,12 @@ export const frames = reactive({
     this.frameNum = framesC.length;
   },
   startStop: function () {
-    generating = false;
+    this.generating = false;
     this.playing = !this.playing;
     if (this.playing) {
       if (frameIdx + 1 == framesC.length) {
         console.log('Generating!!')
-        generating = true;
+        this.generating = true;
         socket.value.emit('generate_frames', 1);
       }
       else {
@@ -132,7 +136,7 @@ export function getFigure() {// request initial canvas from backend
   socket.value.on("frame", (imgdata) => {
     console.log("Got frame!!");
     pushFrame(imgdata);
-    if (generating) { socket.value.emit('generate_frames', 1); }
+    if (frames.generating) { socket.value.emit('generate_frames', 1); }
   });
 
 }
