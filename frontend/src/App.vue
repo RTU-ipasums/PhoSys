@@ -1,4 +1,5 @@
 <script>
+import { data } from './data.js'
 import Draw from './Draw.vue'
 import Result from './Result.vue'
 import { getFigure } from './result.js'
@@ -37,23 +38,56 @@ export default {
     Properties,
     Pane
   },
-  data(){
+  data() {
     return {
       getFigure,
       isMounted: false,
-      sizeObserver:null
+      sizeObserver: null,
+      data
     }
   },
   methods: {
     getShape() {
       if (!this.isMounted) return;
       return this.$refs.draw.selectedShapeObject;
+    },
+    saveSimulationData() {
+      const data = JSON.stringify(this.data);
+      const filename = 'PhosysSave.json';
+      const blob = new Blob([data], { type: 'text/json' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = url;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      link.remove();
+    },
+    openSimulationData() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+          const data = JSON.parse(reader.result);
+          console.log(JSON.parse(JSON.stringify(this.data)));
+          //this.data=data doesn't work
+          Object.assign(this.data, data);
+          console.log(JSON.parse(JSON.stringify(this.data)));
+        });
+        reader.readAsText(file);
+      });
+      input.click();
+      input.remove();
     }
   },
-  mounted(){
-    this.isMounted=true;
-    this.sizeObserver = new ResizeObserver(()=>{
-      this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth,this.$refs.flexeditor.offsetHeight);
+  mounted() {
+    this.isMounted = true;
+    //Todo: throttle resizing to improve performance (ex. resize every second, or after no new resize events have been recieved for the past 0.4s)
+    this.sizeObserver = new ResizeObserver(() => {
+      this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight);
     }).observe(this.$refs.flexeditor);
   }
 }
@@ -63,17 +97,22 @@ export default {
   <div class="u-i-container">
     <div class="grid-item top-bar">
       <div class="tool-buttons">
-        <img class="bar-button" title="Open from file" alt="open" src="/playground_assets/folder.png" />
+        <img class="logo" title="Phosys" alt="logo" src="/playground_assets/logo.png" />
+        <img class="bar-button" @click="saveSimulationData()" title="Save simulation to file" alt="open"
+          src="/playground_assets/save.png" />
+        <img class="bar-button" @click="openSimulationData()" title="Open simulation from file" alt="open"
+          src="/playground_assets/folder.png" />
         <img class="bar-button" @click="this.$refs.draw.addRect()" title="Add object" alt="object"
           src="/playground_assets/object.png" />
-        <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource"
-          alt="point lightsource" src="/playground_assets/light.png" />
+        <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource" alt="point lightsource"
+          src="/playground_assets/light.png" />
       </div>
       <div class="action-buttons">
-        <button class="run-button" @click="getFigure()" title="Start simulation">▶&#xFE0E; LAUNCH</button>
+        <button class="run-button" @click="getFigure()" title="Start simulation"><i class="fa-solid fa-play"
+            data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
       </div>
     </div>
-    
+
     <splitpanes id="splitpanes">
       <pane size="20" class="properties grid-item">
         <Properties :selectedShape="this.getShape()" />
@@ -85,13 +124,14 @@ export default {
           </div>
           <div class="grid-item canvas" id="canvas">
             <Result ref="result" />
+            <SeekBar />
           </div>
         </div>
       </pane>
 
     </splitpanes>
 
-    <SeekBar/>
+
   </div>
 </template>
 
@@ -102,7 +142,11 @@ export default {
   box-sizing: border-box;
   margin: 0;
   position: relative;
-  font-weight: normal;
+}
+
+.logo {
+  border-right: 2px solid gray;
+  padding-right: 10px;
 }
 
 body {
@@ -134,7 +178,7 @@ body {
   width: 100vw;
   display: flex;
   flex-direction: column;
-  row-gap: 10px;
+  row-gap: 6px;
   background-color: rgba(167, 161, 161, 1);
 }
 
@@ -144,15 +188,13 @@ body {
   padding: 10px 20px;
 }
 
-.top-bar {
-  height: 50px;
-  padding: 5px;
-  display: flex;
-  flex-direction: row;
-}
+
 
 .canvas {
   padding: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .tool-buttons {
@@ -179,12 +221,21 @@ body {
   max-width: 100%;
 }
 
+.top-bar {
+  height: 56px;
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+}
+
 .run-button {
+  height: 100%;
+  white-space: nowrap;
   max-height: 100%;
   cursor: pointer;
   font-weight: bold;
   padding: 10px;
-  font-size: 1em;
+  font-size: 1.1em;
   border-radius: 10px;
   display: flex;
   justify-content: center;
