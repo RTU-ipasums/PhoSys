@@ -17,7 +17,7 @@ export const frames = reactive({
   loop: false,
   generating: false,
   fps: 30,
-  genActive: false,
+  genActive: false,// used for showing loading spinner
   get genActive() {
     return framecount>framesC.length || this.generating;
   },
@@ -39,10 +39,10 @@ export const frames = reactive({
 
         imgObj.image._groups[0][0].setAttribute("href", "data:image/png;base64," + imgObj.props.data);
       }
-      else if (framesC.length < val) {
+      else if (framesC.length < val) {// too big
         this.frameNum = framesC.length;
       }
-      else if (val < 1) {
+      else if (val < 1) {// too small
         this.frameNum = 1;
       }
       else {
@@ -61,7 +61,7 @@ export const frames = reactive({
     }
     else {
       clearInterval(this.advanceInterval)
-      this.playing = false;
+      this.playing = this.genActive;
     }
   },
   previousFrame: function () {
@@ -97,8 +97,21 @@ export function resetResult() {
 }
 export function pushFrame(frame) {// adds new frame to the buffer
   framesC.push(frame);
-  if (framesC.length - 2 == frameIdx) {
-    frames.frameNum = frameIdx + 2;
+  if (framecount == framesC.length) {
+    frames.generating = false;
+    frames.playing = false;
+    if (frameIdx == framesC.length-2) {
+      frames.frameNum = 1
+    }
+    else {
+      frames.frameNum++;
+      frames.frameNum--;
+    }
+  }
+  else if ((framesC.length - 2 == frameIdx)) {
+    if (frames.playing) {
+      frames.frameNum = frameIdx + 2;
+    }
   }
 }
 
@@ -127,6 +140,7 @@ export function getFigure() {// request initial canvas from backend
   socket.value.on("connect", () => {
     socket.value.emit("sim_data", data)
     resetResult();
+    frames.playing = true;
   });
   socket.value.on("canvas", (drawObj) => {
     console.log(drawObj);
