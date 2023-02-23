@@ -334,6 +334,8 @@ def visualize(
     plt.figlegend()
     plt.tight_layout()
 
+    interactive_legend = plugins.InteractiveLegendPlugin([ob[0] for ob in leg], [ob[1] for ob in leg])
+
     return plt.gcf(), img, interactive_legend
 
 class Property:
