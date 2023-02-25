@@ -15,8 +15,7 @@ export default {
         <div class="seekBar">
             <div class="seek-container">
                 <input v-model.lazy.number="frames.frameNum" type="number" />
-                <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum"
-                    class="slider"><!--TODO add max-->
+                <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum" class="slider">
                 <input v-model.lazy.number="frames.maxFrame" type="number" />
             </div>
             <div class="controls">
@@ -77,8 +76,8 @@ export default {
     border-radius: 50%;
     animation: spin 1s linear infinite;
     border-bottom-color: transparent;
-    width: 30px;
-    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
 }
 
 @keyframes spin {
@@ -117,7 +116,8 @@ input[type=number] {
     background: transparent;
     border: 0;
     border-bottom: 2px solid #676774;
-    width: 100px;
+    width: 100%;
+    max-width: 100px;
     outline: 0;
     transition: 0.1s;
 }
@@ -135,7 +135,7 @@ input[type=number]:focus {
 
 .controls {
     display: grid;
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(3, 1fr);
     grid-column-gap: 5px;
     justify-items: center;
     align-items: center;
@@ -151,7 +151,6 @@ input[type=number]:focus {
     display: flex;
     gap: 10px;
     grid-column-start: 2;
-    align-items: center;
 }
 
 .center-buttons>* {

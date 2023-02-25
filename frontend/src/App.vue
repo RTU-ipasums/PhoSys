@@ -107,10 +107,8 @@ export default {
         <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource" alt="point lightsource"
           src="/playground_assets/light.png" />
       </div>
-      <div class="action-buttons">
-        <button class="run-button" @click="getFigure()" title="Start simulation"><i class="fa-solid fa-play"
-            data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
-      </div>
+      <button class="run-button" @click="getFigure()" title="Start simulation"><i class="fa-solid fa-play"
+          data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
     </div>
 
     <splitpanes id="splitpanes">
@@ -141,7 +139,7 @@ export default {
 ::after {
   box-sizing: border-box;
   margin: 0;
-  position: relative;
+  padding: 0;
 }
 
 .logo {
@@ -150,8 +148,6 @@ export default {
 }
 
 body {
-  margin: 0;
-  padding: 0;
   color: #2c3e50;
   line-height: 1.6;
 }
@@ -183,15 +179,11 @@ body {
 }
 
 .properties {
-
   text-align: center;
   padding: 10px 20px;
 }
 
-
-
 .canvas {
-  padding: 0px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -199,20 +191,12 @@ body {
 
 .tool-buttons {
   display: flex;
-  flex-direction: row;
-  position: relative;
-  padding-right: 10px;
   gap: 10px;
+  min-width: 0px;
 }
 
-.action-buttons {
-  margin-left: auto;
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  height: 100%;
+.tool-buttons>* {
+  flex: 0;
 }
 
 .bar-button {
@@ -225,7 +209,7 @@ body {
   height: 56px;
   padding: 5px;
   display: flex;
-  flex-direction: row;
+  justify-content: space-between;
 }
 
 .run-button {
