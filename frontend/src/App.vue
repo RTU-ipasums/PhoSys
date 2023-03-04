@@ -43,6 +43,7 @@ export default {
       getFigure,
       isMounted: false,
       sizeObserver: null,
+      resizeTimeoutId: undefined,
       data
     }
   },
@@ -87,7 +88,12 @@ export default {
     this.isMounted = true;
     //Todo: throttle resizing to improve performance (ex. resize every second, or after no new resize events have been recieved for the past 0.4s)
     this.sizeObserver = new ResizeObserver(() => {
-      this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight);
+      if (this.resizeTimeoutId) {
+        clearTimeout(this.resizeTimeoutId);
+      }
+      this.resizeTimeoutId = setTimeout(() => {
+        this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight);
+      }, 5)
     }).observe(this.$refs.flexeditor);
   }
 }
