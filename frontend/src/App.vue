@@ -193,6 +193,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  z-index: 1;
 }
 
 .tool-buttons {

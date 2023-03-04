@@ -269,10 +269,35 @@ export default {
     this.data.yBounds = 500;
     window.addEventListener('keydown', e => {
       const key = e.key;
-      if (key === "Delete") {
-        this.deleteShape();
+      if (!this.selectedShapeObject) return;
+      switch (key) {
+        case "Delete":
+          this.deleteShape();
+          break;
+        case "ArrowLeft":
+          this.globalTransform(() => {
+            this.selectedShapeObject.x--;
+          })
+          break;
+        case "ArrowUp":
+          this.globalTransform(() => {
+            this.selectedShapeObject.y--;
+          })
+          break;
+        case "ArrowRight":
+          this.globalTransform(() => {
+            this.selectedShapeObject.x++;
+          })
+          break;
+        case "ArrowDown":
+          this.globalTransform(() => {
+            this.selectedShapeObject.y++;
+          })
+          break;
       }
     });
+    //todo: 	ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CTRL+C, CTRL+V
+
   }
 };
 </script>
@@ -280,7 +305,8 @@ export default {
   <!-- export addrect, import RECT ARRAY from other files -->
   <div>
     <v-stage ref="stage" :config="stageConfig" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
-      @dragend="handleDragend" @touchmove="handleTouch" @touchend="handleTouchEnd" @wheel="zoomStage">
+      @dragend="handleDragend" @touchmove="handleTouch" @touchend="handleTouchEnd" @wheel="zoomStage"
+      @keydown.delete="deleteShape">
       <v-layer ref="layer">
         <v-rect :config="{
           x: 0,
