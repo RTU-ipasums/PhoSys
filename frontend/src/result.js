@@ -19,12 +19,12 @@ export const frames = reactive({
   fps: 30,
   genActive: false,// used for showing loading spinner
   get genActive() {
-    return framecount>framesC.length || this.generating;
+    return framecount > framesC.length || this.generating;
   },
   get maxFrame() {
     return Math.max(framecount, framesC.length)//Math.max(framesC.length, data.properties.find(item => item.propertyName === "Framecount").value);
   },
-  set maxFrame(val){
+  set maxFrame(val) {
     if (framesC.length < val) {// requests aditional frames if out of bounds
       this.frameNum = framesC.length;
       framecount = val;
@@ -100,7 +100,7 @@ export function pushFrame(frame) {// adds new frame to the buffer
   if (framecount == framesC.length) {
     frames.generating = false;
     frames.playing = false;
-    if (frameIdx == framesC.length-2) {
+    if (frameIdx == framesC.length - 2) {
       frames.frameNum = 1
     }
     else {
@@ -146,6 +146,9 @@ export function getFigure() {// request initial canvas from backend
     console.log(drawObj);
     document.getElementById("fig_main").innerHTML = "";
     mpld3.draw_figure("fig_main", drawObj);
+    let svg = document.querySelector(".mpld3-figure");
+    svg.setAttribute("viewBox", "40 40 400 400");
+    svg.setAttribute("preserveAspectRatio", "xMinYMin slice");
   });
   socket.value.on("frame", (imgdata) => {
     console.log("Got frame!!");
