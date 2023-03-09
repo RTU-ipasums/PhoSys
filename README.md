@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a><img src="https://user-images.githubusercontent.com/52111482/204376583-93224acc-b712-4028-8742-98119b433448.png" alt="Logo" width="100%"/></a>
+  <a><img src="https://user-images.githubusercontent.com/47260097/222973916-7ca2e9d3-a7bd-4917-8164-0fdc84df400b.png" alt="Logo" width="100%"/></a>
   <br>
   Phosys
   <br>
