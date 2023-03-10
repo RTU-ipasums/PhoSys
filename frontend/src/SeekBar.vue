@@ -7,6 +7,19 @@ export default {
             frames
         }
     },
+    mounted() {
+    window.addEventListener('keydown', e => {
+      const key = e.key;
+      if (key === " " && e.target.tagName === "BUTTON") {
+            e.preventDefault();
+        }
+      switch (key) {
+        case " ":
+          this.frames.startStop();
+          break;
+      }
+    });
+  }
 }
 </script>
 
