@@ -147,7 +147,7 @@ export function getFigure() {// request initial canvas from backend
     document.getElementById("fig_main").innerHTML = "";
     mpld3.draw_figure("fig_main", drawObj);
     let svg = document.querySelector(".mpld3-figure");
-    svg.setAttribute("viewBox", "40 40 400 400");
+    svg.setAttribute("viewBox", "41 40 400 400");
     svg.setAttribute("preserveAspectRatio", "xMinYMin slice");
   });
   socket.value.on("frame", (imgdata) => {

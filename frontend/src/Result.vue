@@ -8,16 +8,17 @@
 
 <style>
 .mpld3-figure {
-  width: auto;
+  flex: 1;
   height: 100%;
-  overflow: visible;
 }
 
 #fig_main {
+  min-height: 0;
   height: 100%;
 }
 
 #fig_main>* {
   height: 100%;
+  display: flex;
 }
 </style>
