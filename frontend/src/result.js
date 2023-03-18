@@ -132,7 +132,7 @@ AnimViewPlugin.prototype.draw = function () {
 };
 
 export function getFigure() {// request initial canvas from backend
-  console.log(JSON.stringify(data));
+  console.log(JSON.parse(JSON.stringify(data)));
   framecount = data.properties.find(item => item.propertyName === "Framecount").value;
   socket.value.close();
   socket = ref(io(import.meta.env.VITE_BACKEND_URL));

@@ -1,7 +1,6 @@
 <script>
 import { data } from './data.js'
 import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject } from './util.js'
-import * as defaults from './defaultObjects';
 export default {
   data() {
     return {
@@ -191,18 +190,12 @@ export default {
         transformerNode.nodes([]);
       }
     },
-    addRect() {
+    addShape(obj, type) {
+      //type: object, pointsource
       this.currentShapeId++;
       this.data.shapes.push({
-        ...JSON.parse(JSON.stringify(defaults.defaultRect)),
-        name: `object_${this.currentShapeId}`
-      })
-    },
-    addCircle() {
-      this.currentShapeId++;
-      this.data.shapes.push({
-        ...JSON.parse(JSON.stringify(defaults.defaultCircle)),
-        name: `pointsource_${this.currentShapeId}`
+        ...newObject(obj),
+        name: `${type}_${this.currentShapeId}`
       })
     },
     deleteShape() {
@@ -246,27 +239,19 @@ export default {
             this.selectedShapeObject.y++;
           })
           break;
-        /*
         case "c":
           if(!e.ctrlKey||!this.selectedShapeObject) break;
-          this.copiedObject=JSON.parse(JSON.stringify(this.selectedShapeObject));
-          this.selectedShapeObject=null;
+          this.copiedObject=newObject(this.selectedShapeObject);
+          this.copiedObject.x+=10;
+          this.copiedObject.y+=10;
           break;
         case "v":
           if(!e.ctrlKey||!this.copiedObject) break;
-          const name = this.copiedObject.name.split('_')[0];
-          if(name === "pointsource"){
-            this.data.circles.push(JSON.parse(JSON.stringify(this.copiedObject)));
-          }
-          else if(name === "object"){
-            this.data.rectangles.push(JSON.parse(JSON.stringify(this.copiedObject)));
-          }
-          break;
-        */
+          this.addShape(this.copiedObject, this.copiedObject.name.split('_')[0]);
+          this.copiedObject.x+=10;
+          this.copiedObject.y+=10;
       }
     });
-    //todo CTRL+C, CTRL+V
-
   }
 };
 </script>

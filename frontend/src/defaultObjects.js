@@ -1,4 +1,4 @@
-export const defaultRect = {
+export const defaultObject = {
     rotation: 0,
     x: 150,
     y: 150,
@@ -21,7 +21,7 @@ export const defaultRect = {
         }
     ]
 };
-export const defaultCircle = {
+export const defaultPointsource = {
     rotation: 0,
     x: 150,
     y: 150,
