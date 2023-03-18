@@ -86,8 +86,8 @@ export default {
   },
   mounted() {
     this.isMounted = true;
-    //Todo: throttle resizing to improve performance (ex. resize every second, or after no new resize events have been recieved for the past 0.4s)
     this.sizeObserver = new ResizeObserver(() => {
+      //Resizes if no new resize event in the past 5ms
       if (this.resizeTimeoutId) {
         clearTimeout(this.resizeTimeoutId);
       }

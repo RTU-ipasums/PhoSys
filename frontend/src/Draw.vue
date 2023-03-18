@@ -181,14 +181,14 @@ export default {
     addRect() {
       this.currentShapeId++;
       this.data.rectangles.push({
-        ...defaults.defaultRect,
+        ...JSON.parse(JSON.stringify(defaults.defaultRect)),
         name: `object_${this.currentShapeId}`
       })
     },
     addCircle() {
       this.currentShapeId++;
       this.data.circles.push({
-        ...defaults.defaultCircle,
+        ...JSON.parse(JSON.stringify(defaults.defaultCircle)),
         name: `pointsource_${this.currentShapeId}`
       })
     },
