@@ -1,12 +1,13 @@
 <script>
 import { data } from './data.js'
-import { getCenter, getDistance, isTouchEnabled, scaleBy } from './util.js'
+import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject } from './util.js'
 import * as defaults from './defaultObjects';
 export default {
   data() {
     return {
       currentShapeId: 0,
       data,
+      copiedObject: null,
       selectedShapeObject: null,
       lastCenter: null,
       lastDist: 0,
@@ -14,6 +15,18 @@ export default {
         draggable: !isTouchEnabled()
       }
     };
+  },
+  computed: {
+    rectangles() {
+      return this.data.shapes.filter((r) => {
+        return r.name.split('_')[0] === "object";
+      });
+    },
+    circles(){
+      return this.data.shapes.filter((r) => {
+        return r.name.split('_')[0] === "pointsource";
+      });
+    }
   },
   methods: {
     globalTransform(func) {
@@ -156,7 +169,7 @@ export default {
       }
       // find clicked object by its name
       const name = e.target.name();
-      this.selectedShapeObject = this.data.rectangles.concat(this.data.circles).find((r) => r.name === name);
+      this.selectedShapeObject = this.data.shapes.find((r) => r.name === name);
       this.updateTransformer();
     },
     updateTransformer() {
@@ -180,24 +193,21 @@ export default {
     },
     addRect() {
       this.currentShapeId++;
-      this.data.rectangles.push({
+      this.data.shapes.push({
         ...JSON.parse(JSON.stringify(defaults.defaultRect)),
         name: `object_${this.currentShapeId}`
       })
     },
     addCircle() {
       this.currentShapeId++;
-      this.data.circles.push({
+      this.data.shapes.push({
         ...JSON.parse(JSON.stringify(defaults.defaultCircle)),
         name: `pointsource_${this.currentShapeId}`
       })
     },
     deleteShape() {
       //Is there a more efficient way?
-      this.data.rectangles = this.data.rectangles.filter((r) => {
-        return r.name !== this.selectedShapeObject.name;
-      });
-      this.data.circles = this.data.circles.filter((r) => {
+      this.data.shapes = this.data.shapes.filter((r) => {
         return r.name !== this.selectedShapeObject.name;
       });
       this.selectedShapeObject = null;
@@ -236,15 +246,33 @@ export default {
             this.selectedShapeObject.y++;
           })
           break;
+        /*
+        case "c":
+          if(!e.ctrlKey||!this.selectedShapeObject) break;
+          this.copiedObject=JSON.parse(JSON.stringify(this.selectedShapeObject));
+          this.selectedShapeObject=null;
+          break;
+        case "v":
+          if(!e.ctrlKey||!this.copiedObject) break;
+          const name = this.copiedObject.name.split('_')[0];
+          if(name === "pointsource"){
+            this.data.circles.push(JSON.parse(JSON.stringify(this.copiedObject)));
+          }
+          else if(name === "object"){
+            this.data.rectangles.push(JSON.parse(JSON.stringify(this.copiedObject)));
+          }
+          break;
+        */
       }
     });
-    //todo: 	ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CTRL+C, CTRL+V
+    //todo CTRL+C, CTRL+V
 
   }
 };
 </script>
 <template>
   <!-- export addrect, import RECT ARRAY from other files -->
+  <!-- TODO: Make all objects in one array and then add computed property that gets all rectangles/circles for displaying on konva canvas-->
   <div>
     <v-stage ref="stage" :config="stageConfig" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
       @dragend="handleDragend" @touchmove="handleTouch" @touchend="handleTouchEnd" @wheel="zoomStage"
@@ -259,9 +287,9 @@ export default {
           fill: 'gray',
           perfectDrawEnabled: false
         }" />
-        <v-rect v-for="item in data.rectangles" :key="item.id" :config="item" @transformend="handleTransformEnd">
+        <v-rect v-for="item in rectangles" :key="item.id" :config="item" @transformend="handleTransformEnd">
         </v-rect>
-        <v-circle v-for="item in data.circles" :key="item.id" :config="item" @transformend="handleTransformEnd">
+        <v-circle v-for="item in circles" :key="item.id" :config="item" @transformend="handleTransformEnd">
         </v-circle>
         <v-transformer ref="transformer" />
       </v-layer>
