@@ -5,11 +5,11 @@ import io from 'socket.io-client';
 import * as d3 from "d3";
 import * as mpld3 from 'mpld3';
 
-export var socket = ref(io());
-var frameIdx = 0;
-var imgObj = null;
-var framesC = [null];
-var framecount = 1;
+export let socket = ref(io());
+let frameIdx = 0;
+let imgObj = null;
+let framesC = [null];
+let framecount = 1;
 
 export const frames = reactive({
   frameNum: 1,
@@ -125,7 +125,7 @@ function AnimViewPlugin(fig, props) {
 };
 
 AnimViewPlugin.prototype.draw = function () {
-  var imgobjT = mpld3.get_element(this.props.idimg, this.fig);
+  let imgobjT = mpld3.get_element(this.props.idimg, this.fig);
   console.log(imgobjT);
   imgObj = imgobjT;
   framesC[0] = imgobjT.props.data;

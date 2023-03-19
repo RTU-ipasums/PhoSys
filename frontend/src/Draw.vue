@@ -197,6 +197,8 @@ export default {
         ...newObject(obj),
         name: `${type}_${this.currentShapeId}`
       })
+      this.selectedShapeObject=this.data.shapes.at(-1);
+      Promise.resolve(this.selectedShapeObject).then(this.updateTransformer);
     },
     deleteShape() {
       //Is there a more efficient way?
@@ -257,7 +259,6 @@ export default {
 </script>
 <template>
   <!-- export addrect, import RECT ARRAY from other files -->
-  <!-- TODO: Make all objects in one array and then add computed property that gets all rectangles/circles for displaying on konva canvas-->
   <div>
     <v-stage ref="stage" :config="stageConfig" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
       @dragend="handleDragend" @touchmove="handleTouch" @touchend="handleTouchEnd" @wheel="zoomStage"
