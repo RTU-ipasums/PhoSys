@@ -160,7 +160,42 @@ export default {
       selectedShape.scaleX = e.target.scaleX();
       selectedShape.scaleY = e.target.scaleY();
     },
-    handleClick(e) {
+    handleStageMouseDown(e) {
+      // clicked on transformer - do nothing
+      const clickedOnTransformer =
+        e.target.getParent()?.className === 'Transformer';
+      if (clickedOnTransformer) {
+        return;
+      }
+      // find clicked object by its name
+      const name = e.target.name();
+      const shape = this.data.shapes.find((r) => r.name === name);
+      if (shape) {
+        if (!e.evt.shiftKey && !this.selectedShapes.includes(shape)) {
+          this.selectedShapes = [shape];
+        }
+      }
+      this.updateTransformer();
+    },
+    handleDragstart(e){
+      // clicked on transformer - do nothing
+      const clickedOnTransformer =
+        e.target.getParent()?.className === 'Transformer';
+      if (clickedOnTransformer) {
+        return;
+      }
+      // find clicked object by its name
+      const name = e.target.name();
+      const shape = this.data.shapes.find((r) => r.name === name);
+      if (shape) {
+        if(e.evt.shiftKey && !this.selectedShapes.includes(shape)){
+          this.selectedShapes.push(shape);
+          this.updateTransformer();
+        }
+      }
+    },
+    handleStageClick(e) {
+      console.log("click: ", e);
       // clicked on stage - clear selection
       if (e.target === e.target.getStage()) {
         this.selectedShapes = [];
@@ -176,18 +211,22 @@ export default {
       // find clicked object by its name
       const name = e.target.name();
       const shape = this.data.shapes.find((r) => r.name === name);
-      if (shape) {
+      if (!shape) {
+        this.selectedShapes = [];
+      } 
+      else {
         if (e.evt.shiftKey) {
-          if(!this.selectedShapes.includes(shape)){
+          const index = this.selectedShapes.indexOf(shape);
+          if (index === -1) {
             this.selectedShapes.push(shape);
+          } 
+          else {
+            this.selectedShapes.splice(index, 1);
           }
-        }
+        } 
         else {
           this.selectedShapes = [shape];
         }
-      }
-      else{
-        this.selectedShapes = [];
       }
       this.updateTransformer();
     },
@@ -287,9 +326,9 @@ export default {
 <template>
   <!-- export addrect, import RECT ARRAY from other files -->
   <div>
-    <v-stage ref="stage" :config="stageConfig" @click="handleClick" @touchstart="handleClick"
-      @dragend="handleDragend" @touchmove="handleTouch" @touchend="handleTouchEnd" @wheel="zoomStage"
-      @keydown.delete="deleteSelectedShapes">
+    <v-stage ref="stage" :config="stageConfig" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
+      @click="handleStageClick" @dragstart="handleDragstart" @dragend="handleDragend" @touchmove="handleTouch" @touchend="handleTouchEnd"
+      @wheel="zoomStage" @keydown.delete="deleteSelectedShapes">
       <v-layer ref="layer">
         <v-rect :config="{
           x: 0,
