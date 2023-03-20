@@ -25,6 +25,11 @@ export default {
       return this.data.shapes.filter((r) => {
         return r.name.split('_')[0] === "pointsource";
       });
+    },
+    lines() {
+      return this.data.shapes.filter((r) => {
+        return r.name.split('_')[0] === "linesource";
+      });
     }
   },
   methods: {
@@ -326,6 +331,8 @@ export default {
         </v-rect>
         <v-circle v-for="item in circles" :key="item.id" :config="item" @transformend="handleTransformEnd">
         </v-circle>
+        <v-line v-for="item in lines" :key="item.id" :config="item" @transformend="handleTransformEnd">
+        </v-line>
         <v-transformer ref="transformer" />
       </v-layer>
     </v-stage>

@@ -62,3 +62,46 @@ export const defaultPointsource = {
     }
     ]
 }
+export const defaultLinesource = {
+    rotation: 0,
+    x: 150,
+    y: 150,
+    points:[50, 50, 100, 100],
+    scaleX: 1,
+    scaleY: 1,
+    stroke: 'red',
+    fill: 'cyan',
+    opacity: 0.5,
+    tension: 1,
+    perfectDrawEnabled: false,
+    draggable: true,
+    propertyTitle: "Line source light",
+    properties: [{
+        propertyName: "Wavelength, nm",
+        units: "nm",
+        min: 100,
+        max: 1600,
+        _value: 1.5e-6,
+        set value(x) {
+            this._value = x / 1e9;
+        },
+        get value() {
+            return this._value * 1e9;
+        }
+    },
+    {
+        propertyName: "Amplitude",
+        units: "su",
+        min: 1,
+        max: 100,
+        value: 10
+    },
+    {
+        propertyName: "Phase shift, degrees",
+        units: "°",
+        min: 0,
+        max: 180,
+        value: 0
+    }
+    ]
+}
