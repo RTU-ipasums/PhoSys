@@ -103,15 +103,15 @@ export default {
   <div class="u-i-container">
     <div class="grid-item top-bar">
       <div class="tool-buttons">
-        <img class="logo" title="Phosys" alt="logo" src="logo.png" />
+        <img class="logo" title="Phosys" alt="logo" src="/logo.png" />
         <img class="bar-button" @click="saveSimulationData()" title="Save simulation to file" alt="open"
-          src="save.png" />
+          src="/save.png" />
         <img class="bar-button" @click="openSimulationData()" title="Open simulation from file" alt="open"
-          src="folder.png" />
+          src="/folder.png" />
         <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultObject, 'object')" title="Add object" alt="object"
-          src="object.png" />
+          src="/object.png" />
         <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPointsource, 'pointsource')" title="Add point lightsource" alt="point lightsource"
-          src="light.png" />
+          src="/light.png" />
       </div>
       <button class="run-button" @click="getFigure()" title="Start simulation"><i class="fa-solid fa-play"
           data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
