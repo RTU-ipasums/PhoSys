@@ -225,9 +225,7 @@ export default {
     }
   },
   mounted() {
-    //todo fix hard coded size
     //todo limit shape dragging to simulation canvas
-    //todo store shapes in sets, computed property to turn into json
     this.data.xBounds = 500;
     this.data.yBounds = 500;
     window.addEventListener('keydown', e => {
@@ -277,7 +275,7 @@ export default {
   <!-- export addrect, import RECT ARRAY from other files -->
   <div>
     <v-stage ref="stage" :config="stageConfig" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
-      @click="handleStageClick" @dragstart="handleDragstart" @dragend="handleDragend" @touchmove="handleTouch"
+      @click="handleStageClick" @dragend="handleDragend" @touchmove="handleTouch"
       @touchend="handleTouchEnd" @wheel="zoomStage" @keydown.delete="deleteSelectedShapes">
       <v-layer ref="layer">
         <v-rect :config="{
@@ -289,6 +287,7 @@ export default {
           fill: 'gray',
           perfectDrawEnabled: false
         }" />
+        <!--Create shape component-->
         <v-rect v-for="item in rectangles" :key="item.id" :config="item" @transformend="handleTransformEnd">
         </v-rect>
         <v-circle v-for="item in circles" :key="item.id" :config="item" @transformend="handleTransformEnd">

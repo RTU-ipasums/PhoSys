@@ -6,16 +6,19 @@ export default {
             data
         };
     },
-    props: ['selectedShape'],
+    props: ['selectedShapes'],
     computed:{
         getRelevantProperties(){
             let props=this.data.properties;
-            if(this.selectedShape)props=this.selectedShape.properties;
+            //todo fix to work with multiple shapes
+            if(this.selectedShapes?.size===1){
+                props=[...this.selectedShapes][0].properties;
+            }
             return props;
         },
         getPropertyTitle(){
             let title=this.data.propertyTitle;
-            if(this.selectedShape)title=this.selectedShape.propertyTitle;
+            if(this.selectedShapes?.size===1)title=[...this.selectedShapes][0].propertyTitle;
             return title;
         }
     }
