@@ -33,22 +33,6 @@ export default {
     }
   },
   methods: {
-    globalTransform(func) {
-      let stage = this.$refs.transformer.getNode().getStage();
-      let a = stage.position();
-      let b = stage.scale();
-      stage.scale({ x: 1, y: 1 });
-      stage.position({ x: 0, y: 0 });
-      func()
-      stage.scale(b);
-      stage.position(a);
-    },
-    forEachSelectedShape(func) {
-      if (!this.selectedShapes || this.selectedShapes.length === 0) return;
-      this.selectedShapes.forEach((selectedShape) => {
-        func(selectedShape)
-      });
-    },
     //mobile
     handleTouch(e) {
       e.evt.preventDefault();
@@ -144,17 +128,10 @@ export default {
       const name = e.target.name();
       const selectedShape = this.data.shapes.find((r) => r.name === name);
       if (!selectedShape) return;
-      if (selectedShape.name.split('_')[0] === "object") {
-        this.globalTransform(() => {
-          selectedShape.x = e.target.x();
-          selectedShape.y = e.target.y();
-        });
-      } else if (selectedShape.name.split('_')[0] === "pointsource") {
-        this.globalTransform(() => {
-          selectedShape.x = e.target.x() /*+ selectedShape.radius * selectedShape.scaleX*/;
-          selectedShape.y = e.target.y() /*+ selectedShape.radius * selectedShape.scaleY*/;
-        });
-      }
+
+      selectedShape.x = e.target.x();
+      selectedShape.y = e.target.y();
+    
     },
     handleTransformEnd(e) {
       const name = e.target.name();
@@ -183,7 +160,6 @@ export default {
       this.updateTransformer();
     },
     handleStageClick(e) {
-      console.log("click: ", e);
       // clicked on stage - clear selection
       if (e.target === e.target.getStage()) {
         this.selectedShapes = [];
@@ -223,7 +199,7 @@ export default {
       const transformerNode = this.$refs.transformer.getNode();
       const stage = transformerNode.getStage();
       let selectedNodes = [];
-      this.forEachSelectedShape((obj) => {
+      this.selectedShapes.forEach((obj) => {
         selectedNodes.push(stage.findOne('.' + obj.name));
       });
       if (selectedNodes && selectedNodes.length !== 0) {
@@ -246,7 +222,7 @@ export default {
     },
     deleteSelectedShapes(obj) {
       //Is there a more efficient way?
-      this.forEachSelectedShape((selectedShape) => {
+      this.selectedShapes.forEach((selectedShape) => {
         this.data.shapes = this.data.shapes.filter((shape) => {
           return shape.name !== selectedShape.name;
         });
@@ -268,31 +244,23 @@ export default {
           this.deleteSelectedShapes();
           break;
         case "ArrowLeft":
-          this.forEachSelectedShape((obj) => {
-            this.globalTransform(() => {
-              obj.x--;
-            })
+          this.selectedShapes.forEach((obj) => {
+            obj.x=Math.floor(obj.x-0.0001);
           });
           break;
         case "ArrowUp":
-          this.forEachSelectedShape((obj) => {
-            this.globalTransform(() => {
-              obj.y--;
-            })
+          this.selectedShapes.forEach((obj) => {
+            obj.y=Math.floor(obj.y-0.0001);
           });
           break;
         case "ArrowRight":
-          this.forEachSelectedShape((obj) => {
-            this.globalTransform(() => {
-              obj.x++;
-            })
+          this.selectedShapes.forEach((obj) => {
+              obj.x=Math.ceil(obj.x+0.0001);
           });
           break;
         case "ArrowDown":
-          this.forEachSelectedShape((obj) => {
-            this.globalTransform(() => {
-              obj.y++;
-            })
+          this.selectedShapes.forEach((obj) => {
+            obj.y=Math.ceil(obj.y+0.0001);
           });
           break;
         case "c":
