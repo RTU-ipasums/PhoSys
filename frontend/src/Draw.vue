@@ -128,10 +128,8 @@ export default {
       const name = e.target.name();
       const selectedShape = this.data.shapes.find((r) => r.name === name);
       if (!selectedShape) return;
-
       selectedShape.x = e.target.x();
       selectedShape.y = e.target.y();
-
     },
     handleTransformEnd(e) {
       const name = e.target.name();
@@ -211,7 +209,6 @@ export default {
       }
     },
     addShape(obj, type) {
-      //type: object, pointsource
       this.currentShapeId++;
       this.data.shapes.push({
         ...newObject(obj),
@@ -266,13 +263,12 @@ export default {
           break;
         case "v":
           if (!e.ctrlKey || this.copiedShapes.length === 0) break;
-          this.copiedShapes.forEach((obj) => {
+          for (const obj of this.copiedShapes) {
             obj.x += 10;
             obj.y += 10;
-            //Why not push objects directly to the shapes array?
             this.addShape(obj, obj.name.split('_')[0]);
-          })
-      }
+          }
+        }
     });
   }
 };
