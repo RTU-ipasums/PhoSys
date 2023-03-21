@@ -6,7 +6,7 @@ export default {
     return {
       currentShapeId: 0,
       data,
-      copiedObject: null,
+      copiedShapes: new Set(),
       selectedShapes: new Set(),
       lastCenter: null,
       lastDist: 0,
@@ -260,12 +260,13 @@ export default {
           };
           break;
         case "c":
-          if (!e.ctrlKey || this.selectedShapes.length === 0) break;
-          this.copiedObjects = newObject(this.selectedShapes);
+          if (!e.ctrlKey || this.selectedShapes.size === 0) break;
+          this.copiedShapes.clear();
+          this.copiedShapes.add(newObject(...this.selectedShapes));
           break;
         case "v":
-          if (!e.ctrlKey || this.copiedObjects.length === 0) break;
-          this.copiedObjects.forEach((obj) => {
+          if (!e.ctrlKey || this.copiedShapes.length === 0) break;
+          this.copiedShapes.forEach((obj) => {
             obj.x += 10;
             obj.y += 10;
             //Why not push objects directly to the shapes array?
