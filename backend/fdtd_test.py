@@ -438,7 +438,7 @@ def processJson(o):
     #frameCount = gAt(o.frameCount, 100)
 
     elements = []
-    for obj in o.shapes:
+    for obj in o.rectangles + o.circles:
         elements.append( elementMapping[obj.name.split('_')[0]](obj) )
     grid = fdtd.Grid(
         (o.xBounds, o.yBounds, ZMAX),#(2.5e-5, 1.5e-5, 1),
