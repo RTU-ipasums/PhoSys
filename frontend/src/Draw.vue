@@ -6,8 +6,8 @@ export default {
     return {
       currentShapeId: 0,
       data,
-      copiedObject: null,
-      selectedShapes: [],
+      copiedShapes: new Set(),
+      selectedShapes: new Set(),
       lastCenter: null,
       lastDist: 0,
       stageConfig: {
@@ -33,22 +33,6 @@ export default {
     }
   },
   methods: {
-    globalTransform(func) {
-      let stage = this.$refs.transformer.getNode().getStage();
-      let a = stage.position();
-      let b = stage.scale();
-      stage.scale({ x: 1, y: 1 });
-      stage.position({ x: 0, y: 0 });
-      func()
-      stage.scale(b);
-      stage.position(a);
-    },
-    forEachSelectedShape(func) {
-      if (!this.selectedShapes || this.selectedShapes.length === 0) return;
-      this.selectedShapes.forEach((selectedShape) => {
-        func(selectedShape)
-      });
-    },
     //mobile
     handleTouch(e) {
       e.evt.preventDefault();
@@ -144,17 +128,8 @@ export default {
       const name = e.target.name();
       const selectedShape = this.data.shapes.find((r) => r.name === name);
       if (!selectedShape) return;
-      if (selectedShape.name.split('_')[0] === "object") {
-        this.globalTransform(() => {
-          selectedShape.x = e.target.x();
-          selectedShape.y = e.target.y();
-        });
-      } else if (selectedShape.name.split('_')[0] === "pointsource") {
-        this.globalTransform(() => {
-          selectedShape.x = e.target.x() /*+ selectedShape.radius * selectedShape.scaleX*/;
-          selectedShape.y = e.target.y() /*+ selectedShape.radius * selectedShape.scaleY*/;
-        });
-      }
+      selectedShape.x = e.target.x();
+      selectedShape.y = e.target.y();
     },
     handleTransformEnd(e) {
       const name = e.target.name();
@@ -176,17 +151,17 @@ export default {
       const name = e.target.name();
       const shape = this.data.shapes.find((r) => r.name === name);
       if (shape) {
-        if (!e.evt.shiftKey && !this.selectedShapes.includes(shape)) {
-          this.selectedShapes = [shape];
+        if (!e.evt.shiftKey && !this.selectedShapes.has(shape)) {
+          this.selectedShapes.clear();
+          this.selectedShapes.add(shape);
         }
       }
       this.updateTransformer();
     },
     handleStageClick(e) {
-      console.log("click: ", e);
       // clicked on stage - clear selection
       if (e.target === e.target.getStage()) {
-        this.selectedShapes = [];
+        this.selectedShapes.clear();
         this.updateTransformer();
         return;
       }
@@ -200,20 +175,19 @@ export default {
       const name = e.target.name();
       const shape = this.data.shapes.find((r) => r.name === name);
       if (!shape) {
-        this.selectedShapes = [];
-      } 
+        this.selectedShapes.clear();
+      }
       else {
         if (e.evt.shiftKey) {
-          const index = this.selectedShapes.indexOf(shape);
-          if (index === -1) {
-            this.selectedShapes.push(shape);
-          } 
-          else {
-            this.selectedShapes.splice(index, 1);
+          if (!this.selectedShapes.has(shape)) {
+            this.selectedShapes.add(shape);
+          } else {
+            this.selectedShapes.delete(shape);
           }
-        } 
+        }
         else {
-          this.selectedShapes = [shape];
+          this.selectedShapes.clear();
+          this.selectedShapes.add(shape);
         }
       }
       this.updateTransformer();
@@ -223,9 +197,9 @@ export default {
       const transformerNode = this.$refs.transformer.getNode();
       const stage = transformerNode.getStage();
       let selectedNodes = [];
-      this.forEachSelectedShape((obj) => {
-        selectedNodes.push(stage.findOne('.' + obj.name));
-      });
+      for (const selectedShape of this.selectedShapes) {
+        selectedNodes.push(stage.findOne('.' + selectedShape.name));
+      }
       if (selectedNodes && selectedNodes.length !== 0) {
         // attach to another node
         transformerNode.nodes(selectedNodes);
@@ -235,30 +209,23 @@ export default {
       }
     },
     addShape(obj, type) {
-      //type: object, pointsource
       this.currentShapeId++;
       this.data.shapes.push({
         ...newObject(obj),
         name: `${type}_${this.currentShapeId}`
       })
-      this.selectedShapes = [this.data.shapes.at(-1)];
+      this.selectedShapes.clear();
+      this.selectedShapes.add(this.data.shapes.at(-1));
       Promise.resolve(this.selectedShapes).then(this.updateTransformer);
     },
     deleteSelectedShapes(obj) {
-      //Is there a more efficient way?
-      this.forEachSelectedShape((selectedShape) => {
-        this.data.shapes = this.data.shapes.filter((shape) => {
-          return shape.name !== selectedShape.name;
-        });
-      })
-      this.selectedShapes = [];
+      this.data.shapes.filter((shape) => !selectedShapes.has(shape));
+      this.selectedShapes.clear();
       this.updateTransformer();
     }
   },
   mounted() {
-    //todo fix hard coded size
     //todo limit shape dragging to simulation canvas
-    //todo store shapes in sets, computed property to turn into json
     this.data.xBounds = 500;
     this.data.yBounds = 500;
     window.addEventListener('keydown', e => {
@@ -268,45 +235,38 @@ export default {
           this.deleteSelectedShapes();
           break;
         case "ArrowLeft":
-          this.forEachSelectedShape((obj) => {
-            this.globalTransform(() => {
-              obj.x--;
-            })
-          });
+          for (const obj of this.selectedShapes) {
+            obj.x = Math.floor(obj.x - 0.0001);
+          };
           break;
         case "ArrowUp":
-          this.forEachSelectedShape((obj) => {
-            this.globalTransform(() => {
-              obj.y--;
-            })
-          });
+          for (const obj of this.selectedShapes) {
+            obj.y = Math.floor(obj.y - 0.0001);
+          };
           break;
         case "ArrowRight":
-          this.forEachSelectedShape((obj) => {
-            this.globalTransform(() => {
-              obj.x++;
-            })
-          });
+          for (const obj of this.selectedShapes) {
+            obj.x = Math.ceil(obj.x + 0.0001);
+          };
           break;
         case "ArrowDown":
-          this.forEachSelectedShape((obj) => {
-            this.globalTransform(() => {
-              obj.y++;
-            })
-          });
+          for (const obj of this.selectedShapes) {
+            obj.y = Math.ceil(obj.y + 0.0001);
+          };
           break;
         case "c":
-          if (!e.ctrlKey || this.selectedShapes.length === 0) break;
-          this.copiedObjects = newObject(this.selectedShapes);
+          if (!e.ctrlKey || this.selectedShapes.size === 0) break;
+          this.copiedShapes.clear();
+          this.copiedShapes.add(newObject(...this.selectedShapes));
           break;
         case "v":
-          if (!e.ctrlKey || this.copiedObjects.length === 0) break;
-          this.copiedObjects.forEach((obj) => {
+          if (!e.ctrlKey || this.copiedShapes.length === 0) break;
+          for (const obj of this.copiedShapes) {
             obj.x += 10;
             obj.y += 10;
             this.addShape(obj, obj.name.split('_')[0]);
-          })
-      }
+          }
+        }
     });
   }
 };
@@ -315,8 +275,8 @@ export default {
   <!-- export addrect, import RECT ARRAY from other files -->
   <div>
     <v-stage ref="stage" :config="stageConfig" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
-      @click="handleStageClick" @dragstart="handleDragstart" @dragend="handleDragend" @touchmove="handleTouch" @touchend="handleTouchEnd"
-      @wheel="zoomStage" @keydown.delete="deleteSelectedShapes">
+      @click="handleStageClick" @dragend="handleDragend" @touchmove="handleTouch"
+      @touchend="handleTouchEnd" @wheel="zoomStage" @keydown.delete="deleteSelectedShapes">
       <v-layer ref="layer">
         <v-rect :config="{
           x: 0,
@@ -327,6 +287,7 @@ export default {
           fill: 'gray',
           perfectDrawEnabled: false
         }" />
+        <!--Create shape component-->
         <v-rect v-for="item in rectangles" :key="item.id" :config="item" @transformend="handleTransformEnd">
         </v-rect>
         <v-circle v-for="item in circles" :key="item.id" :config="item" @transformend="handleTransformEnd">

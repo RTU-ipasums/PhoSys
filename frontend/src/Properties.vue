@@ -6,16 +6,28 @@ export default {
             data
         };
     },
-    props: ['selectedShape'],
+    props: ['selectedShapes'],
     computed:{
+        //todo fix to work with multiple shapes
         getRelevantProperties(){
             let props=this.data.properties;
-            if(this.selectedShape)props=this.selectedShape.properties;
+            if(this.selectedShapes?.size===1){
+                props=[...this.selectedShapes][0].properties;
+            }
+            return props;
+        },
+        getCoords(){
+            const props = {};
+            if (this.selectedShapes?.size === 1) {
+                const { x, y } = [...this.selectedShapes][0];
+                props.x = Math.round((x + Number.EPSILON) * 100) / 100;
+                props.y = Math.round((y + Number.EPSILON) * 100) / 100;
+            }
             return props;
         },
         getPropertyTitle(){
             let title=this.data.propertyTitle;
-            if(this.selectedShape)title=this.selectedShape.propertyTitle;
+            if(this.selectedShapes?.size===1)title=[...this.selectedShapes][0].propertyTitle;
             return title;
         }
     }
@@ -31,6 +43,7 @@ export default {
     <div class="header">
         <h1>Properties</h1>
         <div>{{ getPropertyTitle }}</div>
+        <div v-if="getCoords"><b>X </b>{{ getCoords.x }} <b>Y </b>{{ getCoords.y }}</div>
     </div>
     <div v-for="property in getRelevantProperties" :key="property" class="property">
         <div>{{ property.propertyName }}</div>

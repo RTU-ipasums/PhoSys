@@ -52,7 +52,7 @@ export default {
   methods: {
     getShape() {
       if (!this.isMounted) return;
-      return this.$refs.draw.selectedShapeObject;
+      return this.$refs.draw.selectedShapes;
     },
     saveSimulationData() {
       const data = JSON.stringify(this.data);
@@ -121,7 +121,7 @@ export default {
 
     <splitpanes id="splitpanes">
       <pane size="20" class="properties grid-item">
-        <Properties :selectedShape="getShape()" />
+        <Properties :selectedShapes="getShape()" />
       </pane>
       <pane>
         <div class="editor-canvas-container">
