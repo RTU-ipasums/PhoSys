@@ -66,10 +66,10 @@ export const defaultLinesource = {
     rotation: 0,
     x: 150,
     y: 150,
-    points:[50, 50, 100, 100],
+    points:[0, 0, 0, 100],
     scaleX: 1,
     scaleY: 1,
-    stroke: 'red',
+    stroke: 'blue',
     fill: 'cyan',
     opacity: 0.5,
     tension: 1,
@@ -92,9 +92,9 @@ export const defaultLinesource = {
     {
         propertyName: "Amplitude",
         units: "su",
-        min: 1,
+        min: 10,
         max: 100,
-        value: 10
+        value: 50
     },
     {
         propertyName: "Phase shift, degrees",
