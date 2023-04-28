@@ -219,9 +219,7 @@ export default {
       Promise.resolve(this.selectedShapes).then(this.updateTransformer);
     },
     deleteSelectedShapes() {
-      this.data.shapes = this.data.shapes.filter((shape) =>{
-        return !this.selectedShapes.has(shape);
-      });
+      this.data.shapes = this.data.shapes.filter((shape) =>!this.selectedShapes.has(shape));
       this.selectedShapes.clear();
       this.updateTransformer();
     }
