@@ -288,12 +288,9 @@ export default {
           perfectDrawEnabled: false
         }" />
         <!--Create shape component-->
-        <v-rect v-for="item in rectangles" :key="item.id" :config="item" @transformend="handleTransformEnd">
-        </v-rect>
-        <v-circle v-for="item in circles" :key="item.id" :config="item" @transformend="handleTransformEnd">
-        </v-circle>
-        <v-line v-for="item in lines" :key="item.id" :config="item" @transformend="handleTransformEnd">
-        </v-line>
+        <v-rect v-for="item in rectangles" :key="item.id" :config="item" @transformend="handleTransformEnd"/>
+        <v-circle v-for="item in circles" :key="item.id" :config="item" @transformend="handleTransformEnd"/>
+        <v-line v-for="item in lines" :key="item.id" :config="item" @transformend="handleTransformEnd"/>
         <v-transformer ref="transformer" />
       </v-layer>
     </v-stage>
