@@ -13,6 +13,7 @@ export default {
         const line = this.$refs.lineobj.getNode();
         line.setPosition(point1pos);
         line.setPoints([0, 0, point2pos.x - point1pos.x, point2pos.y - point1pos.y]);
+        this.config.points=[point1pos.x,point1pos.y,point2pos.x,point2pos.y];
     },
   },
 };
