@@ -63,18 +63,7 @@ export const defaultPointsource = {
     ]
 }
 export const defaultLinesource = {
-    rotation: 0,
-    x: 150,
-    y: 150,
-    points:[0, 0, 0, 100],
-    scaleX: 1,
-    scaleY: 1,
-    stroke: 'blue',
-    fill: 'cyan',
-    opacity: 0.5,
-    tension: 1,
-    perfectDrawEnabled: false,
-    draggable: true,
+    points:[100,100,400,400],
     propertyTitle: "Line source light",
     properties: [{
         propertyName: "Wavelength, nm",

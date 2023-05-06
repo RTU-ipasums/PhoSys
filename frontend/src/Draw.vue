@@ -1,7 +1,11 @@
 <script>
 import { data } from './data.js'
 import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject } from './util.js'
+import DraggableLine from './DraggableLine.vue'
 export default {
+  components: {
+    DraggableLine
+  },
   data() {
     return {
       currentShapeId: 0,
@@ -38,7 +42,7 @@ export default {
       e.evt.preventDefault();
       var touch1 = e.evt.touches[0];
       var touch2 = e.evt.touches[1];
-      const stage = this.$refs.transformer.getNode().getStage();
+      const stage = this.$refs.stage.getStage();
       if (stage == null) {
         return;
       }
@@ -99,13 +103,13 @@ export default {
       this.lastDist = 0;
     },
     updateSize(x, y) {
-      let stage = this.$refs.transformer.getNode().getStage();
+      let stage = this.$refs.stage.getStage();
       stage.width(x);
       stage.height(y);
     },
     zoomStage(event) {
       event.evt.preventDefault();
-      const stage = this.$refs.transformer.getNode().getStage();
+      const stage = this.$refs.stage.getStage();
       if (stage == null) {
         return;
       }
@@ -196,6 +200,7 @@ export default {
       // here we need to manually attach or detach Transformer node
       const transformerNode = this.$refs.transformer.getNode();
       const stage = transformerNode.getStage();
+
       let selectedNodes = [];
       for (const selectedShape of this.selectedShapes) {
         selectedNodes.push(stage.findOne('.' + selectedShape.name));
@@ -208,6 +213,7 @@ export default {
         transformerNode.nodes([]);
       }
     },
+    //TODO: remove transformer for everything except rectangle object
     addShape(obj, type) {
       this.currentShapeId++;
       this.data.shapes.push({
@@ -290,7 +296,7 @@ export default {
         <!--Create shape component-->
         <v-rect v-for="item in rectangles" :key="item.id" :config="item" @transformend="handleTransformEnd"/>
         <v-circle v-for="item in circles" :key="item.id" :config="item" @transformend="handleTransformEnd"/>
-        <v-line v-for="item in lines" :key="item.id" :config="item" @transformend="handleTransformEnd"/>
+        <DraggableLine v-for="item in lines" :key="item.id" :config="item"/>
         <v-transformer ref="transformer" />
       </v-layer>
     </v-stage>
