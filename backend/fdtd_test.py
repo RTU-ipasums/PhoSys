@@ -424,6 +424,10 @@ class RectObj(PermObj):
             else:
                 rightShift = 0 
                 downShift = -int( math.sin(math.radians(self.rotation)) * abs(self.x2-self.x1) )
+
+            print(grid.inverse_permittivity[0, 0, 0])
+            permittivity += 1/grid.inverse_permittivity[int(self.x1)-rightShift:int(self.x1)-rightShift +sizes[0], int(self.y1)-downShift:int(self.y1)-downShift +sizes[1], 0:ZMAX, 0]
+
             grid[int(self.x1)-rightShift:int(self.x1)-rightShift +sizes[0], int(self.y1)-downShift:int(self.y1)-downShift +sizes[1], 0:ZMAX] = fdtd.AnisotropicObject(permittivity=permittivity, name=self.name)
     def patch(self):
         return ptc.Rectangle(
