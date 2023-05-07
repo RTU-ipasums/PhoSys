@@ -56,7 +56,7 @@ export const defaultPointsource = {
     {
         propertyName: "Phase shift, degrees",
         units: "°",
-        min: 0,
+        min: -180,
         max: 180,
         value: 0
     }
@@ -88,7 +88,7 @@ export const defaultLinesource = {
     {
         propertyName: "Phase shift, degrees",
         units: "°",
-        min: 0,
+        min: -180,
         max: 180,
         value: 0
     }
