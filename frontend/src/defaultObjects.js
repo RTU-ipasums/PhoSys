@@ -63,7 +63,7 @@ export const defaultPointsource = {
     ]
 }
 export const defaultLinesource = {
-    points:[100,100,400,400],
+    points:[100,100,200,200],
     propertyTitle: "Line source light",
     properties: [{
         propertyName: "Wavelength, nm",
@@ -81,9 +81,9 @@ export const defaultLinesource = {
     {
         propertyName: "Amplitude",
         units: "su",
-        min: 10,
-        max: 100,
-        value: 50
+        min: 50,
+        max: 500,
+        value: 175
     },
     {
         propertyName: "Phase shift, degrees",
