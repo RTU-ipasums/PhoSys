@@ -376,7 +376,7 @@ class CanvasEl:
         for prop in self.reqProps: 
             propObj = properties[prop]
             try:
-                propVal = next(x for x in self.properties if x.propertyName.lower() == propObj.name )['value']
+                propVal = next(x for x in self.properties if propObj.name in x.propertyName.lower() )['value']
             except StopIteration:
                 propVal = None
             setattr(self, prop.replace(' ', '_'), gAt(propVal, propObj.default, min=propObj.min, max=propObj.max))
@@ -409,10 +409,10 @@ class Source(CanvasEl):
 class Linesource(Source):
     def __init__(self, o) -> None:
         super(Linesource, self).__init__(o)
-        self.x1 = o.points[0]
-        self.y1 = o.points[1]
-        self.x2 = o.points[2]
-        self.y2 = o.points[3]
+        self.x1 = o.points[0]+gAt(o.x, 0)
+        self.y1 = o.points[1]+gAt(o.y, 0)
+        self.x2 = o.points[2]+gAt(o.x, 0)
+        self.y2 = o.points[3]+gAt(o.y, 0)
     def addFdtd(self, grid):
         grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.LineSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 class Pointsource(Source):
@@ -421,6 +421,7 @@ class Pointsource(Source):
         self.x = o.x
         self.y = o.y
     def addFdtd(self, grid):
+        print(self.wavelength)
         grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 
 elementMapping = {
