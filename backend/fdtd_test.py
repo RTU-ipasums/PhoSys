@@ -25,7 +25,7 @@ fdtd.set_backend("numpy")
 
 WAVELENGTH = 1550e-9
 SPEED_LIGHT: float = 299_792_458.0
-gCmap = "twilight"
+gCmap = "Blues"
 
 startTime = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
 
@@ -173,7 +173,7 @@ def visualize(
             elif z is not None:
                 _x = [source.x[0], source.x[-1]]
                 _y = [source.y[0], source.y[-1]]
-            leg.append(plt.plot(_x, _y, lw=1, color=srccolor), "Sources")
+            leg.append((plt.plot(_x, _y, lw=1, color=srccolor), "Sources"))
         elif isinstance(source, PointSource):
             if x is not None:
                 _x = source.y
@@ -421,7 +421,6 @@ class Pointsource(Source):
         self.x = o.x
         self.y = o.y
     def addFdtd(self, grid):
-        print(self.wavelength)
         grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 
 elementMapping = {
