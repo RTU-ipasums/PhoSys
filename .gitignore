@@ -6,3 +6,4 @@ flask_session/
 __pycache__/
 *.pyc
 logs/
+backend/render/*

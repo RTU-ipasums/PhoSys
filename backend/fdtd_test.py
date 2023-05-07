@@ -12,6 +12,11 @@ import fdtd.backend as bd
 from flask_socketio import SocketIO, send, emit
 import io, base64
 import math
+from datetime import datetime
+import os
+
+global debug
+debug = False
 
 ZMAX = 1
 
@@ -21,6 +26,8 @@ fdtd.set_backend("numpy")
 WAVELENGTH = 1550e-9
 SPEED_LIGHT: float = 299_792_458.0
 gCmap = "twilight"
+
+startTime = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
 
 def gAt(inpt, default:str):
     return str(inpt) if inpt else default
@@ -428,9 +435,17 @@ def stepGrid(grid):
     grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]
     plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap=gCmap, format='png', vmin=1e-4, vmax=100)#TODO
     vv.seek(0)
+
+    if debug:
+        with open(f'render/{startTime}/{grid.time_steps_passed}.png', 'wb') as f:
+            f.write(vv.getbuffer())
     return base64.b64encode(vv.read())
 
 def processJson(o):
+    if debug:
+        startTime = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+        os.makedirs(f'render/{startTime}')
+
     globalObj = GlobalObj(o)
     #WAVELENGTH = gAt(o.wavelength, 1550e-9)
     xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
