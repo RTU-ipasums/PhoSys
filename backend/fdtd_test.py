@@ -4,6 +4,9 @@ import matplotlib as mpl
 from matplotlib.colors import FuncNorm
 mpl.use('svg')  # or whatever other backend that you want
 import matplotlib.pyplot as plt
+import matplotlib.patches as ptc
+import numpy as np
+from scipy.ndimage import rotate
 
 import fdtd, sys
 import mpld3
@@ -27,6 +30,9 @@ WAVELENGTH = 1550e-9
 SPEED_LIGHT: float = 299_792_458.0
 gCmap = "Blues"
 
+pmlcolor=(0, 0, 0, 0.1)
+objcolor=(1, 0, 0, 0.1)
+
 startTime = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
 
 def gAt(inpt, default:str):
@@ -40,13 +46,12 @@ def gAt(inpt, default:float, min=None, max=None):
 
 def visualize(
     grid,
+    elements,
     x=None,
     y=None,
     z=None,
     cmap=gCmap,#"Blues",
     pbcolor="C3",
-    pmlcolor=(0, 0, 0, 0.1),
-    objcolor=(1, 0, 0, 0.1),
     srccolor="C0",
     detcolor="C2",
     norm="linear",
@@ -94,7 +99,6 @@ def visualize(
         _PMLZlow,
         _PMLZhigh,
     )
-    import matplotlib.patches as ptc
 
     if animate:  # pause for 0.1s, clear plot
         plt.pause(0.02)
@@ -306,7 +310,7 @@ def visualize(
             )
             plt.gca().add_patch(patch)
 
-    for obj in grid.objects:
+    '''for obj in grid.objects:
         if x is not None:
             _x = (obj.y.start, obj.y.stop)
             _y = (obj.z.start, obj.z.stop)
@@ -326,6 +330,12 @@ def visualize(
             facecolor=objcolor,
         )
         plt.gca().add_patch(patch)
+    '''
+    for elem in elements:
+        try:
+            plt.gca().add_patch(elem.patch())
+        except AttributeError:
+            pass
 
     # visualize the energy in the grid
     cmap_norm = None
@@ -397,8 +407,34 @@ class RectObj(PermObj):
         self.y1 = o.y
         self.x2 = o.x+o.scaleX*o.width
         self.y2 = o.y+o.scaleY*o.height
+        self.rotation = o.rotation
     def addFdtd(self, grid):
-        grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=self.permittivity, name=self.name)
+        if self.rotation==0:
+            grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=self.permittivity, name=self.name)
+        else:
+            #permittivity = np.zeros(grid.shape)
+            permittivity = np.ones((int(abs(self.x2-self.x1)), int(abs(self.y2-self.y1)), 1))*(self.permittivity-globalObj.permittivity)
+            permittivity = rotate(permittivity, self.rotation%180)
+            #permittivity += globalObj.permittivity# to fix the zero permitivity region
+
+            sizes = permittivity.shape
+            if self.rotation > 0:
+                rightShift = int( math.sin(math.radians(self.rotation)) * abs(self.y2-self.y1) ) #amount of shift ringht after transformation
+                downShift = 0
+            else:
+                rightShift = 0 
+                downShift = -int( math.sin(math.radians(self.rotation)) * abs(self.x2-self.x1) )
+            grid[int(self.x1)-rightShift:int(self.x1)-rightShift +sizes[0], int(self.y1)-downShift:int(self.y1)-downShift +sizes[1], 0:ZMAX] = fdtd.AnisotropicObject(permittivity=permittivity, name=self.name)
+    def patch(self):
+        return ptc.Rectangle(
+            xy=(self.x1, self.y1),
+            width=abs(self.x2-self.x1),
+            height=abs(self.y2-self.y1),
+            angle=self.rotation,
+            linewidth=0,
+            edgecolor="none",
+            facecolor=objcolor,
+        )
 
 class Source(CanvasEl):
     def __init__(self, o) -> None:
@@ -446,6 +482,7 @@ def processJson(o):
         startTime = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
         os.makedirs(f'render/{startTime}')
 
+    global globalObj
     globalObj = GlobalObj(o)
     #WAVELENGTH = gAt(o.wavelength, 1550e-9)
     xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
@@ -469,6 +506,7 @@ def processJson(o):
     #grid[:, 0, :] = fdtd.PeriodicBoundary(name="ybounds")
     #grid[:, 0:50, :] = fdtd.PML(name="pml_ylow")
     #rid[:, -50:, :] = fdtd.PML(name="pml_yhigh")
+    grid.sources
     grid[:, :, 0] = fdtd.PeriodicBoundary(name="zbounds")
 
     for i in elements: i.addFdtd(grid)
@@ -476,7 +514,7 @@ def processJson(o):
     grid.run(1, progress_bar=False)
 
     plt.autoscale() 
-    fig, img, interactive_legend = visualize(grid, z=0)
+    fig, img, interactive_legend = visualize(grid, elements, z=0)
 
     #Thread(target=stepGrid, args=[grid, 30]).start()
     #stepGrid(grid, 30)

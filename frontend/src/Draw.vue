@@ -143,6 +143,7 @@ export default {
       selectedShape.y = e.target.y();
       selectedShape.scaleX = e.target.scaleX();
       selectedShape.scaleY = e.target.scaleY();
+      selectedShape.rotation = e.target.rotation();
     },
     handleStageMouseDown(e) {
       // clicked on transformer - do nothing
