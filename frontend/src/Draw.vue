@@ -143,15 +143,7 @@ export default {
       selectedShape.y = e.target.y();
       selectedShape.scaleX = e.target.scaleX();
       selectedShape.scaleY = e.target.scaleY();
-      if (e.target.rotation()>90) {
-        e.target.rotation(90);
-      }
-      else if (e.target.rotation()<-90) {
-        e.target.rotation(-90);
-      }
-      else {
-        selectedShape.rotation = e.target.rotation();
-      }
+      selectedShape.rotation = e.target.rotation();
     },
     handleStageMouseDown(e) {
       // clicked on transformer - do nothing

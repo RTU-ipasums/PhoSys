@@ -9,6 +9,7 @@ import numpy as np
 from scipy.ndimage import rotate
 
 import fdtd, sys
+from pathlib import Path
 import mpld3
 from mpld3 import plugins, utils
 import fdtd.backend as bd
@@ -414,21 +415,22 @@ class RectObj(PermObj):
         else:
             #permittivity = np.zeros(grid.shape)
             permittivity = np.ones((int(abs(self.x2-self.x1)), int(abs(self.y2-self.y1)), 1))*(self.permittivity-globalObj.permittivity)
-            permittivity = rotate(permittivity, self.rotation%180)
+            permittivity = rotate(permittivity, self.rotation)
             #permittivity += globalObj.permittivity# to fix the zero permitivity region
 
             sizes = permittivity.shape
-            if self.rotation > 0:
-                rightShift = int( math.sin(math.radians(self.rotation)) * abs(self.y2-self.y1) ) #amount of shift ringht after transformation
+            if (90 > self.rotation > 0) or (-90 > self.rotation > -180):
+                rightShift = int( math.sin(math.radians(self.rotation)) * (self.y2-self.y1) ) #amount of shift ringht after transformation
                 downShift = 0
             else:
                 rightShift = 0 
-                downShift = -int( math.sin(math.radians(self.rotation)) * abs(self.x2-self.x1) )
+                downShift = -int( math.sin(math.radians(self.rotation)) * (self.x2-self.x1) )
 
-            print(grid.inverse_permittivity[0, 0, 0])
             permittivity += 1/grid.inverse_permittivity[int(self.x1)-rightShift:int(self.x1)-rightShift +sizes[0], int(self.y1)-downShift:int(self.y1)-downShift +sizes[1], 0:ZMAX, 0]
 
-            grid[int(self.x1)-rightShift:int(self.x1)-rightShift +sizes[0], int(self.y1)-downShift:int(self.y1)-downShift +sizes[1], 0:ZMAX] = fdtd.AnisotropicObject(permittivity=permittivity, name=self.name)
+            rvrs = sizes if abs(self.rotation)>90 else [0, 0]
+            grid[int(self.x1)-rightShift -rvrs[0]: int(self.x1)-rightShift+sizes[0] -rvrs[0], 
+                 int(self.y1)-downShift -rvrs[1]: int(self.y1)-downShift+sizes[1] -rvrs[1], 0:ZMAX] = fdtd.AnisotropicObject(permittivity=permittivity, name=self.name)
     def patch(self):
         return ptc.Rectangle(
             xy=(self.x1, self.y1),
@@ -477,7 +479,9 @@ def stepGrid(grid):
     vv.seek(0)
 
     if debug:
-        with open(f'render/{startTime}/{grid.time_steps_passed}.png', 'wb') as f:
+        filePath = Path(f'render/{startTime}/{grid.time_steps_passed}.png')
+        filePath.touch(exist_ok= True)
+        with open(filePath, 'wb') as f:
             f.write(vv.getbuffer())
     return base64.b64encode(vv.read())
 
