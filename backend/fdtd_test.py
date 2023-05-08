@@ -371,6 +371,7 @@ properties = {
     'amplitude': [0,None,10.],
     'phase shift': [0,360,0.],
     'resolution': [1, 30, int(15)],
+    'conductivity': [0,None,1.],
 }
 for propKey, propValue in properties.items():
     properties[propKey] = Property(propKey, *propValue)
@@ -399,7 +400,7 @@ class GlobalObj(CanvasEl):
 
 class PermObj(CanvasEl):
     def __init__(self, o) -> None:
-        self.reqProps = ['permittivity']
+        self.reqProps = ['permittivity', 'conductivity']
         super(PermObj, self).__init__(o)
 class RectObj(PermObj):
     def __init__(self, o) -> None:
@@ -411,26 +412,31 @@ class RectObj(PermObj):
         self.rotation = o.rotation
     def addFdtd(self, grid):
         if self.rotation==0:
-            grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=self.permittivity, name=self.name)
+            grid[round(self.x1):round(self.x2), round(self.y1):round(self.y2), 0:ZMAX] = fdtd.AbsorbingObject(permittivity=self.permittivity, conductivity=self.conductivity, name=self.name)
         else:
             #permittivity = np.zeros(grid.shape)
             permittivity = np.ones((int(abs(self.x2-self.x1)), int(abs(self.y2-self.y1)), 1))*(self.permittivity-globalObj.permittivity)
+            conductivity =  np.ones((int(abs(self.x2-self.x1)), int(abs(self.y2-self.y1)), 1))*self.conductivity
+
             permittivity = rotate(permittivity, self.rotation)
-            #permittivity += globalObj.permittivity# to fix the zero permitivity region
+            conductivity = rotate(conductivity, self.rotation)
 
             sizes = permittivity.shape
             if (90 > self.rotation > 0) or (-90 > self.rotation > -180):
-                rightShift = int( math.sin(math.radians(self.rotation)) * (self.y2-self.y1) ) #amount of shift ringht after transformation
+                rightShift = round( math.sin(math.radians(self.rotation)) * (self.y2-self.y1) ) #amount of shift ringht after transformation
                 downShift = 0
             else:
                 rightShift = 0 
-                downShift = -int( math.sin(math.radians(self.rotation)) * (self.x2-self.x1) )
+                downShift = -round( math.sin(math.radians(self.rotation)) * (self.x2-self.x1) )
 
-            permittivity += 1/grid.inverse_permittivity[int(self.x1)-rightShift:int(self.x1)-rightShift +sizes[0], int(self.y1)-downShift:int(self.y1)-downShift +sizes[1], 0:ZMAX, 0]
+            permittivity += 1/grid.inverse_permittivity[round(self.x1)-rightShift:round(self.x1)-rightShift +sizes[0],
+                                                         round(self.y1)-downShift:round(self.y1)-downShift +sizes[1]
+                                                         , 0:ZMAX, 0]# to fix the zero permitivity region
 
             rvrs = sizes if abs(self.rotation)>90 else [0, 0]
-            grid[int(self.x1)-rightShift -rvrs[0]: int(self.x1)-rightShift+sizes[0] -rvrs[0], 
-                 int(self.y1)-downShift -rvrs[1]: int(self.y1)-downShift+sizes[1] -rvrs[1], 0:ZMAX] = fdtd.AnisotropicObject(permittivity=permittivity, name=self.name)
+            grid[round(self.x1)-rightShift -rvrs[0]: round(self.x1)-rightShift+sizes[0] -rvrs[0], 
+                 round(self.y1)-downShift -rvrs[1]: round(self.y1)-downShift+sizes[1] -rvrs[1]
+                 , 0:ZMAX] = fdtd.AbsorbingObject(permittivity=permittivity, conductivity=conductivity, name=self.name)
     def patch(self):
         return ptc.Rectangle(
             xy=(self.x1, self.y1),

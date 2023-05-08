@@ -18,7 +18,14 @@ export const defaultObject = {
             min: 0,
             max: 100,
             value: 25
-        }
+        },
+        {
+            propertyName: "Conductivity",
+            units: "S/m",
+            min: 0,
+            max: 30000,
+            value: 0
+        },
     ]
 };
 export const defaultPointsource = {
