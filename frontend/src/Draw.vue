@@ -129,7 +129,6 @@ export default {
       stage.batchDraw();
     },
     handleDragend(e) {
-      this.updateTransformer();
       const name = e.target.name();
       const selectedShape = this.data.shapes.find((r) => r.name === name);
       if (!selectedShape) return;
@@ -252,6 +251,7 @@ export default {
           break;
         case "ArrowLeft":
           for (const obj of this.selectedShapes) {
+            console.log(this.selectedShapes);
             obj.x = Math.floor(obj.x - 0.0001);
           };
           break;

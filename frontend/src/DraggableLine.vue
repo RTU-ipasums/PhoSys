@@ -21,12 +21,14 @@ export default {
 <template>
 <v-group :config="{ 
     draggable: true,
-    name:config.name
+    name:config.name,
+    x:config.x,
+    y:config.y
 }">
     <v-line :config="{
                 x: config.points[0],
                 y: config.points[1],
-                points: [0, 0, config.points[2]-config.points[0], config.points[3]-config.points[1]],
+                points: [0, 0, config.points[2], config.points[3]],
                 strokeWidth: 5,
                 opacity: 0.5,
                 stroke: 'blue',
@@ -35,8 +37,8 @@ export default {
     ref="lineobj"/>
     <v-circle :config="{
                 rotation: 0,
-                x: config.points[0],
-                y: config.points[1],
+                x: 0,
+                y: 0,
                 radius: 10,
                 scaleX: 1,
                 scaleY: 1,
