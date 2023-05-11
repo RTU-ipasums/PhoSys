@@ -12,6 +12,11 @@ import fdtd.backend as bd
 from flask_socketio import SocketIO, send, emit
 import io, base64
 import math
+from datetime import datetime
+import os
+
+global debug
+debug = False
 
 ZMAX = 1
 
@@ -20,6 +25,9 @@ fdtd.set_backend("numpy")
 
 WAVELENGTH = 1550e-9
 SPEED_LIGHT: float = 299_792_458.0
+gCmap = "twilight"
+
+startTime = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
 
 def gAt(inpt, default:str):
     return str(inpt) if inpt else default
@@ -35,7 +43,7 @@ def visualize(
     x=None,
     y=None,
     z=None,
-    cmap="Blues",
+    cmap=gCmap,#"Blues",
     pbcolor="C3",
     pmlcolor=(0, 0, 0, 0.1),
     objcolor=(1, 0, 0, 0.1),
@@ -120,12 +128,13 @@ def visualize(
             "at least one projection plane (x, y or z) should be supplied to visualize the grid!"
         )
 
-    # just to create the right legend entries:
+    # just to create the right legend entries: "Objects", "PML", "Periodic Boundaries", "Sources", "Detectors"
     plt.plot([], lw=7, color=objcolor, label="Objects")
     plt.plot([], lw=7, color=pmlcolor, label="PML")
     plt.plot([], lw=3, color=pbcolor, label="Periodic Boundaries")
-    #plt.plot([], lw=3, color=srccolor, label="Sources") #temp
+    plt.plot([], lw=3, color=srccolor, label="Sources") #temp
     plt.plot([], lw=3, color=detcolor, label="Detectors")
+    leg=[]
 
     # Grid energy
     grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)
@@ -164,7 +173,7 @@ def visualize(
             elif z is not None:
                 _x = [source.x[0], source.x[-1]]
                 _y = [source.y[0], source.y[-1]]
-            plt.plot(_x, _y, lw=1, color=srccolor)
+            leg.append(plt.plot(_x, _y, lw=1, color=srccolor), "Sources")
         elif isinstance(source, PointSource):
             if x is not None:
                 _x = source.y
@@ -175,7 +184,8 @@ def visualize(
             elif z is not None:
                 _x = source.x
                 _y = source.y
-            plt.plot(_x - 0.5, _y - 0.5, lw=1, marker="o", color=srccolor)
+            
+            leg.append((plt.plot(_x - 0.5, _y - 0.5, lw=1, marker="o", color=srccolor), "Sources"))
             grid_energy[_x, _y] = 0  # do not visualize energy at location of source
         elif isinstance(source, PlaneSource):
             if x is not None:
@@ -331,7 +341,9 @@ def visualize(
     plt.figlegend()
     plt.tight_layout()
 
-    return plt.gcf(), img
+    interactive_legend = plugins.InteractiveLegendPlugin([ob[0] for ob in leg], [ob[1] for ob in leg])
+
+    return plt.gcf(), img, interactive_legend
 
 class Property:
     def __init__(self, name, min, max, default) -> None:
@@ -364,7 +376,7 @@ class CanvasEl:
         for prop in self.reqProps: 
             propObj = properties[prop]
             try:
-                propVal = next(x for x in self.properties if x.propertyName.lower() == propObj.name )['value']
+                propVal = next(x for x in self.properties if propObj.name in x.propertyName.lower() )['value']
             except StopIteration:
                 propVal = None
             setattr(self, prop.replace(' ', '_'), gAt(propVal, propObj.default, min=propObj.min, max=propObj.max))
@@ -397,10 +409,10 @@ class Source(CanvasEl):
 class Linesource(Source):
     def __init__(self, o) -> None:
         super(Linesource, self).__init__(o)
-        self.x1 = o.points[0]*o.scaleX+o.x
-        self.y1 = o.points[1]*o.scaleY+o.y
-        self.x2 = o.points[2]*o.scaleX+o.x
-        self.y2 = o.points[3]*o.scaleY+o.y
+        self.x1 = o.points[0]+gAt(o.x, 0)
+        self.y1 = o.points[1]+gAt(o.y, 0)
+        self.x2 = o.points[2]+gAt(o.x, 0)
+        self.y2 = o.points[3]+gAt(o.y, 0)
     def addFdtd(self, grid):
         grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.LineSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 class Pointsource(Source):
@@ -409,6 +421,7 @@ class Pointsource(Source):
         self.x = o.x
         self.y = o.y
     def addFdtd(self, grid):
+        print(self.wavelength)
         grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 
 elementMapping = {
@@ -421,11 +434,19 @@ def stepGrid(grid):
     grid.step()
     vv = io.BytesIO()
     grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]
-    plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap="Blues", format='png', vmin=1e-4, vmax=100)#TODO
+    plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap=gCmap, format='png', vmin=1e-4, vmax=100)#TODO
     vv.seek(0)
+
+    if debug:
+        with open(f'render/{startTime}/{grid.time_steps_passed}.png', 'wb') as f:
+            f.write(vv.getbuffer())
     return base64.b64encode(vv.read())
 
 def processJson(o):
+    if debug:
+        startTime = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+        os.makedirs(f'render/{startTime}')
+
     globalObj = GlobalObj(o)
     #WAVELENGTH = gAt(o.wavelength, 1550e-9)
     xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
@@ -433,7 +454,7 @@ def processJson(o):
     #frameCount = gAt(o.frameCount, 100)
 
     elements = []
-    for obj in o.shapes:
+    for obj in (o.rectangles+o.circles if o.rectangles!=None else []) + (o.shapes if o.shapes!=None else []):
         elements.append( elementMapping[obj.name.split('_')[0]](obj) )
     grid = fdtd.Grid(
         (o.xBounds, o.yBounds, ZMAX),#(2.5e-5, 1.5e-5, 1),
@@ -456,7 +477,7 @@ def processJson(o):
     grid.run(1, progress_bar=False)
 
     plt.autoscale() 
-    fig, img = visualize(grid, z=0)
+    fig, img, interactive_legend = visualize(grid, z=0)
 
     #Thread(target=stepGrid, args=[grid, 30]).start()
     #stepGrid(grid, 30)
@@ -466,7 +487,7 @@ def processJson(o):
     fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
 
     plugins.clear(fig)
-    plugins.connect(fig, plugins.Zoom(button=False), AnimView(img))
+    plugins.connect(fig, plugins.Zoom(button=False), AnimView(img), interactive_legend)
     outJson = mpld3.fig_to_dict(fig)
     fig.clear()
     plt.close()
