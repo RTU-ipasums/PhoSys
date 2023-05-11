@@ -174,6 +174,7 @@ export default {
       // find clicked object by its name
       const name = e.target.name();
       const shape = this.data.shapes.find((r) => r.name === name);
+
       if (!shape) {
         this.selectedShapes.clear();
       }
@@ -206,6 +207,15 @@ export default {
       } else {
         // remove transformer
         transformerNode.nodes([]);
+      }
+      //console.log(this.selectedShapes.size, this.selectedShapes);
+      if(this.selectedShapes.size === 1 && [...this.selectedShapes][0].name.startsWith("object_")){
+        transformerNode.resizeEnabled(true);
+        transformerNode.rotateEnabled(true);
+      }
+      else{
+        transformerNode.resizeEnabled(false);
+        transformerNode.rotateEnabled(false);
       }
     },
     addShape(obj, type) {
