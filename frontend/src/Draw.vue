@@ -129,6 +129,7 @@ export default {
       stage.batchDraw();
     },
     handleDragend(e) {
+      this.updateTransformer();
       const name = e.target.name();
       const selectedShape = this.data.shapes.find((r) => r.name === name);
       if (!selectedShape) return;
@@ -213,7 +214,6 @@ export default {
         // remove transformer
         transformerNode.nodes([]);
       }
-      //console.log(this.selectedShapes.size, this.selectedShapes);
       if(this.selectedShapes.size === 1 && [...this.selectedShapes][0].name.startsWith("object_")){
         transformerNode.resizeEnabled(true);
         transformerNode.rotateEnabled(true);

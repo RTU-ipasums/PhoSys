@@ -29,7 +29,8 @@ export default {
                 points: [0, 0, config.points[2]-config.points[0], config.points[3]-config.points[1]],
                 strokeWidth: 5,
                 opacity: 0.5,
-                stroke: 'blue'
+                stroke: 'blue',
+                name:config.name
             }"
     ref="lineobj"/>
     <v-circle :config="{
@@ -43,6 +44,7 @@ export default {
                 opacity: 0.5,
                 perfectDrawEnabled: false,
                 draggable: true,
+                name:config.name
             }"
      ref="point1obj" @dragmove="updateLine"/>
     <v-circle :config="{
@@ -56,6 +58,7 @@ export default {
                 opacity: 0.5,
                 perfectDrawEnabled: false,
                 draggable: true,
+                name:config.name
             }"
      ref="point2obj" @dragmove="updateLine"/>
 </v-group>
