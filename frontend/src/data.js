@@ -24,7 +24,7 @@ export const data = reactive({
         value:1
     }
     ],
-    rectangles: [
+    shapes: [
         // {
         //   rotation: 0,
         //   x: 5,
@@ -36,10 +36,7 @@ export const data = reactive({
         //   fill: 'red',
         //   name: 'object_1',
         //   draggable: true,
-        // }
-        
-      ],
-      circles:[
+        // },
         // {
         //   rotation: 0,
         //   x: 10,
