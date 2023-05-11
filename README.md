@@ -6,10 +6,29 @@
   <br>
 </h1>
 
-<h4 align="center"> A simple to use, web-based photonics simulator. Made during <a href="https://the-raccoons-2022.devpost.com/?ref_feature=challenge" target="_blank">the Racoons Hackathon</a>.</h4>
+<h4 align="center"> A simple to use, web-based photonics simulator. Based on <a href="https://github.com/flaport">flaport's<a/> <a href="https://github.com/flaport/fdtd">fdtd<a/> library.</h4>
 
 ## How To Use
-A demo page is currently hosted on [phosys.pages.dev](https://phosys.pages.dev)
+A demo page is currently hosted on [phosys.lv](https://phosys.lv)
 
 ## How to host
-To run this application, you'll need [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) and [Docker](https://www.docker.com/) installed on your computer.
+To run this application, you'll need [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) and Python 3.10+ installed on your computer.
+Optionally you can use Conda to create an isolated environment with the commmand `conda create -n phosys python=3.3.0` and activate it each time with:
+```
+conda activate
+conda activate phosys
+```
+
+After cloning the repository open two terminals and run:
+```
+cd frontend
+npm i
+npm run dev
+```
+And:
+```
+cd backend
+pip install -r requirements.txt
+flask --app main.py --debug run
+```
+(`npm i` and `pip install` are only required to update/install)
