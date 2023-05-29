@@ -130,9 +130,7 @@ export default {
     },
     handleDragend(e) {
       this.updateTransformer();
-
-      let name = e.target.name();
-
+      const name = e.target.name();
       const selectedShape = this.data.shapes.find((r) => r.name === name);
       if (!selectedShape) return;
       const newPos=e.target.position();
@@ -140,7 +138,7 @@ export default {
       selectedShape.y = newPos.y;
     },
     handleTransformEnd(e) {
-      let name = e.target.name();
+      const name = e.target.name();
       const selectedShape = this.data.shapes.find((r) => r.name === name);
       if (!selectedShape) return;
       selectedShape.x = e.target.x();
@@ -157,7 +155,7 @@ export default {
         return;
       }
       // find clicked object by its name
-      let name = e.target.name();
+      const name = e.target.name();
       
       const shape = this.data.shapes.find((r) => r.name === name);
       if (shape) {
@@ -264,6 +262,7 @@ export default {
           break;
         case "ArrowLeft":
           for (const obj of this.selectedShapes) {
+            console.log(this.selectedShapes);
             obj.x = Math.floor(obj.x - 0.0001);
           };
           break;

@@ -37,8 +37,8 @@ export default {
     ref="lineobj"/>
     <v-circle :config="{
                 rotation: 0,
-                x: config.points[0],
-                y: config.points[1],
+                x: 0,
+                y: 0,
                 radius: 10,
                 scaleX: 1,
                 scaleY: 1,

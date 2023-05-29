@@ -66,7 +66,6 @@ export const defaultLinesource = {
     x:0,
     y:0,
     points:[100,100,200,200],
-
     propertyTitle: "Line source light",
     properties: [{
         propertyName: "Wavelength, nm",
