@@ -8,12 +8,15 @@ export default {
     props: ['config'],
     methods: {
     updateLine() {
+        console.log("updateLine");
         const point1pos = this.$refs.point1obj.getNode().getPosition();
         const point2pos = this.$refs.point2obj.getNode().getPosition();  
         const line = this.$refs.lineobj.getNode();
-        line.setPosition(point1pos);
-        line.setPoints([0, 0, point2pos.x - point1pos.x, point2pos.y - point1pos.y]);
-        this.config.points=[point1pos.x,point1pos.y,point2pos.x,point2pos.y];
+        line.setPoints([point1pos.x, point1pos.y, point2pos.x, point2pos.y]);
+        this.config.points[0]=point1pos.x;
+        this.config.points[1]=point1pos.y;
+        this.config.points[2]=point2pos.x;
+        this.config.points[3]=point2pos.y;
     },
   },
 };
@@ -26,13 +29,10 @@ export default {
     y:config.y
 }">
     <v-line :config="{
-                x: config.points[0],
-                y: config.points[1],
-                points: [0, 0, config.points[2], config.points[3]],
+                points: config.points,
                 strokeWidth: 5,
                 opacity: 0.5,
                 stroke: 'blue',
-                name:config.name
             }"
     ref="lineobj"/>
     <v-circle :config="{
@@ -46,7 +46,6 @@ export default {
                 opacity: 0.5,
                 perfectDrawEnabled: false,
                 draggable: true,
-                name:config.name
             }"
      ref="point1obj" @dragmove="updateLine"/>
     <v-circle :config="{
@@ -60,7 +59,6 @@ export default {
                 opacity: 0.5,
                 perfectDrawEnabled: false,
                 draggable: true,
-                name:config.name
             }"
      ref="point2obj" @dragmove="updateLine"/>
 </v-group>
