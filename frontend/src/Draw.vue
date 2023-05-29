@@ -130,22 +130,24 @@ export default {
     },
     handleDragend(e) {
       this.updateTransformer();
-      const name = e.target.name();
+
+      let name = e.target.name();
+
       const selectedShape = this.data.shapes.find((r) => r.name === name);
       if (!selectedShape) return;
-      selectedShape.x = e.target.x();
-      selectedShape.y = e.target.y();
-      console.dir("handleDragEnd", selectedShape, e.target);
+      const newPos=e.target.position();
+      selectedShape.x =newPos.x;
+      selectedShape.y = newPos.y;
     },
     handleTransformEnd(e) {
-      const name = e.target.name();
+      let name = e.target.name();
       const selectedShape = this.data.shapes.find((r) => r.name === name);
       if (!selectedShape) return;
       selectedShape.x = e.target.x();
       selectedShape.y = e.target.y();
+      
       selectedShape.scaleX = e.target.scaleX();
       selectedShape.scaleY = e.target.scaleY();
-      console.dir("handleTransformEnd", selectedShape, e.target);
     },
     handleStageMouseDown(e) {
       // clicked on transformer - do nothing
@@ -155,12 +157,14 @@ export default {
         return;
       }
       // find clicked object by its name
-      const name = e.target.name();
+      let name = e.target.name();
+      
       const shape = this.data.shapes.find((r) => r.name === name);
       if (shape) {
         if (!e.evt.shiftKey && !this.selectedShapes.has(shape)) {
           this.selectedShapes.clear();
           this.selectedShapes.add(shape);
+          console.log(structuredClone(this.selectedShapes.size));
         }
       }
       this.updateTransformer();
@@ -168,6 +172,7 @@ export default {
     handleStageClick(e) {
       // clicked on stage - clear selection
       if (e.target === e.target.getStage()) {
+        
         this.selectedShapes.clear();
         this.updateTransformer();
         return;
@@ -179,7 +184,12 @@ export default {
         return;
       }
       // find clicked object by its name
-      const name = e.target.name();
+      let name = e.target.name();
+      if(!name)
+      {
+        //TODO:This isn't the most optimal solution
+        name=e.target.getParent().name();
+      }
       const shape = this.data.shapes.find((r) => r.name === name);
 
       if (!shape) {
@@ -293,8 +303,8 @@ export default {
   <!-- export addrect, import RECT ARRAY from other files -->
   <div>
     <v-stage ref="stage" :config="stageConfig" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
-      @click="handleStageClick" @dragend="handleDragend" @touchmove="handleTouch"
-      @touchend="handleTouchEnd" @wheel="zoomStage" @keydown.delete="deleteSelectedShapes">
+      @click="handleStageClick"  @touchmove="handleTouch"
+      @touchend="handleTouchEnd" @wheel="zoomStage" @keydown.delete="deleteSelectedShapes" @dragend="handleDragend">
       <v-layer ref="layer">
         <v-rect :config="{
           x: 0,
