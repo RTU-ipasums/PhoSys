@@ -135,6 +135,7 @@ export default {
       if (!selectedShape) return;
       selectedShape.x = e.target.x();
       selectedShape.y = e.target.y();
+      console.dir("handleDragEnd", selectedShape, e.target);
     },
     handleTransformEnd(e) {
       const name = e.target.name();
@@ -144,6 +145,7 @@ export default {
       selectedShape.y = e.target.y();
       selectedShape.scaleX = e.target.scaleX();
       selectedShape.scaleY = e.target.scaleY();
+      console.dir("handleTransformEnd", selectedShape, e.target);
     },
     handleStageMouseDown(e) {
       // clicked on transformer - do nothing
