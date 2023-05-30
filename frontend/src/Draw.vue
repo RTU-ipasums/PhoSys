@@ -2,9 +2,13 @@
 import { data } from './data.js'
 import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject } from './util.js'
 import DraggableLine from './DraggableLine.vue'
+import Rectangle from './Rectangle.vue'
+import Circle from './Circle.vue'
 export default {
   components: {
-    DraggableLine
+    DraggableLine,
+    Rectangle,
+    Circle
   },
   data() {
     return {
@@ -128,25 +132,6 @@ export default {
       stage.position(newPos);
       stage.batchDraw();
     },
-    handleDragend(e) {
-      this.updateTransformer();
-      const name = e.target.name();
-      const selectedShape = this.data.shapes.find((r) => r.name === name);
-      if (!selectedShape) return;
-      const newPos=e.target.position();
-      selectedShape.x =newPos.x;
-      selectedShape.y = newPos.y;
-    },
-    handleTransformEnd(e) {
-      const name = e.target.name();
-      const selectedShape = this.data.shapes.find((r) => r.name === name);
-      if (!selectedShape) return;
-      selectedShape.x = e.target.x();
-      selectedShape.y = e.target.y();
-      
-      selectedShape.scaleX = e.target.scaleX();
-      selectedShape.scaleY = e.target.scaleY();
-    },
     handleStageMouseDown(e) {
       // clicked on transformer - do nothing
       const clickedOnTransformer =
@@ -155,14 +140,17 @@ export default {
         return;
       }
       // find clicked object by its name
-      const name = e.target.name();
-      
+      let name = e.target.name();
+      if(!name)
+      {
+        //TODO:This isn't the most optimal solution
+        name=e.target?.getParent().name();
+      }
       const shape = this.data.shapes.find((r) => r.name === name);
       if (shape) {
         if (!e.evt.shiftKey && !this.selectedShapes.has(shape)) {
           this.selectedShapes.clear();
           this.selectedShapes.add(shape);
-          console.log(structuredClone(this.selectedShapes.size));
         }
       }
       this.updateTransformer();
@@ -262,7 +250,6 @@ export default {
           break;
         case "ArrowLeft":
           for (const obj of this.selectedShapes) {
-            console.log(this.selectedShapes);
             obj.x = Math.floor(obj.x - 0.0001);
           };
           break;
@@ -303,7 +290,7 @@ export default {
   <div>
     <v-stage ref="stage" :config="stageConfig" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
       @click="handleStageClick"  @touchmove="handleTouch"
-      @touchend="handleTouchEnd" @wheel="zoomStage" @keydown.delete="deleteSelectedShapes" @dragend="handleDragend">
+      @touchend="handleTouchEnd" @wheel="zoomStage" @keydown.delete="deleteSelectedShapes">
       <v-layer ref="layer">
         <v-rect :config="{
           x: 0,
@@ -315,9 +302,9 @@ export default {
           perfectDrawEnabled: false
         }" />
         <!--Create shape component-->
-        <v-rect v-for="item in rectangles" :key="item.id" :config="item" @transformend="handleTransformEnd"/>
-        <v-circle v-for="item in circles" :key="item.id" :config="item" @transformend="handleTransformEnd"/>
-        <DraggableLine v-for="item in lines" :key="item.id" :config="item"/>
+        <Circle v-for="item in circles" :key="item.id" :config="item"/>
+        <DraggableLine v-for="item in lines" :key="item.id" :config="item" @sizeupdate="updateTransformer"/>
+        <Rectangle v-for="item in rectangles" :key="item.id" :config="item"/>
         <v-transformer ref="transformer" />
       </v-layer>
     </v-stage>

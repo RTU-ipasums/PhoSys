@@ -43,7 +43,7 @@ export default {
     <div class="header">
         <h1>Properties</h1>
         <div>{{ getPropertyTitle }}</div>
-        <div v-if="getCoords.x"><b>X </b>{{ getCoords.x }} <b>Y </b>{{ getCoords.y }}</div>
+        <div v-if="getCoords.x||getCoords.x===0"><b>X </b>{{ getCoords.x }} <b>Y </b>{{ getCoords.y }}</div>
     </div>
     <div v-for="property in getRelevantProperties" :key="property" class="property">
         <div>{{ property.propertyName }}</div>

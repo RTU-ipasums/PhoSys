@@ -6,10 +6,6 @@ export const defaultObject = {
     height: 100,
     scaleX: 1,
     scaleY: 1,
-    fill: 'red',
-    opacity: 0.3,
-    perfectDrawEnabled: false,
-    draggable: true,
     propertyTitle: "Rectangle object",
     properties: [
         {
@@ -28,10 +24,6 @@ export const defaultPointsource = {
     radius: 15,
     scaleX: 1,
     scaleY: 1,
-    fill: 'blue',
-    opacity: 0.5,
-    perfectDrawEnabled: false,
-    draggable: true,
     propertyTitle: "Point source light",
     properties: [{
         propertyName: "Wavelength, nm",
@@ -63,9 +55,9 @@ export const defaultPointsource = {
     ]
 }
 export const defaultLinesource = {
-    x:0,
-    y:0,
-    points:[100,100,200,200],
+    x:100,
+    y:100,
+    points:[0,0,100,100],
     propertyTitle: "Line source light",
     properties: [{
         propertyName: "Wavelength, nm",
