@@ -1,6 +1,6 @@
 <script>
 import { data } from './data.js'
-import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject } from './util.js'
+import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject, radToDeg, degToRad} from './util.js'
 import DraggableLine from './shapes/DraggableLine.vue'
 import Rectangle from './shapes/Rectangle.vue'
 import Circle from './shapes/Circle.vue'
@@ -20,7 +20,9 @@ export default {
       lastDist: 0,
       stageConfig: {
         draggable: !isTouchEnabled()
-      }
+      },
+      ctrlKeyPressed:false,
+      rotationSnaps:[0,22.5,45,67.5,90,112.5,135,157.5,180,202.5,225,247.5,270,292.5,315,337.5]
     };
   },
   computed: {
@@ -106,13 +108,8 @@ export default {
       this.lastCenter = null;
       this.lastDist = 0;
     },
-    updateSize(x, y) {
-      let stage = this.$refs.stage.getStage();
-      stage.width(x);
-      stage.height(y);
-    },
-    zoomStage(event) {
-      event.evt.preventDefault();
+    handleZoomStage(e) {
+      e.evt.preventDefault();
       const stage = this.$refs.stage.getStage();
       if (stage == null) {
         return;
@@ -123,7 +120,7 @@ export default {
         x: (pointerX - stage.x()) / oldScale,
         y: (pointerY - stage.y()) / oldScale,
       };
-      const newScale = event.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
+      const newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
       stage.scale({ x: newScale, y: newScale });
       const newPos = {
         x: pointerX - mousePointTo.x * newScale,
@@ -156,7 +153,7 @@ export default {
     },
     handleStageClick(e) {
       // clicked on stage - clear selection
-      if (e.target === e.target.getStage()) {
+      if (e.target === this.$refs.stage.getStage()) {
         
         this.selectedShapes.clear();
         this.updateTransformer();
@@ -197,7 +194,7 @@ export default {
     updateTransformer() {
       // here we need to manually attach or detach Transformer node
       const transformerNode = this.$refs.transformer.getNode();
-      const stage = transformerNode.getStage();
+      const stage = this.$refs.stage.getStage();
 
       let selectedNodes = [];
       for (const selectedShape of this.selectedShapes) {
@@ -218,6 +215,45 @@ export default {
         transformerNode.resizeEnabled(false);
         transformerNode.rotateEnabled(false);
       }
+    },
+    updateSize(x, y) {
+      let stage = this.$refs.stage.getStage();
+      stage.width(x);
+      stage.height(y);
+    },
+    snappingFunction(oldBoundBox, newBoundBox){
+      if (this.ctrlKeyPressed) {
+        //convert to rotation in range 0-2pi rad
+        newBoundBox.rotation=((newBoundBox.rotation % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+        oldBoundBox.rotation=((oldBoundBox.rotation % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+        //TODO: This is inefficient
+        const closestSnap = this.rotationSnaps.reduce((a, b) => {
+          return Math.abs(b - radToDeg(newBoundBox.rotation)) < Math.abs(a - radToDeg(newBoundBox.rotation)) ? b : a;
+        });
+        const diff = degToRad(closestSnap) - oldBoundBox.rotation;
+        if (Math.abs(diff) > 0) {
+          const center = {
+            x: oldBoundBox.x + oldBoundBox.width / 2 * Math.cos(oldBoundBox.rotation) +
+                               oldBoundBox.height / 2 * Math.sin(-oldBoundBox.rotation),
+            y: oldBoundBox.y + oldBoundBox.height / 2 * Math.cos(oldBoundBox.rotation) +
+                               oldBoundBox.width / 2 * Math.sin(oldBoundBox.rotation)
+          }
+          const newPos = {
+            x: Math.round(center.x + (oldBoundBox.x - center.x) * Math.cos(diff) -
+                                          (oldBoundBox.y - center.y) * Math.sin(diff)),
+            y: Math.round(center.y + (oldBoundBox.x - center.x) * Math.sin(diff) +
+                                          (oldBoundBox.y - center.y) * Math.cos(diff))
+          }
+          return {
+            ...oldBoundBox,
+            rotation: oldBoundBox.rotation + diff,
+            x:newPos.x,
+            y:newPos.y
+          };
+        }
+        return oldBoundBox;
+      }
+      return newBoundBox;
     },
     addShape(obj, type) {
       this.currentShapeId++;
@@ -244,6 +280,9 @@ export default {
       switch (key) {
         case "Delete":
           this.deleteSelectedShapes();
+          break;
+        case "Control":
+          this.ctrlKeyPressed=true;
           break;
         case "ArrowLeft":
           for (const obj of this.selectedShapes) {
@@ -279,6 +318,17 @@ export default {
           }
         }
     });
+    window.addEventListener('keyup', e=>{
+      const key = e.key;
+      switch (key) {
+        case "Control":
+          this.ctrlKeyPressed=false;
+          break;
+      }
+    });
+    window.addEventListener('blur', e=>{
+      this.ctrlKeyPressed = false;
+    });
   }
 };
 </script>
@@ -290,7 +340,7 @@ export default {
       @click="handleStageClick" @tap="handleStageClick" 
       @touchmove="handleTouch" 
       @touchend="handleTouchEnd" 
-      @wheel="zoomStage" 
+      @wheel="handleZoomStage" 
       @keydown.delete="deleteSelectedShapes">
       <v-layer ref="layer">
         <v-rect :config="{
@@ -303,10 +353,16 @@ export default {
           perfectDrawEnabled: false,
           listening: false
         }" />
+
         <Circle v-for="item in circles" :key="item.id" :config="item"/>
         <DraggableLine v-for="item in lines" :key="item.id" :config="item" @sizeupdate="updateTransformer"/>
         <Rectangle v-for="item in rectangles" :key="item.id" :config="item"/>
-        <v-transformer ref="transformer" />
+
+        <v-transformer ref="transformer" 
+        :config="{
+          boundBoxFunc: snappingFunction
+        }"/>
+
       </v-layer>
     </v-stage>
   </div>

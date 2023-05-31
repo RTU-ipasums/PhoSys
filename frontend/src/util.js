@@ -25,3 +25,9 @@ export function isTouchEnabled() {
          ( navigator.maxTouchPoints > 0 ) ||  
          ( navigator.msMaxTouchPoints > 0 ); 
 } 
+export function degToRad(angle) {
+  return angle / 180 * Math.PI;
+}
+export function radToDeg(angle) {
+  return angle * (180 / Math.PI);
+}

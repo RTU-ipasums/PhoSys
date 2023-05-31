@@ -101,7 +101,7 @@ export default {
 
 <template>
   <div class="u-i-container">
-    <div class="grid-item top-bar">
+    <nav class="grid-item top-bar">
       <div class="tool-buttons">
         <img class="logo" title="Phosys" alt="logo" src="/logo.png" />
         <img class="bar-button" @click="saveSimulationData()" title="Save simulation to file" alt="open"
@@ -117,7 +117,7 @@ export default {
       </div>
       <button class="run-button" @click="getFigure()" title="Start simulation"><i class="fa-solid fa-play"
           data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
-    </div>
+    </nav>
 
     <splitpanes id="splitpanes">
       <pane size="20" class="properties grid-item">
