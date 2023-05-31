@@ -1,9 +1,9 @@
 <script>
 import { data } from './data.js'
 import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject } from './util.js'
-import DraggableLine from './DraggableLine.vue'
-import Rectangle from './Rectangle.vue'
-import Circle from './Circle.vue'
+import DraggableLine from './shapes/DraggableLine.vue'
+import Rectangle from './shapes/Rectangle.vue'
+import Circle from './shapes/Circle.vue'
 export default {
   components: {
     DraggableLine,
@@ -140,11 +140,10 @@ export default {
         return;
       }
       // find clicked object by its name
-      let name = e.target.name();
-      if(!name)
-      {
-        //TODO:This isn't the most optimal solution
-        name=e.target?.getParent().name();
+      //TODO: the solution of finding the parent for grouped objects isn't optimal
+      let name = e.target.name() || e.target.getParent()?.name();
+      if (!name) {
+        return;
       }
       const shape = this.data.shapes.find((r) => r.name === name);
       if (shape) {
@@ -170,11 +169,10 @@ export default {
         return;
       }
       // find clicked object by its name
-      let name = e.target.name();
-      if(!name)
-      {
-        //TODO:This isn't the most optimal solution
-        name=e.target.getParent().name();
+      //TODO: the solution of finding the parent for grouped objects isn't optimal
+      let name = e.target.name() || e.target.getParent()?.name();
+      if (!name) {
+        return;
       }
       const shape = this.data.shapes.find((r) => r.name === name);
 
@@ -221,7 +219,6 @@ export default {
         transformerNode.rotateEnabled(false);
       }
     },
-    //TODO: remove transformer for everything except rectangle object
     addShape(obj, type) {
       this.currentShapeId++;
       this.data.shapes.push({
