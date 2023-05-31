@@ -33,6 +33,7 @@ ref="group">
         strokeWidth: 5,
         opacity: 0.5,
         stroke: 'blue',
+        perfectDrawEnabled: false
     }"
     @dragmove="updateLine" 
     @transformend="updateLine"

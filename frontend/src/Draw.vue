@@ -285,9 +285,13 @@ export default {
 <template>
   <!-- export addrect, import RECT ARRAY from other files -->
   <div>
-    <v-stage ref="stage" :config="stageConfig" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
-      @click="handleStageClick"  @touchmove="handleTouch"
-      @touchend="handleTouchEnd" @wheel="zoomStage" @keydown.delete="deleteSelectedShapes">
+    <v-stage ref="stage" :config="stageConfig" 
+      @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
+      @click="handleStageClick" @tap="handleStageClick" 
+      @touchmove="handleTouch" 
+      @touchend="handleTouchEnd" 
+      @wheel="zoomStage" 
+      @keydown.delete="deleteSelectedShapes">
       <v-layer ref="layer">
         <v-rect :config="{
           x: 0,
@@ -296,9 +300,9 @@ export default {
           height: 500,
           opacity: 0.1,
           fill: 'gray',
-          perfectDrawEnabled: false
+          perfectDrawEnabled: false,
+          listening: false
         }" />
-        <!--Create shape component-->
         <Circle v-for="item in circles" :key="item.id" :config="item"/>
         <DraggableLine v-for="item in lines" :key="item.id" :config="item" @sizeupdate="updateTransformer"/>
         <Rectangle v-for="item in rectangles" :key="item.id" :config="item"/>
