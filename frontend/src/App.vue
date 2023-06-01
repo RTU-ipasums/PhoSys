@@ -1,6 +1,7 @@
 <script>
 import { data } from './data.js'
 import Draw from './Draw.vue'
+import * as defaults from './defaultObjects'
 import Result from './Result.vue'
 import { getFigure } from './result.js'
 import SeekBar from './SeekBar.vue'
@@ -43,13 +44,15 @@ export default {
       getFigure,
       isMounted: false,
       sizeObserver: null,
-      data
+      resizeTimeoutId: undefined,
+      data,
+      defaults
     }
   },
   methods: {
     getShape() {
       if (!this.isMounted) return;
-      return this.$refs.draw.selectedShapeObject;
+      return this.$refs.draw.selectedShapes;
     },
     saveSimulationData() {
       const data = JSON.stringify(this.data);
@@ -72,10 +75,8 @@ export default {
         const reader = new FileReader();
         reader.addEventListener('load', () => {
           const data = JSON.parse(reader.result);
-          console.log(JSON.parse(JSON.stringify(this.data)));
           //this.data=data doesn't work
           Object.assign(this.data, data);
-          console.log(JSON.parse(JSON.stringify(this.data)));
         });
         reader.readAsText(file);
       });
@@ -85,9 +86,14 @@ export default {
   },
   mounted() {
     this.isMounted = true;
-    //Todo: throttle resizing to improve performance (ex. resize every second, or after no new resize events have been recieved for the past 0.4s)
     this.sizeObserver = new ResizeObserver(() => {
-      this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight);
+      //Resizes if no new resize event in the past 5ms
+      if (this.resizeTimeoutId) {
+        clearTimeout(this.resizeTimeoutId);
+      }
+      this.resizeTimeoutId = setTimeout(() => {
+        this.$refs.draw.updateSize(this.$refs.flexeditor.offsetWidth, this.$refs.flexeditor.offsetHeight);
+      }, 5)
     }).observe(this.$refs.flexeditor);
   }
 }
@@ -95,27 +101,27 @@ export default {
 
 <template>
   <div class="u-i-container">
-    <div class="grid-item top-bar">
+    <nav class="grid-item top-bar">
       <div class="tool-buttons">
-        <img class="logo" title="Phosys" alt="logo" src="/playground_assets/logo.png" />
+        <img class="logo" title="Phosys" alt="logo" src="/logo.png" />
         <img class="bar-button" @click="saveSimulationData()" title="Save simulation to file" alt="open"
-          src="/playground_assets/save.png" />
+          src="/save.png" />
         <img class="bar-button" @click="openSimulationData()" title="Open simulation from file" alt="open"
-          src="/playground_assets/folder.png" />
-        <img class="bar-button" @click="this.$refs.draw.addRect()" title="Add object" alt="object"
-          src="/playground_assets/object.png" />
-        <img class="bar-button" @click="this.$refs.draw.addCircle()" title="Add point lightsource" alt="point lightsource"
-          src="/playground_assets/light.png" />
+          src="/folder.png" />
+        <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultObject, 'object')" title="Add object" alt="object"
+          src="/object.png" />
+        <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPointsource, 'pointsource')" title="Add point lightsource" alt="point lightsource"
+          src="/light.png" />
+        <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinesource, 'linesource')" title="Add line lightsource" alt="line lightsource"
+          src="/linesource.png" />
       </div>
-      <div class="action-buttons">
-        <button class="run-button" @click="getFigure()" title="Start simulation"><i class="fa-solid fa-play"
-            data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
-      </div>
-    </div>
+      <button class="run-button" @click="getFigure()" title="Start simulation"><i class="fa-solid fa-play"
+          data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
+    </nav>
 
     <splitpanes id="splitpanes">
       <pane size="20" class="properties grid-item">
-        <Properties :selectedShape="this.getShape()" />
+        <Properties :selectedShapes="getShape()" />
       </pane>
       <pane>
         <div class="editor-canvas-container">
@@ -141,7 +147,7 @@ export default {
 ::after {
   box-sizing: border-box;
   margin: 0;
-  position: relative;
+  padding: 0;
 }
 
 .logo {
@@ -150,8 +156,6 @@ export default {
 }
 
 body {
-  margin: 0;
-  padding: 0;
   color: #2c3e50;
   line-height: 1.6;
 }
@@ -183,36 +187,25 @@ body {
 }
 
 .properties {
-
   text-align: center;
   padding: 10px 20px;
 }
 
-
-
 .canvas {
-  padding: 0px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  z-index: 1;
 }
 
 .tool-buttons {
   display: flex;
-  flex-direction: row;
-  position: relative;
-  padding-right: 10px;
   gap: 10px;
+  min-width: 0px;
 }
 
-.action-buttons {
-  margin-left: auto;
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  height: 100%;
+.tool-buttons>* {
+  flex: 0;
 }
 
 .bar-button {
@@ -225,7 +218,7 @@ body {
   height: 56px;
   padding: 5px;
   display: flex;
-  flex-direction: row;
+  justify-content: space-between;
 }
 
 .run-button {
