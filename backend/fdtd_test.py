@@ -4,14 +4,23 @@ import matplotlib as mpl
 from matplotlib.colors import FuncNorm
 mpl.use('svg')  # or whatever other backend that you want
 import matplotlib.pyplot as plt
+import matplotlib.patches as ptc
+import numpy as np
+from scipy.ndimage import rotate
 
 import fdtd, sys
+from pathlib import Path
 import mpld3
 from mpld3 import plugins, utils
 import fdtd.backend as bd
 from flask_socketio import SocketIO, send, emit
 import io, base64
 import math
+from datetime import datetime
+import os
+
+global debug
+debug = False
 
 ZMAX = 1
 
@@ -20,7 +29,12 @@ fdtd.set_backend("numpy")
 
 WAVELENGTH = 1550e-9
 SPEED_LIGHT: float = 299_792_458.0
-gCmap = "twilight"
+gCmap = "Blues"
+
+pmlcolor=(0, 0, 0, 0.1)
+objcolor=(1, 0, 0, 0.1)
+
+startTime = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
 
 def gAt(inpt, default:str):
     return str(inpt) if inpt else default
@@ -33,13 +47,12 @@ def gAt(inpt, default:float, min=None, max=None):
 
 def visualize(
     grid,
+    elements,
     x=None,
     y=None,
     z=None,
     cmap=gCmap,#"Blues",
     pbcolor="C3",
-    pmlcolor=(0, 0, 0, 0.1),
-    objcolor=(1, 0, 0, 0.1),
     srccolor="C0",
     detcolor="C2",
     norm="linear",
@@ -87,7 +100,6 @@ def visualize(
         _PMLZlow,
         _PMLZhigh,
     )
-    import matplotlib.patches as ptc
 
     if animate:  # pause for 0.1s, clear plot
         plt.pause(0.02)
@@ -166,7 +178,7 @@ def visualize(
             elif z is not None:
                 _x = [source.x[0], source.x[-1]]
                 _y = [source.y[0], source.y[-1]]
-            leg.append(plt.plot(_x, _y, lw=1, color=srccolor), "Sources")
+            leg.append((plt.plot(_x, _y, lw=1, color=srccolor), "Sources"))
         elif isinstance(source, PointSource):
             if x is not None:
                 _x = source.y
@@ -299,7 +311,7 @@ def visualize(
             )
             plt.gca().add_patch(patch)
 
-    for obj in grid.objects:
+    '''for obj in grid.objects:
         if x is not None:
             _x = (obj.y.start, obj.y.stop)
             _y = (obj.z.start, obj.z.stop)
@@ -319,6 +331,12 @@ def visualize(
             facecolor=objcolor,
         )
         plt.gca().add_patch(patch)
+    '''
+    for elem in elements:
+        try:
+            plt.gca().add_patch(elem.patch())
+        except AttributeError:
+            pass
 
     # visualize the energy in the grid
     cmap_norm = None
@@ -353,6 +371,7 @@ properties = {
     'amplitude': [0,None,10.],
     'phase shift': [0,360,0.],
     'resolution': [1, 30, int(15)],
+    'conductivity': [0,None,1.],
 }
 for propKey, propValue in properties.items():
     properties[propKey] = Property(propKey, *propValue)
@@ -369,7 +388,7 @@ class CanvasEl:
         for prop in self.reqProps: 
             propObj = properties[prop]
             try:
-                propVal = next(x for x in self.properties if x.propertyName.lower() == propObj.name )['value']
+                propVal = next(x for x in self.properties if propObj.name in x.propertyName.lower() )['value']
             except StopIteration:
                 propVal = None
             setattr(self, prop.replace(' ', '_'), gAt(propVal, propObj.default, min=propObj.min, max=propObj.max))
@@ -381,7 +400,7 @@ class GlobalObj(CanvasEl):
 
 class PermObj(CanvasEl):
     def __init__(self, o) -> None:
-        self.reqProps = ['permittivity']
+        self.reqProps = ['permittivity', 'conductivity']
         super(PermObj, self).__init__(o)
 class RectObj(PermObj):
     def __init__(self, o) -> None:
@@ -390,8 +409,44 @@ class RectObj(PermObj):
         self.y1 = o.y
         self.x2 = o.x+o.scaleX*o.width
         self.y2 = o.y+o.scaleY*o.height
+        self.rotation = o.rotation
     def addFdtd(self, grid):
-        grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.AnisotropicObject(permittivity=self.permittivity, name=self.name)
+        if self.rotation==0:
+            grid[round(self.x1):round(self.x2), round(self.y1):round(self.y2), 0:ZMAX] = fdtd.AbsorbingObject(permittivity=self.permittivity, conductivity=self.conductivity, name=self.name)
+        else:
+            #permittivity = np.zeros(grid.shape)
+            permittivity = np.ones((int(abs(self.x2-self.x1)), int(abs(self.y2-self.y1)), 1))*(self.permittivity-globalObj.permittivity)
+            conductivity =  np.ones((int(abs(self.x2-self.x1)), int(abs(self.y2-self.y1)), 1))*self.conductivity
+
+            permittivity = rotate(permittivity, self.rotation)
+            conductivity = rotate(conductivity, self.rotation)
+
+            sizes = permittivity.shape
+            if (90 > self.rotation > 0) or (-90 > self.rotation > -180):
+                rightShift = round( math.sin(math.radians(self.rotation)) * (self.y2-self.y1) ) #amount of shift ringht after transformation
+                downShift = 0
+            else:
+                rightShift = 0 
+                downShift = -round( math.sin(math.radians(self.rotation)) * (self.x2-self.x1) )
+
+            permittivity += 1/grid.inverse_permittivity[round(self.x1)-rightShift:round(self.x1)-rightShift +sizes[0],
+                                                         round(self.y1)-downShift:round(self.y1)-downShift +sizes[1]
+                                                         , 0:ZMAX, 0]# to fix the zero permitivity region
+
+            rvrs = sizes if abs(self.rotation)>90 else [0, 0]
+            grid[round(self.x1)-rightShift -rvrs[0]: round(self.x1)-rightShift+sizes[0] -rvrs[0], 
+                 round(self.y1)-downShift -rvrs[1]: round(self.y1)-downShift+sizes[1] -rvrs[1]
+                 , 0:ZMAX] = fdtd.AbsorbingObject(permittivity=permittivity, conductivity=conductivity, name=self.name)
+    def patch(self):
+        return ptc.Rectangle(
+            xy=(self.x1, self.y1),
+            width=abs(self.x2-self.x1),
+            height=abs(self.y2-self.y1),
+            angle=self.rotation,
+            linewidth=0,
+            edgecolor="none",
+            facecolor=objcolor,
+        )
 
 class Source(CanvasEl):
     def __init__(self, o) -> None:
@@ -402,10 +457,10 @@ class Source(CanvasEl):
 class Linesource(Source):
     def __init__(self, o) -> None:
         super(Linesource, self).__init__(o)
-        self.x1 = o.points[0]
-        self.y1 = o.points[1]
-        self.x2 = o.points[2]
-        self.y2 = o.points[3]
+        self.x1 = o.points[0]+gAt(o.x, 0)
+        self.y1 = o.points[1]+gAt(o.y, 0)
+        self.x2 = o.points[2]+gAt(o.x, 0)
+        self.y2 = o.points[3]+gAt(o.y, 0)
     def addFdtd(self, grid):
         grid[int(self.x1):int(self.x2), int(self.y1):int(self.y2), 0:ZMAX] = fdtd.LineSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 class Pointsource(Source):
@@ -428,9 +483,20 @@ def stepGrid(grid):
     grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]
     plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap=gCmap, format='png', vmin=1e-4, vmax=100)#TODO
     vv.seek(0)
+
+    if debug:
+        filePath = Path(f'render/{startTime}/{grid.time_steps_passed}.png')
+        filePath.touch(exist_ok= True)
+        with open(filePath, 'wb') as f:
+            f.write(vv.getbuffer())
     return base64.b64encode(vv.read())
 
 def processJson(o):
+    if debug:
+        startTime = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+        os.makedirs(f'render/{startTime}')
+
+    global globalObj
     globalObj = GlobalObj(o)
     #WAVELENGTH = gAt(o.wavelength, 1550e-9)
     xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
@@ -438,7 +504,7 @@ def processJson(o):
     #frameCount = gAt(o.frameCount, 100)
 
     elements = []
-    for obj in o.rectangles+o.circles:
+    for obj in (o.rectangles+o.circles if o.rectangles!=None else []) + (o.shapes if o.shapes!=None else []):
         elements.append( elementMapping[obj.name.split('_')[0]](obj) )
     grid = fdtd.Grid(
         (o.xBounds, o.yBounds, ZMAX),#(2.5e-5, 1.5e-5, 1),
@@ -454,6 +520,7 @@ def processJson(o):
     #grid[:, 0, :] = fdtd.PeriodicBoundary(name="ybounds")
     #grid[:, 0:50, :] = fdtd.PML(name="pml_ylow")
     #rid[:, -50:, :] = fdtd.PML(name="pml_yhigh")
+    grid.sources
     grid[:, :, 0] = fdtd.PeriodicBoundary(name="zbounds")
 
     for i in elements: i.addFdtd(grid)
@@ -461,7 +528,7 @@ def processJson(o):
     grid.run(1, progress_bar=False)
 
     plt.autoscale() 
-    fig, img, interactive_legend = visualize(grid, z=0)
+    fig, img, interactive_legend = visualize(grid, elements, z=0)
 
     #Thread(target=stepGrid, args=[grid, 30]).start()
     #stepGrid(grid, 30)
