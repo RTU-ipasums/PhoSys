@@ -1,10 +1,14 @@
 <script>
 import { data } from './data.js'
-import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject } from './util.js'
-import DraggableLine from './DraggableLine.vue'
+import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject, radToDeg, degToRad} from './util.js'
+import DraggableLine from './shapes/DraggableLine.vue'
+import Rectangle from './shapes/Rectangle.vue'
+import Circle from './shapes/Circle.vue'
 export default {
   components: {
-    DraggableLine
+    DraggableLine,
+    Rectangle,
+    Circle
   },
   data() {
     return {
@@ -16,7 +20,9 @@ export default {
       lastDist: 0,
       stageConfig: {
         draggable: !isTouchEnabled()
-      }
+      },
+      ctrlKeyPressed:false,
+      rotationSnaps:[0,22.5,45,67.5,90,112.5,135,157.5,180,202.5,225,247.5,270,292.5,315,337.5]
     };
   },
   computed: {
@@ -102,13 +108,8 @@ export default {
       this.lastCenter = null;
       this.lastDist = 0;
     },
-    updateSize(x, y) {
-      let stage = this.$refs.stage.getStage();
-      stage.width(x);
-      stage.height(y);
-    },
-    zoomStage(event) {
-      event.evt.preventDefault();
+    handleZoomStage(e) {
+      e.evt.preventDefault();
       const stage = this.$refs.stage.getStage();
       if (stage == null) {
         return;
@@ -119,7 +120,7 @@ export default {
         x: (pointerX - stage.x()) / oldScale,
         y: (pointerY - stage.y()) / oldScale,
       };
-      const newScale = event.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
+      const newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
       stage.scale({ x: newScale, y: newScale });
       const newPos = {
         x: pointerX - mousePointTo.x * newScale,
@@ -127,23 +128,6 @@ export default {
       }
       stage.position(newPos);
       stage.batchDraw();
-    },
-    handleDragend(e) {
-      const name = e.target.name();
-      const selectedShape = this.data.shapes.find((r) => r.name === name);
-      if (!selectedShape) return;
-      selectedShape.x = e.target.x();
-      selectedShape.y = e.target.y();
-    },
-    handleTransformEnd(e) {
-      const name = e.target.name();
-      const selectedShape = this.data.shapes.find((r) => r.name === name);
-      if (!selectedShape) return;
-      selectedShape.x = e.target.x();
-      selectedShape.y = e.target.y();
-      selectedShape.scaleX = e.target.scaleX();
-      selectedShape.scaleY = e.target.scaleY();
-      selectedShape.rotation = e.target.rotation();
     },
     handleStageMouseDown(e) {
       // clicked on transformer - do nothing
@@ -153,7 +137,11 @@ export default {
         return;
       }
       // find clicked object by its name
-      const name = e.target.name();
+      //TODO: the solution of finding the parent for grouped objects isn't optimal
+      let name = e.target.name() || e.target.getParent()?.name();
+      if (!name) {
+        return;
+      }
       const shape = this.data.shapes.find((r) => r.name === name);
       if (shape) {
         if (!e.evt.shiftKey && !this.selectedShapes.has(shape)) {
@@ -165,7 +153,8 @@ export default {
     },
     handleStageClick(e) {
       // clicked on stage - clear selection
-      if (e.target === e.target.getStage()) {
+      if (e.target === this.$refs.stage.getStage()) {
+        
         this.selectedShapes.clear();
         this.updateTransformer();
         return;
@@ -177,8 +166,13 @@ export default {
         return;
       }
       // find clicked object by its name
-      const name = e.target.name();
+      //TODO: the solution of finding the parent for grouped objects isn't optimal
+      let name = e.target.name() || e.target.getParent()?.name();
+      if (!name) {
+        return;
+      }
       const shape = this.data.shapes.find((r) => r.name === name);
+
       if (!shape) {
         this.selectedShapes.clear();
       }
@@ -200,7 +194,7 @@ export default {
     updateTransformer() {
       // here we need to manually attach or detach Transformer node
       const transformerNode = this.$refs.transformer.getNode();
-      const stage = transformerNode.getStage();
+      const stage = this.$refs.stage.getStage();
 
       let selectedNodes = [];
       for (const selectedShape of this.selectedShapes) {
@@ -213,8 +207,54 @@ export default {
         // remove transformer
         transformerNode.nodes([]);
       }
+      if(this.selectedShapes.size === 1 && [...this.selectedShapes][0].name.startsWith("object_")){
+        transformerNode.resizeEnabled(true);
+        transformerNode.rotateEnabled(true);
+      }
+      else{
+        transformerNode.resizeEnabled(false);
+        transformerNode.rotateEnabled(false);
+      }
     },
-    //TODO: remove transformer for everything except rectangle object
+    updateSize(x, y) {
+      let stage = this.$refs.stage.getStage();
+      stage.width(x);
+      stage.height(y);
+    },
+    snappingFunction(oldBoundBox, newBoundBox){
+      if (this.ctrlKeyPressed) {
+        //convert to rotation in range 0-2pi rad
+        newBoundBox.rotation=((newBoundBox.rotation % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+        oldBoundBox.rotation=((oldBoundBox.rotation % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+        //TODO: This is inefficient
+        const closestSnap = this.rotationSnaps.reduce((a, b) => {
+          return Math.abs(b - radToDeg(newBoundBox.rotation)) < Math.abs(a - radToDeg(newBoundBox.rotation)) ? b : a;
+        });
+        const diff = degToRad(closestSnap) - oldBoundBox.rotation;
+        if (Math.abs(diff) > 0) {
+          const center = {
+            x: oldBoundBox.x + oldBoundBox.width / 2 * Math.cos(oldBoundBox.rotation) +
+                               oldBoundBox.height / 2 * Math.sin(-oldBoundBox.rotation),
+            y: oldBoundBox.y + oldBoundBox.height / 2 * Math.cos(oldBoundBox.rotation) +
+                               oldBoundBox.width / 2 * Math.sin(oldBoundBox.rotation)
+          }
+          const newPos = {
+            x: Math.round(center.x + (oldBoundBox.x - center.x) * Math.cos(diff) -
+                                          (oldBoundBox.y - center.y) * Math.sin(diff)),
+            y: Math.round(center.y + (oldBoundBox.x - center.x) * Math.sin(diff) +
+                                          (oldBoundBox.y - center.y) * Math.cos(diff))
+          }
+          return {
+            ...oldBoundBox,
+            rotation: oldBoundBox.rotation + diff,
+            x:newPos.x,
+            y:newPos.y
+          };
+        }
+        return oldBoundBox;
+      }
+      return newBoundBox;
+    },
     addShape(obj, type) {
       this.currentShapeId++;
       this.data.shapes.push({
@@ -240,6 +280,9 @@ export default {
       switch (key) {
         case "Delete":
           this.deleteSelectedShapes();
+          break;
+        case "Control":
+          this.ctrlKeyPressed=true;
           break;
         case "ArrowLeft":
           for (const obj of this.selectedShapes) {
@@ -275,15 +318,30 @@ export default {
           }
         }
     });
+    window.addEventListener('keyup', e=>{
+      const key = e.key;
+      switch (key) {
+        case "Control":
+          this.ctrlKeyPressed=false;
+          break;
+      }
+    });
+    window.addEventListener('blur', e=>{
+      this.ctrlKeyPressed = false;
+    });
   }
 };
 </script>
 <template>
   <!-- export addrect, import RECT ARRAY from other files -->
   <div>
-    <v-stage ref="stage" :config="stageConfig" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
-      @click="handleStageClick" @dragend="handleDragend" @touchmove="handleTouch"
-      @touchend="handleTouchEnd" @wheel="zoomStage" @keydown.delete="deleteSelectedShapes">
+    <v-stage ref="stage" :config="stageConfig" 
+      @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown"
+      @click="handleStageClick" @tap="handleStageClick" 
+      @touchmove="handleTouch" 
+      @touchend="handleTouchEnd" 
+      @wheel="handleZoomStage" 
+      @keydown.delete="deleteSelectedShapes">
       <v-layer ref="layer">
         <v-rect :config="{
           x: 0,
@@ -292,13 +350,19 @@ export default {
           height: 500,
           opacity: 0.1,
           fill: 'gray',
-          perfectDrawEnabled: false
+          perfectDrawEnabled: false,
+          listening: false
         }" />
-        <!--Create shape component-->
-        <v-rect v-for="item in rectangles" :key="item.id" :config="item" @transformend="handleTransformEnd"/>
-        <v-circle v-for="item in circles" :key="item.id" :config="item" @transformend="handleTransformEnd"/>
-        <DraggableLine v-for="item in lines" :key="item.id" :config="item"/>
-        <v-transformer ref="transformer" />
+
+        <Circle v-for="item in circles" :key="item.id" :config="item"/>
+        <DraggableLine v-for="item in lines" :key="item.id" :config="item" @sizeupdate="updateTransformer"/>
+        <Rectangle v-for="item in rectangles" :key="item.id" :config="item"/>
+
+        <v-transformer ref="transformer" 
+        :config="{
+          boundBoxFunc: snappingFunction
+        }"/>
+
       </v-layer>
     </v-stage>
   </div>
