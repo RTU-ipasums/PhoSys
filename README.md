@@ -4,6 +4,7 @@
   <br>
   Phosys
   <br>
+  <img src="https://img.shields.io/github/actions/workflow/status/RTU-ipasums/PhoSys/testing-linting.yml"/>
 </h1>
 
 <h4 align="center"> A simple to use, web-based photonics simulator. Made during <a href="https://the-raccoons-2022.devpost.com/?ref_feature=challenge" target="_blank">the Racoons Hackathon</a>.</h4>
