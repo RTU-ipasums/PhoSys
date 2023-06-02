@@ -39,7 +39,7 @@ flask --app main.py --debug run
 # Technical description
 
 ## Directory structure
-The directory structure is very simple. All frontend code is in the "frontend" directory, all backend code is in the "backend" directory.
+The directory structure is very simple. All frontend code is in the `frontend` directory, all backend code is in the `backend` directory.
 
 ## UI Design
 ![UI overview](https://user-images.githubusercontent.com/47260097/242680617-3a3ae81e-4771-4708-8262-22a1ea9c170f.png)
@@ -52,13 +52,13 @@ The PhoSys user interface consists of 4 main parts:
 
 The interface was made with the [VueJS](https://vuejs.org/) JavaScript framework and the Vue [Splitpanes](https://antoniandre.github.io/splitpanes/) component, which were used to create a responsive and modern UI with user resizable panels. Additionally the [Font Awesome](https://fontawesome.com/) icon library was used for some icons.
 
-The UI is split up into 5 Vue components. Furthermore, there is a Vue component for each type of object in the "shapes" subdirectory.
+The UI is split up into 5 Vue components. Furthermore, there is a Vue component for each type of object in the `shapes` subdirectory.
 
-  * App.vue - The main component that has the toolbar and all other components
-  * Draw.vue - The canvas component, this component also uses shape components from the "shapes" subdirectory
-  * Properties.vue - The properties panel component
-  * Result.vue - The component responsible for showing the result of the simulation
-  * SeekBar.vue - The component that has all of the controls for simulation playback
+  * `App.vue` - The main component that has the toolbar and all other components
+  * `Draw.vue` - The canvas component, this component also uses shape components from the `shapes` subdirectory
+  * `Properties.vue` - The properties panel component
+  * `Result.vue` - The component responsible for showing the result of the simulation
+  * `SeekBar.vue` - The component that has all of the controls for simulation playback
 
 ## Toolbar
 The toolbar contains useful icons for interacting with the canvas and simulation
@@ -106,10 +106,10 @@ Here is a list of features the canvas editor currently supports:
 PhoSys uses the [Konva.js](https://konvajs.org/) javascript library to draw objects to a canvas. Konva additionally provides an easy way of adding object transformation control, but all other features had to be added on top.
 
 ### Object data storage
-All information nessecary to draw and simulate an object is stored in a JavaScript data object defined in the "data.js" file. This object also contains information about global simulation properties.
-Whenever a shape icon in the toolbar is clicked, an object from the "defaultObjects.js" file is added to the "shapes" array in the data object. The Draw.vue component passes shape properties from the "shapes" array to their respective shape components. Each of these components update their respective properties after they have been transformed in the Konva canvas to ensure the data accurately represents what is being shown on the canvas.
+All information nessecary to draw and simulate an object is stored in a JavaScript object `data` defined in the `data.js` file. This object also contains information about global simulation properties.
+Whenever a shape icon in the toolbar is clicked, an object from the `defaultObjects.js` file is added to the `shapes` array in the `data` object. The `Draw.vue` component passes shape properties from the `shapes` array to their respective shape components. Each of these components update their respective properties after they have been transformed in the Konva canvas to ensure the data accurately represents what is being shown on the canvas.
 
-All shapes have a property "name" that allows them to be uniquely identified in the canvas. Each shape also stores information about their properties, which gets displayed in the properties panel.
+All shapes have a property `name` that allows them to be uniquely identified in the canvas. Each shape also stores information about their properties, which gets displayed in the properties panel.
 
 Storing the information about objects in this centralized way allows for easy loading/saving of canvas objects and a simple way to send object information to the server without including any unnecessary data.
 
@@ -134,7 +134,7 @@ This panel is used for displaying the result of the simulation recieved from the
 
 ## Backend design
 
-Uses an electromagnetic FDTD simulation based on [Flaport's](https://github.com/flaport) [fdtd](https://github.com/flaport/fdtd) library. More information on how the simulation actually works is available on the libraries github page.
+Uses an electromagnetic FDTD simulation based on [Flaport's](https://github.com/flaport) [fdtd](https://github.com/flaport/fdtd) library. More information on how the simulation works is available on the library's GitHub page.
 
 # Simulation examples (screenshots and json files)
 
