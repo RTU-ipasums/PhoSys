@@ -25,6 +25,7 @@ export default {
     height:config.height,
     scaleX:config.scaleX,
     scaleY:config.scaleY,
+    rotation:config.rotation,
     fill: 'red',
     opacity:0.3,
     perfectDrawEnabled: false,

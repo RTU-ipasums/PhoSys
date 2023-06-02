@@ -25,7 +25,6 @@ export const defaultObject = {
     ]
 };
 export const defaultPointsource = {
-    rotation: 0,
     x: 150,
     y: 150,
     radius: 15,
