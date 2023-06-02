@@ -7,12 +7,12 @@
   <img src="https://img.shields.io/github/actions/workflow/status/RTU-ipasums/PhoSys/testing-linting.yml"/>
 </h1>
 
-<h4 align="center"> A simple to use, web-based photonics simulator. Based on <a href="https://github.com/flaport">flaport's<a/> <a href="https://github.com/flaport/fdtd">fdtd<a/> library.</h4>
+<h4 align="center"> A simple to use, web-based photonics simulator. Based on <a href="https://github.com/flaport">Flaport's<a/> <a href="https://github.com/flaport/fdtd">fdtd<a/> library.</h4>
 
 # Motivation
-
+PhoSys provides a simple to use interface for running complex FDTD photonics simulations.
 # How To Use
-A demo page is currently hosted on [phosys.lv](https://phosys.lv)
+A demo page is currently hosted on [phosys.lv](https://phosys.lv). Although mobile use is supported, it is highly recommended to use a desktop device.
 
 # How to host
 To run this application, you'll need [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) and Python 3.10+ installed on your computer.
@@ -42,10 +42,6 @@ flask --app main.py --debug run
 The directory structure is very simple. All frontend code is in the "frontend" directory, all backend code is in the "backend" directory.
 
 ## UI Design
-splitplanes/
-konva/
-mpld3/
-vue/
 ![UI overview](https://user-images.githubusercontent.com/47260097/242680617-3a3ae81e-4771-4708-8262-22a1ea9c170f.png)
 
 The PhoSys user interface consists of 4 main parts:
@@ -64,8 +60,6 @@ The UI is split up into 5 Vue components. Furthermore, there is a Vue component 
   * Result.vue - The component responsible for showing the result of the simulation
   * SeekBar.vue - The component that has all of the controls for simulation playback
 
-### Simulation JSON file structure
-
 ## Toolbar
 The toolbar contains useful icons for interacting with the canvas and simulation
 |Name|Icon|Description|
@@ -78,15 +72,74 @@ The toolbar contains useful icons for interacting with the canvas and simulation
 |Launch|![Launch icon](https://user-images.githubusercontent.com/47260097/242705768-16eb77bd-590a-44d8-af62-92733ebd2db3.png)| Sends a request to the server to start the FDTD simulation with the objects added to the canvas
 
 ## Properties panel
+The properties panel lists all of the properties of the selected object or global simulation properties if a single object isn't selected. It also has additional information about the object, such as it's position and name.
+
+Here is a list of all the properties that are currently editable by the user:
+### Global properties
+  * Permittivity
+  * Permiability
+### Rectangle object
+  * Permittivity
+  * Conductivity
+### Point source
+  * Wavelength
+  * Amplitude
+  * Phase shift
+### Line source
+  * Wavelength
+  * Amplitude
+  * Phase shift
 
 ## Canvas
-This is the most important part of the PhoSys user interface. The simulation canvas is used for adding objects to the simulation.
+This is the most important part of the PhoSys user interface. The simulation canvas is used for adding objects to the simulation. 
+
+Here is a list of features the canvas editor currently supports:
+  * Scene navigation (pan and zoom with left-click and scroll wheel)
+  * Multi-touch zooming on mobile
+  * Object adding and deleting with <kbd>Del</kbd>
+  * Multi-object selection while holding <kbd>⇧ Shift</kbd>
+  * Object transformation (moving, scaling and rotating)
+  * Incremental object moving with arrow keys
+  * Rotation snapping while holding <kbd>Ctrl</kbd>
+  * Object copy/paste with <kbd>Ctrl</kbd> + <kbd>C</kbd> and <kbd>Ctrl</kbd> + <kbd>V</kbd>
+  
+PhoSys uses the [Konva.js](https://konvajs.org/) javascript library to draw objects to a canvas. Konva additionally provides an easy way of adding object transformation control, but all other features had to be added on top.
+
+### Object data storage
+All information nessecary to draw and simulate an object is stored in a JavaScript data object defined in the "data.js" file. This object also contains information about global simulation properties.
+Whenever a shape icon in the toolbar is clicked, an object from the "defaultObjects.js" file is added to the "shapes" array in the data object. The Draw.vue component passes shape properties from the "shapes" array to their respective shape components. Each of these components update their respective properties after they have been transformed in the Konva canvas to ensure the data accurately represents what is being shown on the canvas.
+
+All shapes have a property "name" that allows them to be uniquely identified in the canvas. Each shape also stores information about their properties, which gets displayed in the properties panel.
+
+Storing the information about objects in this centralized way allows for easy loading/saving of canvas objects and a simple way to send object information to the server without including any unnecessary data.
+
 ## Simulation result panel
 
+This panel is used for displaying the result of the simulation recieved from the server.
+
+### Simulation playback controls
+
+![Playback controls](https://user-images.githubusercontent.com/47260097/242866407-41118bca-abd9-46ee-8c6f-572d3b040b70.png)
+
+1. Current frame number
+2. Simulation playback framerate (experimental)
+3. Playback controls. From left-to-right: 
+    * Go to beginning
+    * Previous frame
+    * Play/pause
+    * Next frame
+    * Go to end
+4. Seek bar. Used for scrubbing through the simulation. Because the simulation generates sequentally, you can only seek to already generated frames.
+5. Final frame number. Determines the final frame to which the simulation will generate. This can be set manually or by pressing play again after the simulation reaches the final frame, in which case it will keep generating forever.
+
 ## Backend design
+
+Uses an electromagnetic FDTD simulation based on [Flaport's](https://github.com/flaport) [fdtd](https://github.com/flaport/fdtd) library. More information on how the simulation actually works is available on the libraries github page.
 
 # Simulation examples (screenshots and json files)
 
 # Limitations and future plans
+
+PhoSys is currently in development, so bugs and other issues are to be expected.
 
 # License
