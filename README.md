@@ -106,7 +106,7 @@ Here is a list of features the canvas editor currently supports:
 PhoSys uses the [Konva.js](https://konvajs.org/) javascript library to draw objects to a canvas. Konva additionally provides an easy way of adding object transformation control, but all other features had to be added on top.
 
 ### Object data storage
-All information nessecary to draw and simulate an object is stored in a JavaScript object `data` defined in the `data.js` file. This object also contains information about global simulation properties.
+All information nessecary to draw and simulate an object is stored in a JavaScript object called `data` defined in the `data.js` file. This object also contains information about global simulation properties.
 Whenever a shape icon in the toolbar is clicked, an object from the `defaultObjects.js` file is added to the `shapes` array in the `data` object. The `Draw.vue` component passes shape properties from the `shapes` array to their respective shape components. Each of these components update their respective properties after they have been transformed in the Konva canvas to ensure the data accurately represents what is being shown on the canvas.
 
 All shapes have a property `name` that allows them to be uniquely identified in the canvas. Each shape also stores information about their properties, which gets displayed in the properties panel.
