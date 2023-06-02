@@ -255,13 +255,15 @@ export default {
       }
       return newBoundBox;
     },
-    addShape(obj, type) {
+    addShape(obj, type, keepSelected) {
       this.currentShapeId++;
       this.data.shapes.push({
         ...newObject(obj),
         name: `${type}_${this.currentShapeId}`
       })
-      this.selectedShapes.clear();
+      if(!keepSelected){
+        this.selectedShapes.clear();
+      }
       this.selectedShapes.add(this.data.shapes.at(-1));
       Promise.resolve(this.selectedShapes).then(this.updateTransformer);
     },
@@ -307,14 +309,17 @@ export default {
         case "c":
           if (!e.ctrlKey || this.selectedShapes.size === 0) break;
           this.copiedShapes.clear();
-          this.copiedShapes.add(newObject(...this.selectedShapes));
+          this.copiedShapes=new Set(newObject([...this.selectedShapes]));
           break;
         case "v":
           if (!e.ctrlKey || this.copiedShapes.length === 0) break;
+          this.selectedShapes.clear();
           for (const obj of this.copiedShapes) {
+            
             obj.x += 10;
             obj.y += 10;
-            this.addShape(obj, obj.name.split('_')[0]);
+            
+            this.addShape(obj, obj.name.split('_')[0], true);
           }
         }
     });

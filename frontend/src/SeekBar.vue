@@ -136,7 +136,7 @@ input[type=number] {
 }
 
 input[type=number]:focus {
-    border-bottom: 2px solid #7dff71;
+    border-bottom: 2px solid #f6c737;
 }
 
 .seekBar {

@@ -32,9 +32,7 @@ export default {
         }
     }
 };
-//todo: property data structure
-//update properties in object data
-//get selected object name and get related properties
+
 </script>
 
 <style>

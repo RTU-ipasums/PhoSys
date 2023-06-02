@@ -8,28 +8,7 @@ import SeekBar from './SeekBar.vue'
 import Properties from './Properties.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
-//todo
-//arrow key change position by one unit
-//pause/ play button
-//frame window
-//permittivity
-//1-100
-//permiability
-//1-100
-//properties:
-//global
-//frame count
-//1-10000
-//pointsource:
-//wavelength
-//100-1600nm
-//amplitude
-//1-100
-//phase shift
-//0-360 degrees
-//object:
-//permittivity
-//1-100
+
 export default {
   components: {
     Draw,
