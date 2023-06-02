@@ -9,8 +9,12 @@
 
 <h4 align="center"> A simple to use, web-based photonics simulator. Based on <a href="https://github.com/flaport">Flaport's<a/> <a href="https://github.com/flaport/fdtd">fdtd<a/> library.</h4>
 
+PhoSys is an open-source, web-based FDTD electromagnetic wave simulator. The project's primary objective is to assist teachers, students, and individuals interested in studying photonics or electromagnetic waves by offering a visualization tool for various electromagnetic phenomena in a simple and intuitive manner. Although the functionality is currently limited due to being in the early stages of development, you can still create visually interesting simulations using the three fundamental objects: point sources, line sources, and rectangle objects.
+
 # Motivation
-PhoSys provides a simple to use interface for running complex FDTD photonics simulations.
+
+We decided to create Phosys because one day, during a physics class about electromagnetic waves, our team had a discussion and couldn't agree on a certain question. We wanted to resolve this question by simulating the problem, but we soon realized that there weren't any easy-to-use tools available. The simulation tools we found were either too complicated and expensive, like Ansys Lumerical, or too basic and didn't allow us to check what we wanted, like the [simulations provided by the University of Colorado Boulder](https://phet.colorado.edu/).
+
 # How To Use
 A demo page is currently hosted on [phosys.lv](https://phosys.lv). Although mobile use is supported, it is highly recommended to use a desktop device.
 
