@@ -16,7 +16,9 @@ PhoSys is an open-source, web-based FDTD electromagnetic wave simulator. The pro
 We decided to create PhoSys because one day, during a physics class about electromagnetic waves, our team had a discussion and couldn't agree on a certain question. We wanted to resolve this question by simulating the problem, but we soon realized that there weren't any easy-to-use tools available. The simulation tools we found were either too complicated and expensive, like Ansys Lumerical, or too basic and didn't allow us to check what we wanted, like the [simulations provided by the University of Colorado Boulder](https://phet.colorado.edu/).
 
 # How to use
-A demo page is currently hosted on [phosys.lv](https://phosys.lv). Although mobile use is supported, it is highly recommended to use a desktop device.
+**A demo page is currently hosted on [phosys.lv](https://phosys.lv). No setup required.** 
+
+Although mobile use is supported, it is highly recommended to use a desktop device.
 
 # How to host
 To run this application, you'll need [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) and Python 3.10+ installed on your computer.
