@@ -15,7 +15,7 @@ PhoSys is an open-source, web-based FDTD electromagnetic wave simulator. The pro
 
 We decided to create Phosys because one day, during a physics class about electromagnetic waves, our team had a discussion and couldn't agree on a certain question. We wanted to resolve this question by simulating the problem, but we soon realized that there weren't any easy-to-use tools available. The simulation tools we found were either too complicated and expensive, like Ansys Lumerical, or too basic and didn't allow us to check what we wanted, like the [simulations provided by the University of Colorado Boulder](https://phet.colorado.edu/).
 
-# How To Use
+# How to use
 A demo page is currently hosted on [phosys.lv](https://phosys.lv). Although mobile use is supported, it is highly recommended to use a desktop device.
 
 # How to host
@@ -140,10 +140,32 @@ This panel is used for displaying the result of the simulation recieved from the
 
 Uses an electromagnetic FDTD simulation based on [Flaport's](https://github.com/flaport) [fdtd](https://github.com/flaport/fdtd) library. More information on how the simulation works is available on the library's GitHub page.
 
-# Simulation examples (screenshots and json files)
+# Simulation examples
+## **Double slit experiment**
+[Download](/examples/doubleslit.json)
+
+![Double slit](https://user-images.githubusercontent.com/47260097/243102886-a5eb21ec-2645-436e-9fde-5df3d68e50d2.png)
+
+## **Double double slit experiment**
+[Download](/examples/doubledoubleslit.json)
+
+![Double double slit](https://user-images.githubusercontent.com/47260097/243102982-bb79c46d-66c4-425d-bd9f-d0410f4fff27.png)
+
+## **Reflection**
+[Download](/examples/lightbounce.json)
+
+![Reflection](https://user-images.githubusercontent.com/47260097/243102922-ddcb5790-0189-419c-9ed8-5f89d3627994.png)
+
+## **Fiber optics**
+[Download](/examples/wire.json)
+
+![Fiber optics](https://user-images.githubusercontent.com/47260097/243102962-143c83f7-d0ab-46e8-a51a-96ac0ffbb6e8.png)
+
+## **Phased array**
+[Download](/examples/phased_radar7.json)
+
+![Phased array](https://user-images.githubusercontent.com/47260097/243102995-eba11928-7ac5-4fa7-bf7d-0196929d9df7.png)
 
 # Limitations and future plans
 
 PhoSys is currently in development, so bugs and other issues are to be expected.
-
-# License

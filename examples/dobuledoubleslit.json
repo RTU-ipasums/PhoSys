@@ -1,0 +1,252 @@
+{
+    "xBounds": 500,
+    "yBounds": 500,
+    "frameCount": 200,
+    "propertyTitle": "Global settings",
+    "properties": [
+        {
+            "propertyName": "Permittivity",
+            "min": 0,
+            "max": 100,
+            "value": 5
+        },
+        {
+            "propertyName": "Permiability",
+            "min": 0,
+            "max": 100,
+            "value": 1
+        }
+    ],
+    "shapes": [
+        {
+            "rotation": 0,
+            "x": 82.68790183261574,
+            "y": 8.654910270889543,
+            "width": 100,
+            "height": 100,
+            "scaleX": 0.20863857186685777,
+            "scaleY": 1.9637371847562062,
+            "propertyTitle": "Rectangle object",
+            "properties": [
+                {
+                    "propertyName": "Permittivity",
+                    "units": "su",
+                    "min": 0,
+                    "max": 100,
+                    "value": 25
+                },
+                {
+                    "propertyName": "Conductivity",
+                    "units": "S/m",
+                    "min": 0,
+                    "max": 30000,
+                    "value": 0
+                }
+            ],
+            "name": "object_1"
+        },
+        {
+            "rotation": 0,
+            "x": 27.505198100583954,
+            "y": 219.06488808737134,
+            "radius": 15,
+            "scaleX": 1,
+            "scaleY": 1,
+            "propertyTitle": "Point source light",
+            "properties": [
+                {
+                    "propertyName": "Wavelength, nm",
+                    "units": "nm",
+                    "min": 100,
+                    "max": 1600,
+                    "_value": 0.0000015,
+                    "value": 1500
+                },
+                {
+                    "propertyName": "Amplitude",
+                    "units": "su",
+                    "min": 1,
+                    "max": 100,
+                    "value": 10
+                },
+                {
+                    "propertyName": "Phase shift, degrees",
+                    "units": "°",
+                    "min": -180,
+                    "max": 180,
+                    "value": 0
+                }
+            ],
+            "name": "pointsource_2"
+        },
+        {
+            "rotation": 0,
+            "x": 82.74049164026876,
+            "y": 213.80389729766148,
+            "width": 100,
+            "height": 100,
+            "scaleX": 0.20924362493370965,
+            "scaleY": 0.1318978421184343,
+            "propertyTitle": "Rectangle object",
+            "properties": [
+                {
+                    "propertyName": "Permittivity",
+                    "units": "su",
+                    "min": 0,
+                    "max": 100,
+                    "value": 25
+                },
+                {
+                    "propertyName": "Conductivity",
+                    "units": "S/m",
+                    "min": 0,
+                    "max": 30000,
+                    "value": 0
+                }
+            ],
+            "name": "object_3"
+        },
+        {
+            "rotation": 0,
+            "x": 82.7404161018203,
+            "y": 235.7456850471875,
+            "width": 100,
+            "height": 100,
+            "scaleX": 0.20926071663197982,
+            "scaleY": 2.457574698374079,
+            "propertyTitle": "Rectangle object",
+            "properties": [
+                {
+                    "propertyName": "Permittivity",
+                    "units": "su",
+                    "min": 0,
+                    "max": 100,
+                    "value": 25
+                },
+                {
+                    "propertyName": "Conductivity",
+                    "units": "S/m",
+                    "min": 0,
+                    "max": 30000,
+                    "value": 0
+                }
+            ],
+            "name": "object_4"
+        },
+        {
+            "rotation": 0,
+            "x": 391,
+            "y": 9,
+            "width": 100,
+            "height": 100,
+            "scaleX": 0.20863857186685777,
+            "scaleY": 1.9637371847562062,
+            "propertyTitle": "Rectangle object",
+            "properties": [
+                {
+                    "propertyName": "Permittivity",
+                    "units": "su",
+                    "min": 0,
+                    "max": 100,
+                    "value": 25
+                },
+                {
+                    "propertyName": "Conductivity",
+                    "units": "S/m",
+                    "min": 0,
+                    "max": 30000,
+                    "value": 0
+                }
+            ],
+            "name": "object_11"
+        },
+        {
+            "rotation": 0,
+            "x": 461,
+            "y": 221.81396749439068,
+            "radius": 15,
+            "scaleX": 1,
+            "scaleY": 1,
+            "propertyTitle": "Point source light",
+            "properties": [
+                {
+                    "propertyName": "Wavelength, nm",
+                    "units": "nm",
+                    "min": 100,
+                    "max": 1600,
+                    "_value": 0.0000015,
+                    "value": 1500
+                },
+                {
+                    "propertyName": "Amplitude",
+                    "units": "su",
+                    "min": 1,
+                    "max": 100,
+                    "value": 10
+                },
+                {
+                    "propertyName": "Phase shift, degrees",
+                    "units": "°",
+                    "min": -180,
+                    "max": 180,
+                    "value": 0
+                }
+            ],
+            "name": "pointsource_12"
+        },
+        {
+            "rotation": 0,
+            "x": 391,
+            "y": 214,
+            "width": 100,
+            "height": 100,
+            "scaleX": 0.20924362493370965,
+            "scaleY": 0.1318978421184343,
+            "propertyTitle": "Rectangle object",
+            "properties": [
+                {
+                    "propertyName": "Permittivity",
+                    "units": "su",
+                    "min": 0,
+                    "max": 100,
+                    "value": 25
+                },
+                {
+                    "propertyName": "Conductivity",
+                    "units": "S/m",
+                    "min": 0,
+                    "max": 30000,
+                    "value": 0
+                }
+            ],
+            "name": "object_13"
+        },
+        {
+            "rotation": 0,
+            "x": 391,
+            "y": 236,
+            "width": 100,
+            "height": 100,
+            "scaleX": 0.20926071663197982,
+            "scaleY": 2.457574698374079,
+            "propertyTitle": "Rectangle object",
+            "properties": [
+                {
+                    "propertyName": "Permittivity",
+                    "units": "su",
+                    "min": 0,
+                    "max": 100,
+                    "value": 25
+                },
+                {
+                    "propertyName": "Conductivity",
+                    "units": "S/m",
+                    "min": 0,
+                    "max": 30000,
+                    "value": 0
+                }
+            ],
+            "name": "object_14"
+        }
+    ]
+}
