@@ -8,7 +8,7 @@ export const data = reactive({
     properties:[
     {
         propertyName:"Permittivity",
-        min:0,
+        min:1,
         max:100,
         value:5
     },

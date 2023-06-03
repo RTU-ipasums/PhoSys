@@ -95,7 +95,7 @@ Here is a list of all the properties that are currently editable by the user:
   * Phase shift
 
 ## Canvas
-This is the most important part of the PhoSys user interface. The simulation canvas is used for adding objects to the simulation. 
+This is the most important part of the PhoSys user interface. The simulation canvas is used for adding objects to the simulation, all objects placed in the gray canvas rectangle will be simulated.
 
 Here is a list of features the canvas editor currently supports:
   * Scene navigation (pan and zoom with left-click and scroll wheel)
@@ -121,6 +121,8 @@ Storing the information about objects in this centralized way allows for easy lo
 
 This panel is used for displaying the result of the simulation recieved from the server.
 
+### Simulation result
+The client recieves a matplotlib graph of the result, which gets converted to HTML with the [mpld3](https://mpld3.github.io/) library. The result canvas supports zooming and panning. The frames of the result of the simulation is saved in a local array.
 ### Simulation playback controls
 
 ![Playback controls](https://user-images.githubusercontent.com/47260097/242866407-41118bca-abd9-46ee-8c6f-572d3b040b70.png)
@@ -136,9 +138,12 @@ This panel is used for displaying the result of the simulation recieved from the
 4. Seek bar. Used for scrubbing through the simulation. Because the simulation generates sequentally, you can only seek to already generated frames.
 5. Final frame number. Determines the final frame to which the simulation will generate. This can be set manually or by pressing play again after the simulation reaches the final frame, in which case it will keep generating forever.
 
-## Backend design
+## Backend API design
+The backend uses the [Flask](https://flask.palletsprojects.com) python web framework and the [Socket.io](https://socket.io) library to make an API that continously sends data to the client with the WebSocket API. Additionally [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) is used to serve this API and [nginx](https://www.nginx.com/) is used for routing. The whole application is containerized with [Docker](https://docs.docker.com) and [Docker compose](https://docs.docker.com/compose/). The API is hosted on [Cloudflare](https://www.cloudflare.com/).
 
-Uses an electromagnetic FDTD simulation based on [Flaport's](https://github.com/flaport) [fdtd](https://github.com/flaport/fdtd) library. More information on how the simulation works is available on the library's GitHub page.
+When the server recieves the JSON object with the information about placement of objects, it parses this data and starts the FDTD simulation. As mentioned before the server uses an electromagnetic FDTD simulation based on [Flaport's](https://github.com/flaport) [fdtd](https://github.com/flaport/fdtd) library. More information on how the simulation works is available on the library's GitHub page. 
+
+The simulation generates a [matplotlib](https://matplotlib.org/) graph that contains representations of scene objects and sends it to the client. When the client sends a socket message to generate a certain number of frames, the server continously starts sending the results of the electromagnetic simulation as Base64-encoded images.
 
 # Simulation examples
 ## **Double slit experiment**
@@ -169,3 +174,19 @@ Uses an electromagnetic FDTD simulation based on [Flaport's](https://github.com/
 # Limitations and future plans
 
 PhoSys is currently in development, so bugs and other issues are to be expected.
+Known bugs:
+ * Placing objects outside of the gray canvas box will give errors.
+ * Simulation result playback is sometimes unstable.
+ * Placing objects on top of eachother sometimes causes problems.
+Some of the features we plan to add in the future:
+ * More advanced shapes (polygons and curved surfaces, so lenses could be simulated) 
+ * More precise control over object positioning, ability to set defined size and position
+ * Result exporting to mp4
+ * Setting a pulse to source objects
+ * Signal detectors
+ * Unit of measurement selection for properties
+ * Improved UI with windowing system
+ * Ability to change simulation resolution/canvas size
+ * Ability to run the simulation locally with WASM and WebGPU
+ * More visualization tools
+ * Ability to hide objects in the results panel
