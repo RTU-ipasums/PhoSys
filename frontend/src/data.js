@@ -13,7 +13,7 @@ export const data = reactive({
         value:5
     },
     {
-        propertyName:"Permiability",
+        propertyName:"Permeability",
         min:0,
         max:100,
         value:1

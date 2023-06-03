@@ -7,20 +7,20 @@
   <img src="https://img.shields.io/github/actions/workflow/status/RTU-ipasums/PhoSys/testing-linting.yml"/>
 </h1>
 
-<h4 align="center"> A simple to use, web-based photonics simulator. Based on <a href="https://github.com/flaport">Flaport's<a/> <a href="https://github.com/flaport/fdtd">fdtd<a/> library.</h4>
+<h4 align="center"> A simple to use, web-based electromagnetics simulator. Based on <a href="https://github.com/flaport">Flaport's<a/> <a href="https://github.com/flaport/fdtd">fdtd<a/> library.</h4>
 
 PhoSys is an open-source, web-based FDTD electromagnetic wave simulator. The project's primary objective is to assist teachers, students, and individuals interested in studying photonics or electromagnetic waves by offering a visualization tool for various electromagnetic phenomena in a simple and intuitive manner. Although the functionality is currently limited due to being in the early stages of development, you can still create visually interesting simulations using the three fundamental objects: point sources, line sources, and rectangle objects.
 
 # Motivation
 
-We decided to create Phosys because one day, during a physics class about electromagnetic waves, our team had a discussion and couldn't agree on a certain question. We wanted to resolve this question by simulating the problem, but we soon realized that there weren't any easy-to-use tools available. The simulation tools we found were either too complicated and expensive, like Ansys Lumerical, or too basic and didn't allow us to check what we wanted, like the [simulations provided by the University of Colorado Boulder](https://phet.colorado.edu/).
+We decided to create PhoSys because one day, during a physics class about electromagnetic waves, our team had a discussion and couldn't agree on a certain question. We wanted to resolve this question by simulating the problem, but we soon realized that there weren't any easy-to-use tools available. The simulation tools we found were either too complicated and expensive, like Ansys Lumerical, or too basic and didn't allow us to check what we wanted, like the [simulations provided by the University of Colorado Boulder](https://phet.colorado.edu/).
 
 # How to use
 A demo page is currently hosted on [phosys.lv](https://phosys.lv). Although mobile use is supported, it is highly recommended to use a desktop device.
 
 # How to host
 To run this application, you'll need [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) and Python 3.10+ installed on your computer.
-Optionally you can use Conda to create an isolated environment with the commmand `conda create -n phosys python=3.3.0` and activate it each time with:
+Optionally you can use Conda to create an isolated environment with the command `conda create -n phosys python=3.3.0` and activate it each time with:
 ```
 conda activate
 conda activate phosys
@@ -65,10 +65,10 @@ The UI is split up into 5 Vue components. Furthermore, there is a Vue component 
   * `SeekBar.vue` - The component that has all of the controls for simulation playback
 
 ## Toolbar
-The toolbar contains useful icons for interacting with the canvas and simulation
+The toolbar contains useful icons for interacting with the canvas and simulation.
 |Name|Icon|Description|
 | ----------- | ----------- | ------- |
-|Save icon|![Save icon](https://user-images.githubusercontent.com/47260097/242689299-983d4c0e-eee7-465b-aaed-611c875b2f06.png)|Opens a diaglog to save the current canvas objects in a json file to a local directory for later importing
+|Save icon|![Save icon](https://user-images.githubusercontent.com/47260097/242689299-983d4c0e-eee7-465b-aaed-611c875b2f06.png)|Opens a diaglog to save the current canvas objects in a JSON file to a local directory for later importing
 |Open icon|![Save icon](https://user-images.githubusercontent.com/47260097/242695808-ce8223f5-8fd9-4b8b-9116-d8de09c0bb9a.png)|Opens dialog to load simulation saved with the save icon
 |Rectangle object|![Rectangle object](https://user-images.githubusercontent.com/47260097/242697239-baa9d372-ca79-4761-bc75-f2cef457d596.png)| Adds a rectangular object to the canvas
 |Point source light|![Pointsource object](https://user-images.githubusercontent.com/47260097/242698558-5d3787ea-684d-4112-9d56-84f09d0bd25e.png)| Adds a point source object to the canvas
@@ -76,12 +76,12 @@ The toolbar contains useful icons for interacting with the canvas and simulation
 |Launch|![Launch icon](https://user-images.githubusercontent.com/47260097/242705768-16eb77bd-590a-44d8-af62-92733ebd2db3.png)| Sends a request to the server to start the FDTD simulation with the objects added to the canvas
 
 ## Properties panel
-The properties panel lists all of the properties of the selected object or global simulation properties if a single object isn't selected. It also has additional information about the object, such as it's position and name.
+The properties panel lists all of the properties of the selected object or global simulation properties if a single object isn't selected. It also has additional information about the object, such as its position and name.
 
 Here is a list of all the properties that are currently editable by the user:
 ### Global properties
   * Permittivity
-  * Permiability
+  * Permeability
 ### Rectangle object
   * Permittivity
   * Conductivity
@@ -95,7 +95,7 @@ Here is a list of all the properties that are currently editable by the user:
   * Phase shift
 
 ## Canvas
-This is the most important part of the PhoSys user interface. The simulation canvas is used for adding objects to the simulation, all objects placed in the gray canvas rectangle will be simulated.
+This is the most important part of the PhoSys user interface. The simulation canvas is used for adding objects to the simulation, all objects placed in the grey canvas rectangle will be simulated.
 
 Here is a list of features the canvas editor currently supports:
   * Scene navigation (pan and zoom with left-click and scroll wheel)
@@ -107,10 +107,10 @@ Here is a list of features the canvas editor currently supports:
   * Rotation snapping while holding <kbd>Ctrl</kbd>
   * Object copy/paste with <kbd>Ctrl</kbd> + <kbd>C</kbd> and <kbd>Ctrl</kbd> + <kbd>V</kbd>
   
-PhoSys uses the [Konva.js](https://konvajs.org/) javascript library to draw objects to a canvas. Konva additionally provides an easy way of adding object transformation control, but all other features had to be added on top.
+PhoSys uses the [Konva.js](https://konvajs.org/) JavaScript library to draw objects to a canvas. Konva additionally provides an easy way of adding object transformation control, but all other features had to be added on top.
 
 ### Object data storage
-All information nessecary to draw and simulate an object is stored in a JavaScript object called `data` defined in the `data.js` file. This object also contains information about global simulation properties.
+All information necessary to draw and simulate an object is stored in a JavaScript object called `data` defined in the `data.js` file. This object also contains information about global simulation properties.
 Whenever a shape icon in the toolbar is clicked, an object from the `defaultObjects.js` file is added to the `shapes` array in the `data` object. The `Draw.vue` component passes shape properties from the `shapes` array to their respective shape components. Each of these components update their respective properties after they have been transformed in the Konva canvas to ensure the data accurately represents what is being shown on the canvas.
 
 All shapes have a property `name` that allows them to be uniquely identified in the canvas. Each shape also stores information about their properties, which gets displayed in the properties panel.
@@ -119,7 +119,7 @@ Storing the information about objects in this centralized way allows for easy lo
 
 ## Simulation result panel
 
-This panel is used for displaying the result of the simulation recieved from the server.
+This panel is used for displaying the result of the simulation received from the server.
 
 ### Simulation result
 The client recieves a matplotlib graph of the result, which gets converted to HTML with the [mpld3](https://mpld3.github.io/) library. The result canvas supports zooming and panning. The frames of the result of the simulation is saved in a local array.
@@ -135,15 +135,15 @@ The client recieves a matplotlib graph of the result, which gets converted to HT
     * Play/pause
     * Next frame
     * Go to end
-4. Seek bar. Used for scrubbing through the simulation. Because the simulation generates sequentally, you can only seek to already generated frames.
-5. Final frame number. Determines the final frame to which the simulation will generate. This can be set manually or by pressing play again after the simulation reaches the final frame, in which case it will keep generating forever.
+4. Seek bar. Used for scrubbing through the simulation. Because the simulation generates sequentially, you can only seek to already generated frames
+5. Final frame number. Determines the final frame to which the simulation will generate. This can be set manually or by pressing play again after the simulation reaches the final frame, in which case it will keep generating forever
 
 ## Backend API design
-The backend uses the [Flask](https://flask.palletsprojects.com) python web framework and the [Socket.io](https://socket.io) library to make an API that continously sends data to the client with the WebSocket API. Additionally [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) is used to serve this API and [nginx](https://www.nginx.com/) is used for routing. The whole application is containerized with [Docker](https://docs.docker.com) and [Docker compose](https://docs.docker.com/compose/). The API is hosted on [Cloudflare](https://www.cloudflare.com/).
+The backend uses the [Flask](https://flask.palletsprojects.com) python web framework and the [Socket.io](https://socket.io) library to make an API that continuously sends data to the client with the WebSocket API. Additionally [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) is used to serve this API and [nginx](https://www.nginx.com/) is used for routing. The whole application is containerized with [Docker](https://docs.docker.com) and [Docker compose](https://docs.docker.com/compose/). The API is hosted on [Cloudflare](https://www.cloudflare.com/).
 
-When the server recieves the JSON object with the information about placement of objects, it parses this data and starts the FDTD simulation. As mentioned before the server uses an electromagnetic FDTD simulation based on [Flaport's](https://github.com/flaport) [fdtd](https://github.com/flaport/fdtd) library. More information on how the simulation works is available on the library's GitHub page. 
+When the server receives the JSON object with the information about placement of objects, it parses this data and starts the FDTD simulation. As mentioned before the server uses an electromagnetic FDTD simulation based on [Flaport's](https://github.com/flaport) [fdtd](https://github.com/flaport/fdtd) library. More information on how the simulation works is available on the library's GitHub page. 
 
-The simulation generates a [matplotlib](https://matplotlib.org/) graph that contains representations of scene objects and sends it to the client. When the client sends a socket message to generate a certain number of frames, the server continously starts sending the results of the electromagnetic simulation as Base64-encoded images.
+The simulation generates a [matplotlib](https://matplotlib.org/) graph that contains representations of scene objects and sends it to the client. When the client sends a socket message to generate a certain number of frames, the server continuously starts sending the results of the electromagnetic simulation as Base64-encoded images.
 
 # Simulation examples
 ## **Double slit experiment**
@@ -167,7 +167,7 @@ The simulation generates a [matplotlib](https://matplotlib.org/) graph that cont
 ![Fiber optics](https://user-images.githubusercontent.com/47260097/243102962-143c83f7-d0ab-46e8-a51a-96ac0ffbb6e8.png)
 
 ## **Phased array**
-[Download](/examples/phased_radar7.json)
+<a href="/examples/phased_radar7.json">Download</a>
 
 ![Phased array](https://user-images.githubusercontent.com/47260097/243102995-eba11928-7ac5-4fa7-bf7d-0196929d9df7.png)
 
@@ -175,9 +175,10 @@ The simulation generates a [matplotlib](https://matplotlib.org/) graph that cont
 
 PhoSys is currently in development, so bugs and other issues are to be expected.
 Known bugs:
- * Placing objects outside of the gray canvas box will give errors.
- * Simulation result playback is sometimes unstable.
- * Placing objects on top of eachother sometimes causes problems.
+ * Placing objects outside of the grey canvas box will give errors
+ * Simulation result playback is sometimes unstable
+ * Placing objects on top of each other sometimes causes problems
+
 Some of the features we plan to add in the future:
  * More advanced shapes (polygons and curved surfaces, so lenses could be simulated) 
  * More precise control over object positioning, ability to set defined size and position
