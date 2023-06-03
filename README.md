@@ -167,7 +167,8 @@ The simulation generates a [matplotlib](https://matplotlib.org/) graph that cont
 ![Fiber optics](https://user-images.githubusercontent.com/47260097/243102962-143c83f7-d0ab-46e8-a51a-96ac0ffbb6e8.png)
 
 ## **Phased array**
-<a href="/examples/phased_radar7.json">Download</a>
+<a href="https://github.com/RTU-ipasums/PhoSys/raw/master/examples/doubleslit.json">Download</a>
+<a href="https://raw.githubusercontent.com/RTU-ipasums/PhoSys/master/examples/wire.json">Download2</a>
 
 ![Phased array](https://user-images.githubusercontent.com/47260097/243102995-eba11928-7ac5-4fa7-bf7d-0196929d9df7.png)
 
