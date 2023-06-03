@@ -54,7 +54,7 @@ The PhoSys user interface consists of 4 main parts:
   * [Canvas](#canvas)
   * [Simulation result panel](#simulation-result-panel)
 
-The interface was made with the [VueJS](https://vuejs.org/) JavaScript framework and the Vue [Splitpanes](https://antoniandre.github.io/splitpanes/) component, which were used to create a responsive and modern UI with user resizable panels. Additionally the [Font Awesome](https://fontawesome.com/) icon library was used for some icons.
+The interface was made with the [VueJS](https://vuejs.org/) JavaScript framework and the Vue [Splitpanes](https://antoniandre.github.io/splitpanes/) component, which were used to create a responsive and modern UI with user resizable panels. Additionally, the [Font Awesome](https://fontawesome.com/) icon library was used for some icons.
 
 The UI is split up into 5 Vue components. Furthermore, there is a Vue component for each type of object in the `shapes` subdirectory.
 
@@ -122,7 +122,7 @@ Storing the information about objects in this centralized way allows for easy lo
 This panel is used for displaying the result of the simulation received from the server.
 
 ### Simulation result
-The client recieves a matplotlib graph of the result, which gets converted to HTML with the [mpld3](https://mpld3.github.io/) library. The result canvas supports zooming and panning. The frames of the result of the simulation is saved in a local array.
+The client receives a matplotlib graph of the result, which gets converted to HTML with the [mpld3](https://mpld3.github.io/) library. The result canvas supports zooming and panning. The frames of the result of the simulation are saved in a local array.
 ### Simulation playback controls
 
 ![Playback controls](https://user-images.githubusercontent.com/47260097/242866407-41118bca-abd9-46ee-8c6f-572d3b040b70.png)
@@ -139,7 +139,7 @@ The client recieves a matplotlib graph of the result, which gets converted to HT
 5. Final frame number. Determines the final frame to which the simulation will generate. This can be set manually or by pressing play again after the simulation reaches the final frame, in which case it will keep generating forever
 
 ## Backend API design
-The backend uses the [Flask](https://flask.palletsprojects.com) python web framework and the [Socket.io](https://socket.io) library to make an API that continuously sends data to the client with the WebSocket API. Additionally [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) is used to serve this API and [nginx](https://www.nginx.com/) is used for routing. The whole application is containerized with [Docker](https://docs.docker.com) and [Docker compose](https://docs.docker.com/compose/). The API is hosted on [Cloudflare](https://www.cloudflare.com/).
+The backend uses the [Flask](https://flask.palletsprojects.com) python web framework and the [Socket.io](https://socket.io) library to make an API that continuously sends data to the client with the WebSocket API. Additionally, [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) is used to serve this API and [nginx](https://www.nginx.com/) is used for routing. The whole application is containerized with [Docker](https://docs.docker.com) and [Docker compose](https://docs.docker.com/compose/). The API is hosted on [Cloudflare](https://www.cloudflare.com/).
 
 When the server receives the JSON object with the information about placement of objects, it parses this data and starts the FDTD simulation. As mentioned before the server uses an electromagnetic FDTD simulation based on [Flaport's](https://github.com/flaport) [fdtd](https://github.com/flaport/fdtd) library. More information on how the simulation works is available on the library's GitHub page. 
 
@@ -147,28 +147,27 @@ The simulation generates a [matplotlib](https://matplotlib.org/) graph that cont
 
 # Simulation examples
 ## **Double slit experiment**
-[Download](/examples/doubleslit.json)
+[JSON file](/examples/doubleslit.json)
 
 ![Double slit](https://user-images.githubusercontent.com/47260097/243102886-a5eb21ec-2645-436e-9fde-5df3d68e50d2.png)
 
 ## **Double double slit experiment**
-[Download](/examples/doubledoubleslit.json)
+[JSON file](/examples/doubledoubleslit.json)
 
 ![Double double slit](https://user-images.githubusercontent.com/47260097/243102982-bb79c46d-66c4-425d-bd9f-d0410f4fff27.png)
 
 ## **Reflection**
-[Download](/examples/lightbounce.json)
+[JSON file](/examples/lightbounce.json)
 
 ![Reflection](https://user-images.githubusercontent.com/47260097/243102922-ddcb5790-0189-419c-9ed8-5f89d3627994.png)
 
 ## **Fiber optics**
-[Download](/examples/wire.json)
+[JSON file](/examples/wire.json)
 
 ![Fiber optics](https://user-images.githubusercontent.com/47260097/243102962-143c83f7-d0ab-46e8-a51a-96ac0ffbb6e8.png)
 
 ## **Phased array**
-<a href="https://github.com/RTU-ipasums/PhoSys/raw/master/examples/doubleslit.json" download>Download</a>
-<a href="https://raw.githubusercontent.com/RTU-ipasums/PhoSys/master/examples/wire.json" download>Download2</a>
+[JSON file](/examples/phased_radar7.json)
 
 ![Phased array](https://user-images.githubusercontent.com/47260097/243102995-eba11928-7ac5-4fa7-bf7d-0196929d9df7.png)
 
