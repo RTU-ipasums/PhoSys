@@ -11,12 +11,12 @@ export const defaultObject = {
         {
             propertyName: "Permittivity",
             units: "su",
-            min: 0,
+            min: 1,
             max: 100,
             value: 25
         },
         {
-            propertyName: "Conductivity",
+            propertyName: "Conductivity, S/m",
             units: "S/m",
             min: 0,
             max: 30000,
@@ -25,7 +25,6 @@ export const defaultObject = {
     ]
 };
 export const defaultPointsource = {
-    rotation: 0,
     x: 150,
     y: 150,
     radius: 15,

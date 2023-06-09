@@ -1,0 +1,288 @@
+{
+    "xBounds": 500,
+    "yBounds": 500,
+    "frameCount": 200,
+    "propertyTitle": "Global settings",
+    "properties": [
+        {
+            "propertyName": "Permittivity",
+            "min": 0,
+            "max": 100,
+            "value": 5
+        },
+        {
+            "propertyName": "Permiability",
+            "min": 0,
+            "max": 100,
+            "value": 1
+        }
+    ],
+    "shapes": [
+        {
+            "rotation": 0,
+            "x": 215.6734084132697,
+            "y": 250.166112374738,
+            "radius": 15,
+            "scaleX": 1.0000000000000044,
+            "scaleY": 1.000000000000027,
+            "fill": "blue",
+            "opacity": 0.5,
+            "perfectDrawEnabled": false,
+            "draggable": true,
+            "propertyTitle": "Point source light",
+            "properties": [
+                {
+                    "propertyName": "Wavelength, nm",
+                    "units": "nm",
+                    "min": 100,
+                    "max": 1600,
+                    "_value": 0.0000015,
+                    "value": 1500
+                },
+                {
+                    "propertyName": "Amplitude",
+                    "units": "su",
+                    "min": 1,
+                    "max": 100,
+                    "value": 10
+                },
+                {
+                    "propertyName": "Phase shift, degrees",
+                    "units": "°",
+                    "min": -180,
+                    "max": 180,
+                    "value": -17
+                }
+            ],
+            "name": "pointsource_1"
+        },
+        {
+            "rotation": 0,
+            "x": 229.81326601255728,
+            "y": 250.419937259006,
+            "radius": 15,
+            "scaleX": 1.0000000000000044,
+            "scaleY": 1.000000000000027,
+            "fill": "blue",
+            "opacity": 0.5,
+            "perfectDrawEnabled": false,
+            "draggable": true,
+            "propertyTitle": "Point source light",
+            "properties": [
+                {
+                    "propertyName": "Wavelength, nm",
+                    "units": "nm",
+                    "min": 100,
+                    "max": 1600,
+                    "_value": 0.0000015,
+                    "value": 1500
+                },
+                {
+                    "propertyName": "Amplitude",
+                    "units": "su",
+                    "min": 1,
+                    "max": 100,
+                    "value": 10
+                },
+                {
+                    "propertyName": "Phase shift, degrees",
+                    "units": "°",
+                    "min": -180,
+                    "max": 180,
+                    "value": 109
+                }
+            ],
+            "name": "pointsource_3"
+        },
+        {
+            "rotation": 0,
+            "x": 243.95312361184506,
+            "y": 250.67376214327277,
+            "radius": 15,
+            "scaleX": 1.0000000000000044,
+            "scaleY": 1.000000000000027,
+            "fill": "blue",
+            "opacity": 0.5,
+            "perfectDrawEnabled": false,
+            "draggable": true,
+            "propertyTitle": "Point source light",
+            "properties": [
+                {
+                    "propertyName": "Wavelength, nm",
+                    "units": "nm",
+                    "min": 100,
+                    "max": 1600,
+                    "_value": 0.0000015,
+                    "value": 1500
+                },
+                {
+                    "propertyName": "Amplitude",
+                    "units": "su",
+                    "min": 1,
+                    "max": 100,
+                    "value": 10
+                },
+                {
+                    "propertyName": "Phase shift, degrees",
+                    "units": "°",
+                    "min": -180,
+                    "max": 180,
+                    "value": -125
+                }
+            ],
+            "name": "pointsource_4"
+        },
+        {
+            "rotation": 0,
+            "x": 258.09298121113267,
+            "y": 250.92758702754045,
+            "radius": 15,
+            "scaleX": 1.0000000000000044,
+            "scaleY": 1.000000000000027,
+            "fill": "blue",
+            "opacity": 0.5,
+            "perfectDrawEnabled": false,
+            "draggable": true,
+            "propertyTitle": "Point source light",
+            "properties": [
+                {
+                    "propertyName": "Wavelength, nm",
+                    "units": "nm",
+                    "min": 100,
+                    "max": 1600,
+                    "_value": 0.0000015,
+                    "value": 1500
+                },
+                {
+                    "propertyName": "Amplitude",
+                    "units": "su",
+                    "min": 1,
+                    "max": 100,
+                    "value": 10
+                },
+                {
+                    "propertyName": "Phase shift, degrees",
+                    "units": "°",
+                    "min": -180,
+                    "max": 180,
+                    "value": 0
+                }
+            ],
+            "name": "pointsource_5"
+        },
+        {
+            "rotation": 0,
+            "x": 272.23283881042,
+            "y": 251.18141191180857,
+            "radius": 15,
+            "scaleX": 1.0000000000000044,
+            "scaleY": 1.000000000000027,
+            "fill": "blue",
+            "opacity": 0.5,
+            "perfectDrawEnabled": false,
+            "draggable": true,
+            "propertyTitle": "Point source light",
+            "properties": [
+                {
+                    "propertyName": "Wavelength, nm",
+                    "units": "nm",
+                    "min": 100,
+                    "max": 1600,
+                    "_value": 0.0000015,
+                    "value": 1500
+                },
+                {
+                    "propertyName": "Amplitude",
+                    "units": "su",
+                    "min": 1,
+                    "max": 100,
+                    "value": 10
+                },
+                {
+                    "propertyName": "Phase shift, degrees",
+                    "units": "°",
+                    "min": -180,
+                    "max": 180,
+                    "value": -125
+                }
+            ],
+            "name": "pointsource_6"
+        },
+        {
+            "rotation": 0,
+            "x": 286.3726964097079,
+            "y": 251.4352367960756,
+            "radius": 15,
+            "scaleX": 1.0000000000000044,
+            "scaleY": 1.000000000000027,
+            "fill": "blue",
+            "opacity": 0.5,
+            "perfectDrawEnabled": false,
+            "draggable": true,
+            "propertyTitle": "Point source light",
+            "properties": [
+                {
+                    "propertyName": "Wavelength, nm",
+                    "units": "nm",
+                    "min": 100,
+                    "max": 1600,
+                    "_value": 0.0000015,
+                    "value": 1500
+                },
+                {
+                    "propertyName": "Amplitude",
+                    "units": "su",
+                    "min": 1,
+                    "max": 100,
+                    "value": 10
+                },
+                {
+                    "propertyName": "Phase shift, degrees",
+                    "units": "°",
+                    "min": -180,
+                    "max": 180,
+                    "value": 109
+                }
+            ],
+            "name": "pointsource_7"
+        },
+        {
+            "rotation": 0,
+            "x": 300.5125540089957,
+            "y": 251.68906168034303,
+            "radius": 15,
+            "scaleX": 1.0000000000000044,
+            "scaleY": 1.000000000000027,
+            "fill": "blue",
+            "opacity": 0.5,
+            "perfectDrawEnabled": false,
+            "draggable": true,
+            "propertyTitle": "Point source light",
+            "properties": [
+                {
+                    "propertyName": "Wavelength, nm",
+                    "units": "nm",
+                    "min": 100,
+                    "max": 1600,
+                    "_value": 0.0000015,
+                    "value": 1500
+                },
+                {
+                    "propertyName": "Amplitude",
+                    "units": "su",
+                    "min": 1,
+                    "max": 100,
+                    "value": 10
+                },
+                {
+                    "propertyName": "Phase shift, degrees",
+                    "units": "°",
+                    "min": -180,
+                    "max": 180,
+                    "value": -17
+                }
+            ],
+            "name": "pointsource_8"
+        }
+    ]
+}

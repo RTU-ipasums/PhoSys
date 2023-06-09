@@ -1,10 +1,12 @@
 <script>
 import { frames } from './result.js'
+import { data } from './data.js'
 
 export default {
     data() {
         return {
-            frames
+            frames,
+            data
         }
     },
     mounted() {
@@ -29,7 +31,7 @@ export default {
             <div class="seek-container">
                 <input v-model.lazy.number="frames.frameNum" type="number" />
                 <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum" class="slider">
-                <input v-model.lazy.number="frames.maxFrame" type="number" />
+                <input v-model.lazy.number="data.frameCount" type="number" />
             </div>
             <div class="controls">
                 <div class="left-options">
@@ -136,7 +138,7 @@ input[type=number] {
 }
 
 input[type=number]:focus {
-    border-bottom: 2px solid #7dff71;
+    border-bottom: 2px solid #f6c737;
 }
 
 .seekBar {
