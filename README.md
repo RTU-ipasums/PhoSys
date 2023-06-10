@@ -70,7 +70,7 @@ The UI is split up into 5 Vue components. Furthermore, there is a Vue component 
 The toolbar contains useful icons for interacting with the canvas and simulation.
 |Name|Icon|Description|
 | ----------- | ----------- | ------- |
-|Save icon|![Save icon](https://user-images.githubusercontent.com/47260097/242689299-983d4c0e-eee7-465b-aaed-611c875b2f06.png)|Opens a diaglog to save the current canvas objects in a JSON file to a local directory for later importing
+|Save icon|![Save icon](https://user-images.githubusercontent.com/47260097/242689299-983d4c0e-eee7-465b-aaed-611c875b2f06.png)|Opens a dialog to save the current canvas objects in a JSON file to a local directory for later importing
 |Open icon|![Save icon](https://user-images.githubusercontent.com/47260097/242695808-ce8223f5-8fd9-4b8b-9116-d8de09c0bb9a.png)|Opens dialog to load simulation saved with the save icon
 |Rectangle object|![Rectangle object](https://user-images.githubusercontent.com/47260097/242697239-baa9d372-ca79-4761-bc75-f2cef457d596.png)| Adds a rectangular object to the canvas
 |Point source light|![Pointsource object](https://user-images.githubusercontent.com/47260097/242698558-5d3787ea-684d-4112-9d56-84f09d0bd25e.png)| Adds a point source object to the canvas
