@@ -92,7 +92,7 @@ export default {
         <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinesource, 'linesource')" title="Add line lightsource" alt="line lightsource"
           src="/linesource.png" />
       </div>
-      <button class="run-button" @click="$refs.result.getFigure()" title="Start simulation"><i class="fa-solid fa-play"
+      <button class="run-button" @click="$refs.result.startGeneration()" title="Start simulation"><i class="fa-solid fa-play"
           data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
     </nav>
 

@@ -17,7 +17,7 @@ export default {
         }
       switch (key) {
         case " ":
-          this.resultView.startStop();
+          this.resultView.togglePlay();
           break;
       }
     });
@@ -30,9 +30,9 @@ export default {
     <div class="container">
         <div class="seekBar">
             <div class="seek-container">
-                <input v-if="this.resultView" v-model.lazy.number="this.resultView.frameIdx" type="number" @change="this.resultView.setFrameNum(this.resultView.frameIdx)"/>
-                <input v-if="this.resultView" type="range" min="1" :max="this.resultView.maxFrame" v-model.number="this.resultView.frameIdx" @change="this.resultView.setFrameNum(this.resultView.frameIdx)" class="slider">
-                <input v-model.lazy.number="data.frameCount" type="number" @change="this.resultView.setMaxFrame(this.resultView.frameCount)"/>
+                <input v-if="this.resultView" v-model.lazy.number="this.resultView.currentFrame" type="number" @change="this.resultView.setFrame(this.resultView.currentFrame)"/>
+                <input v-if="this.resultView" type="range" min="1" :max="this.resultView.maxFrame" v-model.number="this.resultView.currentFrame" @change="this.resultView.setFrame(this.resultView.currentFrame)" class="slider">
+                <input v-model.lazy.number="data.frameCount" type="number" @change="this.resultView.setMaxFrame(this.resultView.targetFrames)"/>
             </div>
             <div class="controls">
                 <div class="left-options">
@@ -43,13 +43,13 @@ export default {
 
                 </div>
                 <div class="center-buttons">
-                    <i @click="this.resultView.firstFrame" class="fa-solid fa-backward-step"></i>
-                    <i @click="this.resultView.previousFrame" class="fa-solid fa-caret-left"></i>
-                    <i @click="this.resultView.startStop" class="fa-solid" :class="this.resultView?.playing ? 'fa-pause' : 'fa-play'"></i>
-                    <i @click="this.resultView.nextFrame" class="fa-solid fa-caret-right"></i>
-                    <i @click="this.resultView.lastFrame" class="fa-solid fa-forward-step"></i>
+                    <i @click="this.resultView.setFirstFrame" class="fa-solid fa-backward-step"></i>
+                    <i @click="this.resultView.setPreviousFrame" class="fa-solid fa-caret-left"></i>
+                    <i @click="this.resultView.togglePlay" class="fa-solid" :class="this.resultView?.isPlaying ? 'fa-pause' : 'fa-play'"></i>
+                    <i @click="this.resultView.setNextFrame" class="fa-solid fa-caret-right"></i>
+                    <i @click="this.resultView.setLastFrame" class="fa-solid fa-forward-step"></i>
                 </div>
-                <div class="loader-container" :style="{ 'visibility': (this.resultView?.genActive ? 'visible' : 'hidden') }">
+                <div class="loader-container" :style="{ 'visibility': (this.resultView?.isGenerationActive ? 'visible' : 'hidden') }">
                     <div class="loader"></div>
                     <div class="loading-text">Generating frames</div>
                 </div>
