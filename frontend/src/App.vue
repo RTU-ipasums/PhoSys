@@ -3,7 +3,6 @@ import { data } from './data.js'
 import Draw from './Draw.vue'
 import * as defaults from './defaultObjects'
 import Result from './Result.vue'
-import { getFigure } from './result.js'
 import SeekBar from './SeekBar.vue'
 import Properties from './Properties.vue'
 import { Splitpanes, Pane } from 'splitpanes'
@@ -20,7 +19,6 @@ export default {
   },
   data() {
     return {
-      getFigure,
       isMounted: false,
       sizeObserver: null,
       resizeTimeoutId: undefined,
@@ -94,7 +92,7 @@ export default {
         <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinesource, 'linesource')" title="Add line lightsource" alt="line lightsource"
           src="/linesource.png" />
       </div>
-      <button class="run-button" @click="getFigure()" title="Start simulation"><i class="fa-solid fa-play"
+      <button class="run-button" @click="$refs.result.getFigure()" title="Start simulation"><i class="fa-solid fa-play"
           data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
     </nav>
 
@@ -109,7 +107,7 @@ export default {
           </div>
           <div class="grid-item canvas" id="canvas">
             <Result ref="result" />
-            <SeekBar />
+            <SeekBar :resultView="$refs.result"/>
           </div>
         </div>
       </pane>

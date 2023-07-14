@@ -19,6 +19,5 @@ export const data = reactive({
         value:1
     }
     ],
-    shapes: [
-      ]
+    shapes: []
 })
