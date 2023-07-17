@@ -13,7 +13,6 @@ export default {
   data() {
     return {
       currentShapeId: 0,
-      data,
       copiedShapes: new Set(),
       selectedShapes: new Set(),
       lastCenter: null,
@@ -27,17 +26,17 @@ export default {
   },
   computed: {
     rectangles() {
-      return this.data.shapes.filter((r) => {
+      return data.shapes.filter((r) => {
         return r.name.split('_')[0] === "object";
       });
     },
     circles() {
-      return this.data.shapes.filter((r) => {
+      return data.shapes.filter((r) => {
         return r.name.split('_')[0] === "pointsource";
       });
     },
     lines() {
-      return this.data.shapes.filter((r) => {
+      return data.shapes.filter((r) => {
         return r.name.split('_')[0] === "linesource";
       });
     }
@@ -142,7 +141,7 @@ export default {
       if (!name) {
         return;
       }
-      const shape = this.data.shapes.find((r) => r.name === name);
+      const shape = data.shapes.find((r) => r.name === name);
       if (shape) {
         if (!e.evt.shiftKey && !this.selectedShapes.has(shape)) {
           this.selectedShapes.clear();
@@ -171,7 +170,7 @@ export default {
       if (!name) {
         return;
       }
-      const shape = this.data.shapes.find((r) => r.name === name);
+      const shape = data.shapes.find((r) => r.name === name);
 
       if (!shape) {
         this.selectedShapes.clear();
@@ -257,26 +256,26 @@ export default {
     },
     addShape(obj, type, keepSelected) {
       this.currentShapeId++;
-      this.data.shapes.push({
+      data.shapes.push({
         ...newObject(obj),
         name: `${type}_${this.currentShapeId}`
       })
       if(!keepSelected){
         this.selectedShapes.clear();
       }
-      this.selectedShapes.add(this.data.shapes.at(-1));
+      this.selectedShapes.add(data.shapes.at(-1));
       Promise.resolve(this.selectedShapes).then(this.updateTransformer);
     },
     deleteSelectedShapes() {
-      this.data.shapes = this.data.shapes.filter((shape) =>!this.selectedShapes.has(shape));
+      data.shapes = data.shapes.filter((shape) =>!this.selectedShapes.has(shape));
       this.selectedShapes.clear();
       this.updateTransformer();
     }
   },
   mounted() {
     //todo limit shape dragging to simulation canvas
-    this.data.xBounds = 500;
-    this.data.yBounds = 500;
+    data.xBounds = 500;
+    data.yBounds = 500;
     window.addEventListener('keydown', e => {
       const key = e.key;
       switch (key) {

@@ -11,8 +11,7 @@ export default {
       socket: io(),
       currentFrame: 1,
       imgObj: null,
-      frameData: [null],
-      targetFrames: null,
+      frameData: [],
       isPlaying: false,
       generating: false,
       fps: 30,
@@ -21,19 +20,13 @@ export default {
   },
   computed: {
     maxFrame() {
-      return Math.max(this.targetFrames, this.frameData.length);
+      return Math.max(data.frameCount, this.frameData.length);
     },
-    isGenerationActive() {
-      return this.targetFrames > this.frameData.length || this.generating;
+    isGenerating() {
+      return this.generating===true||(this.frameData.length<data.frameCount&&this.frameData.length>0);
     },
   },
   methods: {
-    setMaxFrame(val) {
-      if (this.frameData.length < val) {
-        this.targetFrames = val;
-        this.socket.emit('generate_frames', val - this.frameData.length);
-      }
-    },
     setFrame(val) {
       if (this.frameData[0] != null) {
         this.currentFrame = val;
@@ -49,7 +42,7 @@ export default {
       }
       else {
         clearInterval(this.advanceInterval)
-        this.isPlaying = this.isGenerationActive;
+        this.isPlaying = this.isGenerating;
       }
     },
     setPreviousFrame() {
@@ -64,7 +57,7 @@ export default {
     togglePlay() {
       this.generating = false;
       this.isPlaying = !this.isPlaying;
-      if(!this.targetFrames)return;
+      if(!this.frameData)return;
       if (this.isPlaying) {
         if (this.currentFrame == this.frameData.length) {
           this.generating = true;
@@ -82,10 +75,10 @@ export default {
     },
     addFrame(frame) {
       this.frameData.push(frame);
-      if (this.targetFrames == this.frameData.length) {
+     
+      if (data.frameCount == this.frameData.length) {
         this.generating = false;
         this.isPlaying = false;
-
 
         this.setFrame(this.currentFrame + 1);
         this.setFrame(this.currentFrame);
@@ -98,7 +91,7 @@ export default {
     
     startGeneration() {
       console.log(structuredClone(toRaw(data)));
-      this.targetFrames = data.frameCount;
+      data.frameCount = data.frameCount;
       this.socket.close();
       this.socket = io(import.meta.env.VITE_BACKEND_URL);
 
