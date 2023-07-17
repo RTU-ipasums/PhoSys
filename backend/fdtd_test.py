@@ -364,7 +364,6 @@ class Property:
         self.default = default
 
 properties = {
-    'framecount': [0, 10000, int(200)],
     'permittivity': [0,None,1.],
     'permiability': [0,None,1.],
     'wavelength': [0,None,1500],#temp
@@ -395,7 +394,7 @@ class CanvasEl:
 
 class GlobalObj(CanvasEl):
     def __init__(self, o) -> None:
-        self.reqProps = ['framecount', 'permittivity', 'permiability', 'resolution']
+        self.reqProps = ['permittivity', 'permiability', 'resolution']
         super(GlobalObj, self).__init__(o)
 
 class PermObj(CanvasEl):
@@ -501,7 +500,7 @@ def processJson(o):
     #WAVELENGTH = gAt(o.wavelength, 1550e-9)
     xOut, yOut = gAt(o.xOut, 500), gAt(o.yOut,500)
     #resolution = gAt(o.resolution, 15)
-    #frameCount = gAt(o.frameCount, 100)
+    frameCount = gAt(o.frameCount, 200)
 
     elements = []
     for obj in (o.rectangles+o.circles if o.rectangles!=None else []) + (o.shapes if o.shapes!=None else []):
@@ -542,7 +541,7 @@ def processJson(o):
     outJson = mpld3.fig_to_dict(fig)
     fig.clear()
     plt.close()
-    return outJson, grid, globalObj.framecount-1
+    return outJson, grid, frameCount-1
 
 def test_fdtd():
 

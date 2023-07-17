@@ -1,14 +1,14 @@
 <script>
-import { frames } from './result.js'
+import Result from './Result.vue'
 import { data } from './data.js'
 
 export default {
     data() {
         return {
-            frames,
             data
         }
     },
+    props:['resultView'],
     mounted() {
     window.addEventListener('keydown', e => {
       const key = e.key;
@@ -17,7 +17,7 @@ export default {
         }
       switch (key) {
         case " ":
-          this.frames.startStop();
+          this.resultView.togglePlay();
           break;
       }
     });
@@ -29,26 +29,26 @@ export default {
     <div class="container">
         <div class="seekBar">
             <div class="seek-container">
-                <input v-model.lazy.number="frames.frameNum" type="number" />
-                <input type="range" min="1" :max="frames.maxFrame" v-model.number="frames.frameNum" class="slider">
-                <input v-model.lazy.number="data.frameCount" type="number" />
+                <input v-if="resultView" v-model.lazy.number="resultView.currentFrame" type="number" @change="resultView.setFrame(this.resultView.currentFrame)"/>
+                <input v-if="resultView" type="range" min="1" :max="resultView.maxFrame" v-model.number="resultView.currentFrame" @change="resultView.setFrame(resultView.currentFrame)" class="slider">
+                <input v-model.lazy.number="data.frameCount" type="number"/>
             </div>
             <div class="controls">
                 <div class="left-options">
                     <div class="control">
                         <label for="fps-input">FPS</label>
-                        <input v-model.lazy.number="frames.fps" id="fps-input" type="number" />
+                        <input v-if="this.resultView" v-model.lazy.number="resultView.fps" id="fps-input" type="number" />
                     </div>
 
                 </div>
                 <div class="center-buttons">
-                    <i @click="frames.firstFrame" class="fa-solid fa-backward-step"></i>
-                    <i @click="frames.previousFrame" class="fa-solid fa-caret-left"></i>
-                    <i @click="frames.startStop" class="fa-solid" :class="frames.playing ? 'fa-pause' : 'fa-play'"></i>
-                    <i @click="frames.nextFrame" class="fa-solid fa-caret-right"></i>
-                    <i @click="frames.lastFrame" class="fa-solid fa-forward-step"></i>
+                    <i @click="resultView.setFirstFrame" class="fa-solid fa-backward-step"></i>
+                    <i @click="resultView.setPreviousFrame" class="fa-solid fa-caret-left"></i>
+                    <i @click="resultView.togglePlay" class="fa-solid" :class="this.resultView?.isPlaying ? 'fa-pause' : 'fa-play'"></i>
+                    <i @click="resultView.setNextFrame" class="fa-solid fa-caret-right"></i>
+                    <i @click="resultView.setLastFrame" class="fa-solid fa-forward-step"></i>
                 </div>
-                <div class="loader-container" :style="{ 'visibility': (frames.genActive ? 'visible' : 'hidden') }">
+                <div class="loader-container" :style="{ 'visibility': (this.resultView?.isGenerating ? 'visible' : 'hidden') }">
                     <div class="loader"></div>
                     <div class="loading-text">Generating frames</div>
                 </div>
