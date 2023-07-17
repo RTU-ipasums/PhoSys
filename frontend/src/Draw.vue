@@ -39,6 +39,11 @@ export default {
       return data.shapes.filter((r) => {
         return r.name.split('_')[0] === "linesource";
       });
+    },
+    linedetectors() {
+      return data.shapes.filter((r) => {
+        return r.name.split('_')[0] === "linedetector";
+      });
     }
   },
   methods: {
@@ -359,7 +364,8 @@ export default {
         }" />
 
         <Circle v-for="item in circles" :key="item.id" :config="item"/>
-        <DraggableLine v-for="item in lines" :key="item.id" :config="item" @sizeupdate="updateTransformer"/>
+        <DraggableLine v-for="item in lines" :key="item.id" :config="{...item,color:'blue'}" @sizeupdate="updateTransformer"/>
+        <DraggableLine v-for="item in linedetectors" :key="item.id" :config="{...item, color:'green'}" @sizeupdate="updateTransformer"/>
         <Rectangle v-for="item in rectangles" :key="item.id" :config="item"/>
 
         <v-transformer ref="transformer" 
