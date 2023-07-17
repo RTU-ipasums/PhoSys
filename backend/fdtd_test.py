@@ -250,15 +250,16 @@ def visualize(
 
         if detector.__class__.__name__ == "BlockDetector":
             # BlockDetector
-            plt.plot(
+            leg.append((plt.plot(
                 [_x[0], _x[0], _x[1], _x[1], _x[0]],
                 [_y[0], _y[1], _y[1], _y[0], _y[0]],
                 lw=3,
                 color=detcolor,
-            )
+            ), "Detectors"))
         else:
             # LineDetector
-            plt.plot(_x, _y, lw=3, color=detcolor)
+            leg.append((plt.plot(
+                _x, _y, lw=3, color=detcolor), "Detectors"))
 
     # Boundaries
     for boundary in grid.boundaries:
@@ -352,7 +353,18 @@ def visualize(
     plt.figlegend()
     plt.tight_layout()
 
-    interactive_legend = plugins.InteractiveLegendPlugin([ob[0] for ob in leg], [ob[1] for ob in leg])
+    legUnique = []
+    for ob in leg:# remove duplicates
+        unique = True
+        for checkOb in legUnique:
+            if ob[1] == checkOb[1]:
+                checkOb[0].append(ob[0][0])
+                unique = False
+                break
+        if unique:
+            legUnique.append(ob)
+
+    interactive_legend = plugins.InteractiveLegendPlugin([ob[0] for ob in legUnique], [ob[1] for ob in legUnique], legend_offset=(-150, 15))
 
     return plt.gcf(), img, interactive_legend
 
