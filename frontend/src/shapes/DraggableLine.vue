@@ -32,7 +32,7 @@ ref="group">
         points: config.points,
         strokeWidth: 5,
         opacity: 0.5,
-        stroke: 'blue',
+        stroke: config.color,
         perfectDrawEnabled: false
     }"
     @dragmove="updateLine" 
