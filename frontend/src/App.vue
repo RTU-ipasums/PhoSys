@@ -91,8 +91,6 @@ export default {
           src="/light.png" />
         <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinesource, 'linesource')" title="Add line lightsource" alt="line lightsource"
           src="/linesource.png" />
-        <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinedetector, 'linedetector')" title="Add line detector" alt="line detector"
-          src="/linedetector.png" />
       </div>
       <button class="run-button" @click="$refs.result.startGeneration()" title="Start simulation"><i class="fa-solid fa-play"
           data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
