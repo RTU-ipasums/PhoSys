@@ -24,6 +24,32 @@ export const defaultObject = {
         },
     ]
 };
+export const defaultPolygon = {
+    rotation: 0,
+    x: 150,
+    y: 150,
+    width: 100,
+    height: 100,
+    scaleX: 1,
+    scaleY: 1,
+    propertyTitle: "Polygon object",
+    properties: [
+        {
+            propertyName: "Permittivity",
+            units: "su",
+            min: 1,
+            max: 100,
+            value: 25
+        },
+        {
+            propertyName: "Conductivity, S/m",
+            units: "S/m",
+            min: 0,
+            max: 30000,
+            value: 0
+        },
+    ]
+};
 export const defaultPointsource = {
     x: 150,
     y: 150,

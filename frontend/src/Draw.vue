@@ -4,11 +4,13 @@ import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject, radToDeg, d
 import DraggableLine from './shapes/DraggableLine.vue'
 import Rectangle from './shapes/Rectangle.vue'
 import Circle from './shapes/Circle.vue'
+import Polygon from './shapes/Polygon.vue'
 export default {
   components: {
     DraggableLine,
     Rectangle,
-    Circle
+    Circle,
+    Polygon
   },
   data() {
     return {
@@ -43,6 +45,11 @@ export default {
     linedetectors() {
       return data.shapes.filter((r) => {
         return r.name.split('_')[0] === "linedetector";
+      });
+    },
+    polygons() {
+      return data.shapes.filter((r) => {
+        return r.name.split('_')[0] === "polygon";
       });
     }
   },
@@ -367,7 +374,7 @@ export default {
         <DraggableLine v-for="item in lines" :key="item.id" :config="{...item,color:'blue'}" @sizeupdate="updateTransformer"/>
         <DraggableLine v-for="item in linedetectors" :key="item.id" :config="{...item, color:'green'}" @sizeupdate="updateTransformer"/>
         <Rectangle v-for="item in rectangles" :key="item.id" :config="item"/>
-
+        <Polygon v-for="item in polygons" :key="item.id" :config="item"/>
         <v-transformer ref="transformer" 
         :config="{
           boundBoxFunc: snappingFunction
