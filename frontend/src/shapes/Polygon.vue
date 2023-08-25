@@ -6,8 +6,6 @@ export default {
         const polygon = this.$refs.polygon.getNode();
         this.config.x=polygon.x();
         this.config.y=polygon.y();
-        this.config.width=polygon.width();
-        this.config.height=polygon.height();
         this.config.scaleX=polygon.scaleX();
         this.config.scaleY=polygon.scaleY();
         this.config.rotation=polygon.rotation();
@@ -18,19 +16,19 @@ export default {
 </script>
 <template>
 <!-- replace rect with polygon -->
-<v-rect :config="{
+<v-line :config="{
     name:config.name,
     x:config.x,
     y:config.y,
-    width:config.width,
-    height:config.height,
     scaleX:config.scaleX,
     scaleY:config.scaleY,
     rotation:config.rotation,
+    points:config.points,
     fill: 'red',
     opacity:1.0,
     perfectDrawEnabled: false,
-    draggable:true
+    draggable:true,
+    closed:true
 }"
 @dragmove="updatePolygon" 
 @transformend="updatePolygon"
