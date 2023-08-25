@@ -88,7 +88,7 @@ export default {
         <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultObject, 'object')" title="Add object" alt="object"
           src="/object.png" />
         <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPolygon, 'polygon')" title="Add polygon" alt="polygon"
-          src="/object.png" />
+          src="/polygon.png" />
         <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPointsource, 'pointsource')" title="Add point lightsource" alt="point lightsource"
           src="/light.png" />
         <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinesource, 'linesource')" title="Add line lightsource" alt="line lightsource"
