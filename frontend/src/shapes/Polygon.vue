@@ -76,7 +76,7 @@ export default {
     rotation:config.rotation,
     points:config.points,
     fill: 'red',
-    opacity:0.5,
+    opacity:0.3,
     perfectDrawEnabled: false,
     draggable:true,
     closed:true
