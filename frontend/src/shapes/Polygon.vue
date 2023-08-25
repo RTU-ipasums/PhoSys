@@ -18,6 +18,37 @@ export default {
             newPoints[index]=pos.x-this.config.x;
             newPoints[index+1]=pos.y-this.config.y;
             polygon.points(newPoints);
+        },
+        handleStrokeClick(e){
+            const stage = e.target.getStage();
+            const clickPos = stage.getRelativePointerPosition();
+            console.log(clickPos);
+            clickPos.x-=this.config.x;
+            clickPos.y-=this.config.y;
+
+            const polygon = this.$refs.polygon.getNode();
+            let newPoints=polygon.points();
+            
+            let min=Number.MAX_VALUE;
+            let bestIndex=-1;
+            //we need to figure out between which two points the new point needs to be inserted
+            for (let i=0; i < newPoints.length / 2; i++) {
+                const ax = clickPos.x-newPoints[i * 2];
+                const ay = clickPos.y-newPoints[i * 2 + 1];
+                const bx = newPoints[(i * 2 + 2) % newPoints.length]-clickPos.x;
+                const by = newPoints[(i * 2 + 3) % newPoints.length]-clickPos.y;
+                
+                const cross = Math.abs(ax*by-ay*bx);
+             
+                if(cross<min&&(ax*bx+ay*by)>0){
+                    min=cross;
+                    bestIndex=i;
+                }
+            }
+            if(bestIndex===-1)return;
+            newPoints.splice(2*(bestIndex+1),0,clickPos.x,clickPos.y)
+            polygon.points(newPoints);
+            console.log(bestIndex);
         }
     },
     computed:{
@@ -53,6 +84,25 @@ export default {
 @dragmove="updatePolygon" 
 @transformend="updatePolygon"
 ref="polygon"/>
+
+<v-line :config="{
+    name:config.name,
+    x:config.x,
+    y:config.y,
+    scaleX:config.scaleX,
+    scaleY:config.scaleY,
+    rotation:config.rotation,
+    points:config.points,
+    fill: 'red',
+    opacity:1,
+    perfectDrawEnabled: false,
+    closed:true,
+    fillEnabled:false,
+    strokeWidth:5,
+    hitStrokeWidth:7,
+    stroke:'red'
+}"
+@click="handleStrokeClick"/>
 
 <v-circle  v-for="(point, index) in circlePoints" :key="index" :config="{
     x:point.x+config.x,
