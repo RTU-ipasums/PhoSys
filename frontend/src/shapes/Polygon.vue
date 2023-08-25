@@ -10,6 +10,15 @@ export default {
             this.config.scaleY=polygon.scaleY();
             this.config.rotation=polygon.rotation();
         },
+        updatePolygonPoints(e) {
+            const polygon = this.$refs.polygon.getNode();
+            const index=e.target.attrs.pointId*2;
+            let newPoints=polygon.points();
+            const pos=e.target.position();
+            newPoints[index]=pos.x-this.config.x;
+            newPoints[index+1]=pos.y-this.config.y;
+            polygon.points(newPoints);
+        }
     },
     computed:{
         circlePoints(){
@@ -36,7 +45,7 @@ export default {
     rotation:config.rotation,
     points:config.points,
     fill: 'red',
-    opacity:1.0,
+    opacity:0.5,
     perfectDrawEnabled: false,
     draggable:true,
     closed:true
@@ -45,10 +54,13 @@ export default {
 @transformend="updatePolygon"
 ref="polygon"/>
 
-<v-circle  v-for="point in circlePoints" :config="{
+<v-circle  v-for="(point, index) in circlePoints" :key="index" :config="{
     x:point.x+config.x,
     y:point.y+config.y,
     fill:'gray',
-    radius:5
-}"/>
+    radius:5,
+    draggable:true,
+    pointId:index
+}"
+@dragmove="updatePolygonPoints"/>
 </template>
