@@ -105,20 +105,15 @@ export default {
         <Properties :selectedShapes="getShape()" />
       </pane>
       <pane>
-        <div class="editor-canvas-container">
-          <div class="grid-item editor" id="editor" ref="flexeditor">
-            <Draw ref="draw" />
-          </div>
-          <div class="grid-item canvas" id="canvas">
-            <Result ref="result" />
-            <SeekBar :resultView="$refs.result"/>
-          </div>
+        <div class="grid-item editor" id="editor" ref="flexeditor">
+          <Draw ref="draw" />
         </div>
       </pane>
-
+      <pane class="grid-item canvas" id="canvas">
+        <Result ref="result" />
+        <SeekBar :resultView="$refs.result"/>
+      </pane>
     </splitpanes>
-
-
   </div>
 </template>
 
@@ -141,21 +136,12 @@ body {
   line-height: 1.6;
 }
 
-.editor-canvas-container {
-  display: flex;
-  width: 100%;
-  gap: 6px;
-  height: 100%;
+.editor{
+  height:100%
 }
 
 .grid-item {
   background-color: rgba(255, 255, 255, 1);
-}
-
-.editor-canvas-container>* {
-  flex: 1;
-  height: 100%;
-  width: 0;
 }
 
 .u-i-container {
