@@ -2,16 +2,27 @@
 export default {
     props: ['config'],
     methods: {
-    updatePolygon() {
-        const polygon = this.$refs.polygon.getNode();
-        this.config.x=polygon.x();
-        this.config.y=polygon.y();
-        this.config.scaleX=polygon.scaleX();
-        this.config.scaleY=polygon.scaleY();
-        this.config.rotation=polygon.rotation();
-
+        updatePolygon() {
+            const polygon = this.$refs.polygon.getNode();
+            this.config.x=polygon.x();
+            this.config.y=polygon.y();
+            this.config.scaleX=polygon.scaleX();
+            this.config.scaleY=polygon.scaleY();
+            this.config.rotation=polygon.rotation();
+        },
     },
-  },
+    computed:{
+        circlePoints(){
+            let points = [];
+            for(let i=0;i<this.config.points.length;i+=2){
+                points.push({
+                    x: this.config.points[i],
+                    y: this.config.points[i+1]
+                })
+            }
+            return points;
+        }
+    }
 };
 </script>
 <template>
@@ -33,4 +44,11 @@ export default {
 @dragmove="updatePolygon" 
 @transformend="updatePolygon"
 ref="polygon"/>
+
+<v-circle  v-for="point in circlePoints" :config="{
+    x:point.x+config.x,
+    y:point.y+config.y,
+    fill:'gray',
+    radius:5
+}"/>
 </template>
