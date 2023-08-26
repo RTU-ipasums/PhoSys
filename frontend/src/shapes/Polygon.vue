@@ -61,12 +61,11 @@ export default {
                 })
             }
             return points;
-        }
-    }
+        },
+    },
 };
 </script>
 <template>
-<!-- replace rect with polygon -->
 <v-line :config="{
     name:config.name,
     x:config.x,
@@ -84,7 +83,6 @@ export default {
 @dragmove="updatePolygon" 
 @transformend="updatePolygon"
 ref="polygon"/>
-
 <v-line :config="{
     name:config.name,
     x:config.x,
@@ -98,19 +96,26 @@ ref="polygon"/>
     perfectDrawEnabled: false,
     closed:true,
     fillEnabled:false,
-    strokeWidth:5,
     hitStrokeWidth:7,
-    stroke:'red'
+    stroke:'rgb(0, 161, 255)',
+    strokeWidth:1,
+    strokeScaleEnabled:false
 }"
 @click="handleStrokeClick"/>
 
-<v-circle  v-for="(point, index) in circlePoints" :key="index" :config="{
+<v-rect  v-for="(point, index) in circlePoints" :key="index" :config="{
     x:point.x+config.x,
     y:point.y+config.y,
-    fill:'gray',
-    radius:5,
+    stroke: 'rgb(0, 161, 255)',
+    fill: 'white',
+    width: 10,
+    height: 10,
+    offsetX: 5,
+    offsetY: 5,
+    strokeWidth: 1,
     draggable:true,
-    pointId:index
+    pointId:index,
+    id:'static'
 }"
 @dragmove="updatePolygonPoints"/>
 </template>
