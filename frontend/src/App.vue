@@ -143,7 +143,6 @@ body {
 button {
   background: none;
   padding: 0;
-  color: inherit;
   font: inherit;
   border: none;
   cursor: pointer;
