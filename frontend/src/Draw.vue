@@ -138,6 +138,14 @@ export default {
         y: pointerY - mousePointTo.y * newScale,
       }
       stage.position(newPos);
+
+      let shapes = stage.find('#static');
+      for (const shape of shapes) {
+        shape.scale({
+          x:1/newScale,
+          y:1/newScale
+        })
+      }
       stage.batchDraw();
     },
     handleStageMouseDown(e) {
