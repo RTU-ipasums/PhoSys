@@ -276,7 +276,7 @@ export default {
         this.selectedShapes.clear();
       }
       this.selectedShapes.add(data.shapes.at(-1));
-      this.scaleStaticShapes();
+
       Promise.resolve(this.selectedShapes).then(()=>{
         this.updateTransformer();
         this.scaleStaticShapes();

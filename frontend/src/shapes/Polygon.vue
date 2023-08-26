@@ -22,7 +22,6 @@ export default {
         handleStrokeClick(e){
             const stage = e.target.getStage();
             const clickPos = stage.getRelativePointerPosition();
-            console.log(clickPos);
             clickPos.x-=this.config.x;
             clickPos.y-=this.config.y;
 
@@ -48,7 +47,10 @@ export default {
             if(bestIndex===-1)return;
             newPoints.splice(2*(bestIndex+1),0,clickPos.x,clickPos.y)
             polygon.points(newPoints);
-            console.log(bestIndex);
+        },
+        getStageScale(){
+            if(!this.$refs.polygon)return {x:1,y:1};
+            return {x:1/this.$refs.polygon.getNode().getStage().scaleX(),y:1/this.$refs.polygon.getNode().getStage().scaleY()}
         }
     },
     computed:{
@@ -115,7 +117,8 @@ ref="polygon"/>
     strokeWidth: 1,
     draggable:true,
     pointId:index,
-    id:'static'
+    id:'static',
+    scale:getStageScale()
 }"
 @dragmove="updatePolygonPoints"/>
 </template>
