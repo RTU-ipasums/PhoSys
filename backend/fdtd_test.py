@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as ptc
 import numpy as np
 from scipy.ndimage import rotate
+from skimage import draw
 
 import fdtd, sys
 from pathlib import Path
@@ -458,6 +459,26 @@ class RectObj(PermObj):
             edgecolor="none",
             facecolor=objcolor,
         )
+class PolygonObj(PermObj):
+    def __init__(self, o) -> None:
+        super(PolygonObj, self).__init__(o)
+        self.xPoints, self.yPoints, self.points = [], [], []
+        for i in range(int(len(o.points)/2)):
+            self.xPoints.append(o.points[i*2]+o.x)
+            self.yPoints.append(o.points[i*2+1]+o.y)
+            self.points.append( (o.points[i*2]+o.x, o.points[i*2+1]+o.y) )
+    def addFdtd(self, grid):
+        rr, cc = draw.polygon(self.yPoints, self.xPoints)
+        for i in range(len(rr)):
+            grid[cc[i]:cc[i]+1, rr[i]:rr[i]+1, 0:ZMAX] = fdtd.AbsorbingObject(permittivity=self.permittivity, conductivity=self.conductivity, name=f'{self.name}_{i}')
+        #grid[tuple(rr.astype(int)), tuple(cc.astype(int)), 0:ZMAX] = fdtd.AbsorbingObject(permittivity=self.permittivity, conductivity=self.conductivity, name=self.name)
+    def patch(self):
+        return ptc.Polygon(
+            self.points,
+            linewidth=0,
+            edgecolor="none",
+            facecolor=objcolor,
+        )
 
 class Source(CanvasEl):
     def __init__(self, o) -> None:
@@ -484,6 +505,7 @@ class Pointsource(Source):
 
 elementMapping = {
     'object':RectObj,
+    'polygon':PolygonObj,
     'linesource':Linesource,
     'pointsource':Pointsource
 }
