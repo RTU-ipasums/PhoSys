@@ -138,14 +138,7 @@ export default {
         y: pointerY - mousePointTo.y * newScale,
       }
       stage.position(newPos);
-
-      let shapes = stage.find('#static');
-      for (const shape of shapes) {
-        shape.scale({
-          x:1/newScale,
-          y:1/newScale
-        })
-      }
+      this.scaleStaticShapes();
       stage.batchDraw();
     },
     handleStageMouseDown(e) {
@@ -173,7 +166,6 @@ export default {
     handleStageClick(e) {
       // clicked on stage - clear selection
       if (e.target === this.$refs.stage.getStage()) {
-        
         this.selectedShapes.clear();
         this.updateTransformer();
         return;
@@ -284,12 +276,26 @@ export default {
         this.selectedShapes.clear();
       }
       this.selectedShapes.add(data.shapes.at(-1));
-      Promise.resolve(this.selectedShapes).then(this.updateTransformer);
+      this.scaleStaticShapes();
+      Promise.resolve(this.selectedShapes).then(()=>{
+        this.updateTransformer();
+        this.scaleStaticShapes();
+      });
     },
     deleteSelectedShapes() {
       data.shapes = data.shapes.filter((shape) =>!this.selectedShapes.has(shape));
       this.selectedShapes.clear();
       this.updateTransformer();
+    },
+    scaleStaticShapes(){
+      const stage = this.$refs.stage.getStage();
+      let shapes = stage.find('#static');
+      for (const shape of shapes) {
+        shape.scale({
+          x:1/stage.scaleX(),
+          y:1/stage.scaleY()
+        })
+      }
     }
   },
   mounted() {

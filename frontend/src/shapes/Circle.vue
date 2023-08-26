@@ -26,6 +26,7 @@ export default {
     opacity: 0.5,
     draggable:true,
     perfectDrawEnabled: false,
+    id:'static'
 }"
 @dragmove="updateCircle" 
 @transformend="updateCircle"

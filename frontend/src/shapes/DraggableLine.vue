@@ -33,7 +33,8 @@ ref="group">
         strokeWidth: 5,
         opacity: 0.5,
         stroke: config.color,
-        perfectDrawEnabled: false
+        perfectDrawEnabled: false,
+        strokeScaleEnabled:false
     }"
     @dragmove="updateLine" 
     @transformend="updateLine"
@@ -49,6 +50,7 @@ ref="group">
         opacity: 0.5,
         perfectDrawEnabled: false,
         draggable: true,
+        id:'static'
     }" 
     @dragend="$emit('sizeupdate')"
     @dragmove="updateLine" 
@@ -65,6 +67,7 @@ ref="group">
         opacity: 0.5,
         perfectDrawEnabled: false,
         draggable: true,
+        id:'static'
     }"
     @dragend="$emit('sizeupdate')"
     @dragmove="updateLine" 
