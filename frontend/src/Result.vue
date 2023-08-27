@@ -8,7 +8,7 @@ import { toRaw } from 'vue'
 export default {
   data() {
     return {
-      socket: io(),
+      socket: io(import.meta.env.VITE_BACKEND_URL),
       currentFrame: 1,
       imgObj: null,
       frameData: [],
