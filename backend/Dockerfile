@@ -19,3 +19,4 @@ COPY . .
 COPY uwsgi.ini /etc/uwsgi/
 
 RUN chmod +x /usr/src/app/entrypoint.sh
+ENTRYPOINT ["/bin/bash", "/usr/src/app/entrypoint.sh"]
