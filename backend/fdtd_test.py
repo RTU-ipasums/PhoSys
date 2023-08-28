@@ -46,6 +46,9 @@ def gAt(inpt, default:float, min=None, max=None):
     if (max!=None) and (conv > max) : return default
     return conv if inpt else default
 
+def modVal(v):
+    return math.sqrt(v[0]**2 + v[1]**2 + v[2]**2)
+
 def visualize(
     grid,
     elements,
@@ -82,8 +85,8 @@ def visualize(
         folder: path to folder to save frames
     """
 
-    fig = plt.figure()
-    plt.figure().clear()
+    fig = plt.figure(1)
+    plt.figure(1).clear()
     plt.close()
     plt.cla()
     plt.clf()
@@ -389,9 +392,10 @@ for propKey, propValue in properties.items():
     properties[propKey] = Property(propKey, *propValue)
 
 class AnimView(plugins.PluginBase):
-    def __init__(self, img):
+    def __init__(self, img, dataPoints):
         self.dict_ = {"type": "animview",
-                      "idimg": utils.get_id(img)}
+                      "idimg": utils.get_id(img),
+                      "idgraph": (utils.get_id(dataPoints) if dataPoints else 0)}
 
 class CanvasEl:
     def __init__(self, o) -> None:
@@ -479,7 +483,7 @@ class PolygonObj(PermObj):
             edgecolor="none",
             facecolor=objcolor,
         )
-
+    
 class Source(CanvasEl):
     def __init__(self, o) -> None:
         self.reqProps = ['amplitude', 'wavelength', 'phase shift']
@@ -503,26 +507,50 @@ class Pointsource(Source):
     def addFdtd(self, grid):
         grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 
+class LineDetector(CanvasEl):
+    def __init__(self, o) -> None:
+        self.reqProps = []
+        super(LineDetector, self).__init__(o)
+        self.x1 = int(o.points[0]+gAt(o.x, 0))
+        self.y1 = int(o.points[1]+gAt(o.y, 0))
+        self.x2 = int(o.points[2]+gAt(o.x, 0))
+        self.y2 = int(o.points[3]+gAt(o.y, 0))
+    def addFdtd(self, grid):
+        grid[self.x1:self.x2, self.y1:self.y2, 0:ZMAX] = fdtd.LineDetector(name=self.name)
+
 elementMapping = {
     'object':RectObj,
     'polygon':PolygonObj,
     'linesource':Linesource,
-    'pointsource':Pointsource
+    'pointsource':Pointsource,
+    'linedetector':LineDetector,
 }
 
 def stepGrid(grid):
     grid.step()
+
     vv = io.BytesIO()
     grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]
     plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap=gCmap, format='png', vmin=1e-4, vmax=100)#TODO
     vv.seek(0)
 
-    if debug:
+    detectorData = []
+    for detector in grid.detectors:
+        detectorData.append( 
+            [ [i, modVal(detector.E[-1][i])**2 + modVal(detector.H[-1][i])**2] for i in range(len(detector.E[0]))] 
+        )
+    #print(max(grid.detectors[0].E[-1][0]))
+    #print(max([ max(grid.detectors[0].E[0][i]) for i in range(len(grid.detectors[0].E[0])) ]))
+    #print(grid.detectors[0].E[0][:10])
+
+    return base64.b64encode(vv.read()), detectorData
+
+'''    if debug:
         filePath = Path(f'render/{startTime}/{grid.time_steps_passed}.png')
         filePath.touch(exist_ok= True)
         with open(filePath, 'wb') as f:
-            f.write(vv.getbuffer())
-    return base64.b64encode(vv.read())
+            f.write(vv.getbuffer())'''
+
 
 def processJson(o):
     if debug:
@@ -570,12 +598,23 @@ def processJson(o):
     fig.set_figwidth(o.xBounds/figSize[0]*fig.get_size_inches()[0])
     fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
 
+    dataPoints, graph = None, None
+    if len(grid.detectors):
+        graph = plt.figure(2)
+
+        detectorLen = len(grid.detectors[0].E[0])
+        intensity = [ modVal(grid.detectors[0].E[0][i])**2 + modVal(grid.detectors[0].H[0][i])**2 for i in range(detectorLen) ]
+        dataPoints = plt.plot(np.arange(0, detectorLen, 1), intensity)
+        plt.yscale("log")
+        plt.gca().set_ylim([1, 200])# TEMP
+        graph = mpld3.fig_to_dict(graph)
+
     plugins.clear(fig)
-    plugins.connect(fig, plugins.Zoom(button=False), AnimView(img), interactive_legend)
-    outJson = mpld3.fig_to_dict(fig)
+    plugins.connect(fig, plugins.Zoom(button=False), AnimView(img, dataPoints), interactive_legend)
+    plot = mpld3.fig_to_dict(fig)
     fig.clear()
     plt.close()
-    return outJson, grid, frameCount-1
+    return plot, graph, grid, frameCount-1
 
 def test_fdtd():
 

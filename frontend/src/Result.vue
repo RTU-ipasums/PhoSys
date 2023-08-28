@@ -10,8 +10,13 @@ export default {
     return {
       socket: io(import.meta.env.VITE_BACKEND_URL),
       currentFrame: 1,
+      figMain: null,
+      figDetector: null,
       imgObj: null,
+      graphObj: null,
       frameData: [],
+      detectorData: [],
+      selectedDetector: 0,// TODO: dropdown to select the detector
       isPlaying: false,
       generating: false,
       fps: 30,
@@ -33,6 +38,12 @@ export default {
         if (this.frameData.length >= val) {
           this.imgObj.props.data = this.frameData[this.currentFrame-1];
           this.imgObj.image._groups[0][0].setAttribute("href", "data:image/png;base64," + this.imgObj.props.data);
+
+          if (this.graphObj!=null) {
+            this.graphObj.data = this.detectorData[this.currentFrame-1][this.selectedDetector];
+            toRaw(this.graphObj.path._groups)[0][0].remove();// clear last path
+            this.graphObj.draw();
+          }
         }
       }
     },
@@ -71,11 +82,15 @@ export default {
     },
     reset() {
       this.frameData = [];
+      this.detectorData = [];
       this.currentFrame = 1;
     },
-    addFrame(frame) {
+    addFrame(frame, detectorData) {
       this.frameData.push(frame);
-     
+      if (detectorData.length) {
+        this.detectorData.push(detectorData);
+      }
+
       if (data.frameCount == this.frameData.length) {
         this.generating = false;
         this.isPlaying = false;
@@ -90,7 +105,7 @@ export default {
     },
     
     startGeneration() {
-      console.log(structuredClone(toRaw(data)));
+      //console.log(structuredClone(toRaw(data)));
       data.frameCount = data.frameCount;
       this.socket.close();
       this.socket = io(import.meta.env.VITE_BACKEND_URL);
@@ -100,17 +115,27 @@ export default {
         this.reset();
         this.isPlaying = true;
       });
-      this.socket.on("canvas", (drawObj) => {
-        console.log(drawObj);
+      this.socket.on("canvas", (inData) => {
+        document.getElementById("fig_detector").innerHTML = "";
+        if (inData.graph != null) {
+          this.figDetector = mpld3.draw_figure("fig_detector", inData.graph);
+        }
+
         document.getElementById("fig_main").innerHTML = "";
-        mpld3.draw_figure("fig_main", drawObj);
+        if (this.figMain != null) {
+          mpld3.remove_figure("fig_main");
+        }
+        this.figMain = new mpld3.Figure("fig_main", inData.res);
+        mpld3.figures.push(this.figMain);
+        this.figMain.draw();
+
         let svg = document.querySelector(".mpld3-figure");
         svg.setAttribute("viewBox", "41 40 400 400");
         svg.setAttribute("preserveAspectRatio", "xMinYMin slice");
       });
-      this.socket.on("frame", (imgdata) => {
+      this.socket.on("frame", frameData => {
         console.log("Got frame!!");
-        this.addFrame(imgdata);
+        this.addFrame(frameData.visual, frameData.graph);
         if (this.generating) { this.socket.emit('generate_frames', 1); }
       });
     },
@@ -119,17 +144,24 @@ export default {
     mpld3.register_plugin("animview", AnimViewPlugin);
     AnimViewPlugin.prototype = Object.create(mpld3.Plugin.prototype);
     AnimViewPlugin.prototype.constructor = AnimViewPlugin;
-    AnimViewPlugin.prototype.requiredProps = ["idimg"];
+    AnimViewPlugin.prototype.requiredProps = ["idgraph", "idimg"];
     AnimViewPlugin.prototype.defaultProps = {}
     function AnimViewPlugin(fig, props) {
       mpld3.Plugin.call(this, fig, props);
     };
     let componentThis=this;
     AnimViewPlugin.prototype.draw = function() {
-      let imgobjT = mpld3.get_element(this.props.idimg, this.fig);
-      console.log(imgobjT);
+      let imgobjT = mpld3.get_element(this.props.idimg, componentThis.figMain);
       componentThis.imgObj = imgobjT;
       componentThis.frameData[0] = imgobjT.props.data;
+
+      if (componentThis.figDetector) {
+        //let graphObjT = mpld3.get_element(this.props.idgraph, componentThis.figDetector);
+        let graphObjT = componentThis.figDetector.axes[0].elements[2];// temp
+        //console.log(graphObjT);
+        componentThis.graphObj = graphObjT;
+        componentThis.detectorData[0] = [graphObjT.props.data];
+      }
     };
   }
 }
@@ -137,6 +169,7 @@ export default {
 
 <template>
   <div id="fig_main"></div>
+  <div id="fig_detector"></div>
 </template>
 
 <style>
@@ -151,6 +184,16 @@ export default {
 }
 
 #fig_main>* {
+  height: 100%;
+  display: flex;
+}
+
+#fig_detector {
+  min-height: 0;
+  height: 100%;
+}
+
+#fig_detector>* {
   height: 100%;
   display: flex;
 }
