@@ -51,6 +51,10 @@ export default {
         getStageScale(){
             if(!this.$refs.polygon)return {x:1,y:1};
             return {x:1/this.$refs.polygon.getNode().getStage().scaleX(),y:1/this.$refs.polygon.getNode().getStage().scaleY()}
+        },
+        setCursorStyle(e, style){
+            const container = e.target.getStage().container();
+            container.style.cursor = style;
         }
     },
     computed:{
@@ -120,5 +124,7 @@ ref="polygon"/>
     id:'static',
     scale:getStageScale()
 }"
+@mouseover="setCursorStyle($event,'move')"
+@mouseleave="setCursorStyle($event,'default')"
 @dragmove="updatePolygonPoints"/>
 </template>
