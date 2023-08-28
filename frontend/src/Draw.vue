@@ -385,8 +385,8 @@ export default {
         }" />
 
         <Circle v-for="item in circles" :key="item.id" :config="item"/>
-        <DraggableLine v-for="item in lines" :key="item.id" :config="{...item,color:'blue'}" @sizeupdate="updateTransformer"/>
-        <DraggableLine v-for="item in linedetectors" :key="item.id" :config="{...item, color:'green'}" @sizeupdate="updateTransformer"/>
+        <DraggableLine v-for="item in lines" :key="item.id" :config="item" :color="'blue'" @sizeupdate="updateTransformer"/>
+        <DraggableLine v-for="item in linedetectors" :key="item.id" :config="item" :color="'green'" @sizeupdate="updateTransformer"/>
         <Rectangle v-for="item in rectangles" :key="item.id" :config="item"/>
         <Polygon v-for="item in polygons" :key="item.id" :config="item"/>
         <v-transformer ref="transformer" 

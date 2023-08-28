@@ -1,6 +1,6 @@
 <script>
 export default {
-    props: ['config'],
+    props: ['config', 'color'],
     methods: {
     updateLine() {
         const point1pos = this.$refs.point1obj.getNode().getPosition();
@@ -32,7 +32,7 @@ ref="group">
         points: config.points,
         strokeWidth: 5,
         opacity: 0.5,
-        stroke: config.color,
+        stroke: color,
         perfectDrawEnabled: false,
         strokeScaleEnabled:false
     }"
