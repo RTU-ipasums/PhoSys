@@ -105,7 +105,7 @@ export default {
     },
     
     startGeneration() {
-      //console.log(structuredClone(toRaw(data)));
+      console.log(JSON.parse(JSON.stringify(data)));
       data.frameCount = data.frameCount;
       this.socket.close();
       this.socket = io(import.meta.env.VITE_BACKEND_URL);
