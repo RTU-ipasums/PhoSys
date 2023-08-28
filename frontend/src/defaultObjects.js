@@ -28,7 +28,7 @@ export const defaultPolygon = {
     rotation: 0,
     x: 150,
     y: 150,
-    points: [23, 20, 23, 160, 70, 93, 150, 109, 290, 139, 270, 93],
+    points: [50,0,100,100,0,100],
     scaleX: 1,
     scaleY: 1,
     propertyTitle: "Polygon object",
