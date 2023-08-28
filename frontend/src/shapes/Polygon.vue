@@ -1,6 +1,6 @@
 <script>
 export default {
-    props: ['config'],
+    props: ['config', 'selected'],
     methods: {
         updatePolygon() {
             const polygon = this.$refs.polygon.getNode();
@@ -85,7 +85,7 @@ export default {
 @dragmove="updatePolygon" 
 @transformend="updatePolygon"
 ref="polygon"/>
-<v-line :config="{
+<v-line v-if="selected" :config="{
     name:config.name,
     x:config.x,
     y:config.y,
@@ -105,7 +105,7 @@ ref="polygon"/>
 }"
 @click="handleStrokeClick"/>
 
-<v-rect  v-for="(point, index) in circlePoints" :key="index" :config="{
+<v-rect v-if="selected" v-for="(point, index) in circlePoints" :key="index" :config="{
     x:point.x+config.x,
     y:point.y+config.y,
     stroke: 'rgb(0, 161, 255)',
