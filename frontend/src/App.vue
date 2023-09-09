@@ -90,17 +90,17 @@ export default {
                 src="/folder.png" /></button></li>
         </ul>
         <ul class="tool-buttons">
-          <li><button><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultObject, 'object')"
+          <li><button id="object-button"><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultObject, 'object')"
                 title="Add object" alt="object" src="/object.png" /></button></li>
-          <li><button><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPolygon, 'polygon')"
+          <li><button id="polygon-button"><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPolygon, 'polygon')"
                 title="Add polygon" alt="polygon" src="/polygon.png" /></button></li>
         </ul>
         <ul class="tool-buttons">
-          <li><button><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPointsource, 'pointsource')"
+          <li><button id="pointsource-button"><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPointsource, 'pointsource')"
                 title="Add point lightsource" alt="point lightsource" src="/light.png" /></button></li>
-          <li><button><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinesource, 'linesource')"
+          <li><button id="linesource-button"><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinesource, 'linesource')"
                 title="Add line lightsource" alt="line lightsource" src="/linesource.png" /></button></li>
-          <li><button><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinedetector, 'linedetector')"
+          <li><button id="linedetector-button"><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinedetector, 'linedetector')"
                 title="Add line detector" alt="line detector" src="/linedetector.png" /></button></li>
         </ul>
       </div>
