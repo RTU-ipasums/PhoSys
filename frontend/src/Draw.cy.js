@@ -26,14 +26,18 @@ describe('Canvas', () => {
         x:data.shapes[0].x,
         y:data.shapes[0].y
       }
-    });
-    cy.get('.konvajs-content')
-      .trigger('mousedown',200,200,{button:0})
-      .trigger('mousemove',300,300,{force:true})
+      const startX=initialCoords.x+data.shapes[0].width/2;
+      const startY=initialCoords.y+data.shapes[0].height/2;
+      const moveAmountX=100;
+      const moveAmountY=200;
+      cy.get('.konvajs-content')
+      .trigger('mousedown',startX,startY)
+      .trigger('mousemove',startX+moveAmountX,startY+moveAmountY)
       .trigger('mouseup').then(()=>{
         expect(data.shapes).have.length(1);
-        expect(data.shapes[0].x).to.equal(initialCoords.x+100);
-        expect(data.shapes[0].y).to.equal(initialCoords.y+100);
+        expect(data.shapes[0].x).to.equal(initialCoords.x+moveAmountX);
+        expect(data.shapes[0].y).to.equal(initialCoords.y+moveAmountY);
       });
+    });
   })
 })
