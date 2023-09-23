@@ -1,4 +1,5 @@
 <script>
+import ResultView from './ResultView.vue'
 import io from "socket.io-client";
 import * as mpld3 from "mpld3";
 import "./interactive-legend";
@@ -6,6 +7,9 @@ import { data } from './data.js'
 import { toRaw } from 'vue'
 
 export default {
+  components: {
+      ResultView
+  },
   data() {
     return {
       socket: io(import.meta.env.VITE_BACKEND_URL),
@@ -129,7 +133,10 @@ export default {
         mpld3.figures.push(this.figMain);
         this.figMain.draw();
 
-        let svg = document.querySelector(".mpld3-figure");
+        let svg = document.querySelectorAll(".mpld3-figure")[1];
+        svg.setAttribute("viewBox", "0 0 640 480");
+        svg.setAttribute("preserveAspectRatio", "xMinYMin meet");
+        svg = document.querySelectorAll(".mpld3-figure")[0];
         svg.setAttribute("viewBox", "41 40 400 400");
         svg.setAttribute("preserveAspectRatio", "xMinYMin slice");
       });
@@ -168,33 +175,36 @@ export default {
 </script>
 
 <template>
-  <div id="fig_main"></div>
-  <div id="fig_detector"></div>
+  <ul class="layouts">
+    <li><img src="/2-views.svg" alt="2 view layout"/></li>
+    <li><img src="/3-views.svg" alt="3 view layout"/></li>
+    <li><img src="/3-views-split.svg" alt="3 view layout split"/></li>
+    <li><img src="/4-views.svg" alt="4 view layout"/></li>
+  </ul>
+  <div class="views">
+    <ResultView :container_id="'fig_main'"/>
+    <ResultView :container_id="'fig_detector'"/>
+  </div>
 </template>
 
-<style>
-.mpld3-figure {
-  flex: 1;
+<style scoped>
+.views{
+  height:100%;
+  display:flex;
+  flex-direction: column;
+  overflow:hidden;
+}
+.layouts{
+  display:flex;
+  padding: 5px 5px;
+  height:30px;
+  gap:5px;
+}
+li{
+  line-height: 0;
   height: 100%;
 }
-
-#fig_main {
-  min-height: 0;
+img{
   height: 100%;
-}
-
-#fig_main>* {
-  height: 100%;
-  display: flex;
-}
-
-#fig_detector {
-  min-height: 0;
-  height: 100%;
-}
-
-#fig_detector>* {
-  height: 100%;
-  display: flex;
 }
 </style>
