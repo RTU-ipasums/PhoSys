@@ -20,7 +20,7 @@ export default {
 </div>
 </template>
 
-<style scoped>
+<style>
 .view{
     height:100%;
     min-height: 0;

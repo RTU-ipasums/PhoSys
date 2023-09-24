@@ -179,12 +179,16 @@ export default {
 
 <template>
   <ul class="layouts">
+    <li><button><img src="/1-view.svg" alt="1 view layout"/></button></li>
     <li><button><img src="/2-views.svg" alt="2 view layout"/></button></li>
+    <li><button><img src="/2-views.svg" alt="2 view layout horizontal" style="transform:rotate(90deg);"/></button></li>
     <li><button><img src="/3-views.svg" alt="3 view layout"/></button></li>
+    <li><button><img src="/3-views.svg" alt="3 view layout horizontal" style="transform:rotate(90deg);"/></button></li>
     <li><button><img src="/3-views-split.svg" alt="3 view layout split"/></button></li>
+    <li><button><img src="/3-views-split.svg" alt="3 view layout split horizontal" style="transform:rotate(90deg);"/></button></li>
     <li><button><img src="/4-views.svg" alt="4 view layout"/></button></li>
   </ul>
-  <splitpanes horizontal first-splitter>
+  <splitpanes id="splitpanes" horizontal first-splitter>
     <pane><ResultView :container_id="'fig_main'"/></pane>
     <pane><ResultView :container_id="'fig_detector'"/></pane>
   </splitpanes>
