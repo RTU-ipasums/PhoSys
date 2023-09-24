@@ -5,10 +5,13 @@ import * as mpld3 from "mpld3";
 import "./interactive-legend";
 import { data } from './data.js'
 import { toRaw } from 'vue'
+import { Splitpanes, Pane } from 'splitpanes'
 
 export default {
   components: {
-      ResultView
+      ResultView,
+      Splitpanes,
+      Pane
   },
   data() {
     return {
@@ -176,24 +179,18 @@ export default {
 
 <template>
   <ul class="layouts">
-    <li><img src="/2-views.svg" alt="2 view layout"/></li>
-    <li><img src="/3-views.svg" alt="3 view layout"/></li>
-    <li><img src="/3-views-split.svg" alt="3 view layout split"/></li>
-    <li><img src="/4-views.svg" alt="4 view layout"/></li>
+    <li><button><img src="/2-views.svg" alt="2 view layout"/></button></li>
+    <li><button><img src="/3-views.svg" alt="3 view layout"/></button></li>
+    <li><button><img src="/3-views-split.svg" alt="3 view layout split"/></button></li>
+    <li><button><img src="/4-views.svg" alt="4 view layout"/></button></li>
   </ul>
-  <div class="views">
-    <ResultView :container_id="'fig_main'"/>
-    <ResultView :container_id="'fig_detector'"/>
-  </div>
+  <splitpanes horizontal first-splitter>
+    <pane><ResultView :container_id="'fig_main'"/></pane>
+    <pane><ResultView :container_id="'fig_detector'"/></pane>
+  </splitpanes>
 </template>
 
 <style scoped>
-.views{
-  height:100%;
-  display:flex;
-  flex-direction: column;
-  overflow:hidden;
-}
 .layouts{
   display:flex;
   padding: 5px 5px;
@@ -202,6 +199,9 @@ export default {
 }
 li{
   line-height: 0;
+  height: 100%;
+}
+button{
   height: 100%;
 }
 img{

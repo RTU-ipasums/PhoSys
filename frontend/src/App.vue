@@ -111,7 +111,10 @@ export default {
 
     <splitpanes id="splitpanes">
       <pane size="20" class="properties grid-item">
-        <Properties :selectedShapes="getShape()" />
+        <div style="padding: 10px 20px;">
+          <Properties :selectedShapes="getShape()" />
+        </div>
+        
       </pane>
       <pane>
         <div class="grid-item editor" id="editor" ref="flexeditor">
@@ -171,7 +174,6 @@ ul {
 
 .properties {
   text-align: center;
-  padding: 10px 20px;
 }
 
 .canvas {
@@ -248,5 +250,6 @@ ul {
 
 .splitpanes__splitter {
   min-width: 6px !important;
+  min-height: 6px !important;
   background: rgba(167, 161, 161, 1);
 }</style>
