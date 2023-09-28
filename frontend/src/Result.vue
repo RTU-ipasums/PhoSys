@@ -28,6 +28,12 @@ export default {
       generating: false,
       fps: 30,
       advanceInterval: null,
+      panes:[
+        {
+          type:"horizontal",
+          panes:['fig_main','fig_detector']
+        }
+      ]
     };
   },
   computed: {
@@ -188,9 +194,8 @@ export default {
     <li><button><img src="/3-views-split.svg" alt="3 view layout split horizontal" style="transform:rotate(90deg);"/></button></li>
     <li><button><img src="/4-views.svg" alt="4 view layout"/></button></li>
   </ul>
-  <splitpanes id="splitpanes" horizontal first-splitter>
-    <pane><ResultView :container_id="'fig_main'"/></pane>
-    <pane><ResultView :container_id="'fig_detector'"/></pane>
+  <splitpanes v-for="mainpane in panes" id="splitpanes" :horizontal="mainpane.type=='horizontal'" first-splitter>
+    <pane v-for="pane in mainpane.panes"><ResultView :container_id="pane"/></pane>
   </splitpanes>
 </template>
 
