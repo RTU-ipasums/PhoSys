@@ -27,13 +27,7 @@ export default {
       isPlaying: false,
       generating: false,
       fps: 30,
-      advanceInterval: null,
-      panes:[
-        {
-          type:"horizontal",
-          panes:['fig_main','fig_detector']
-        }
-      ]
+      advanceInterval: null
     };
   },
   computed: {
@@ -184,9 +178,7 @@ export default {
 </script>
 
 <template>
-  <splitpanes v-for="mainpane in panes" id="splitpanes" :horizontal="mainpane.type=='horizontal'" first-splitter>
-    <pane v-for="pane in mainpane.panes"><ResultView :container_id="pane" @click="splitPane"/></pane>
-  </splitpanes>
+  <ResultView :horizontal="false"/>
 </template>
 
 <style scoped>
