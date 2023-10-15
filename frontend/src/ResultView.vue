@@ -15,6 +15,9 @@ export default {
       <option>View 3</option>
       <option>View 4</option>
     </select>
+    <button><img src="split.svg"/></button>
+    <button><img src="split.svg" style="transform:rotate(90deg);"/></button>
+    <button><img src="close.svg"/></button>
   </div>
 
 </div>

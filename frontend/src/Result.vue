@@ -154,20 +154,6 @@ export default {
         this.addFrame(frameData.visual, frameData.graph);
         if (this.generating) { this.socket.emit('generate_frames', 1); }
       });
-    },
-    splitPane(e){
-      let coord={
-        x:e.layerX/e.target.offsetWidth,
-        y:e.layerY/e.target.offsetHeight
-      }
-      if(1.0-coord.x>coord.y){
-        if(coord.x>coord.y)console.log(0);
-        else console.log(1);
-      }
-      else{
-          if(coord.y<coord.x)console.log(3);
-          else console.log(2);
-      }
     }
   },
   mounted() {
@@ -198,28 +184,12 @@ export default {
 </script>
 
 <template>
-  <ul class="layouts">
-    <li><button><img src="/1-view.svg" alt="1 view layout"/></button></li>
-    <li><button><img src="/2-views.svg" alt="2 view layout"/></button></li>
-    <li><button><img src="/2-views.svg" alt="2 view layout horizontal" style="transform:rotate(90deg);"/></button></li>
-    <li><button><img src="/3-views.svg" alt="3 view layout"/></button></li>
-    <li><button><img src="/3-views.svg" alt="3 view layout horizontal" style="transform:rotate(90deg);"/></button></li>
-    <li><button><img src="/3-views-split.svg" alt="3 view layout split"/></button></li>
-    <li><button><img src="/3-views-split.svg" alt="3 view layout split horizontal" style="transform:rotate(90deg);"/></button></li>
-    <li><button><img src="/4-views.svg" alt="4 view layout"/></button></li>
-  </ul>
   <splitpanes v-for="mainpane in panes" id="splitpanes" :horizontal="mainpane.type=='horizontal'" first-splitter>
     <pane v-for="pane in mainpane.panes"><ResultView :container_id="pane" @click="splitPane"/></pane>
   </splitpanes>
 </template>
 
 <style scoped>
-.layouts{
-  display:flex;
-  padding: 5px 5px;
-  height:30px;
-  gap:5px;
-}
 li{
   line-height: 0;
   height: 100%;
