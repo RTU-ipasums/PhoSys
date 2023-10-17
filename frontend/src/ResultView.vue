@@ -45,9 +45,9 @@ export default {
           <option>View 3</option>
           <option>View 4</option>
         </select>
-        <button @click="horizontalSplit(index)"><img src="split.svg"/></button>
-        <button @click="verticalSplit(index)"><img src="split.svg" style="transform:rotate(90deg);"/></button>
-        <button><img src="close.svg"/></button>
+        <button @click="horizontalSplit(index)"><img src="/split.svg"/></button>
+        <button @click="verticalSplit(index)"><img src="/split.svg" style="transform:rotate(90deg);"/></button>
+        <button><img src="/close.svg"/></button>
       </div>
     </div>
     <ResultView v-if="!pane" :horizontal="!horizontal"></ResultView>
