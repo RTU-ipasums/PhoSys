@@ -25,6 +25,9 @@ export default {
           return;
         }
         this.panes.push(1);
+      },
+      deletePane(index){
+        this.panes.splice(index,1);
       }
     }
     
@@ -47,7 +50,7 @@ export default {
         </select>
         <button @click="horizontalSplit(index)"><img src="/split.svg"/></button>
         <button @click="verticalSplit(index)"><img src="/split.svg" style="transform:rotate(90deg);"/></button>
-        <button><img src="/close.svg"/></button>
+        <button @click="deletePane(index)"><img src="/close.svg"/></button>
       </div>
     </div>
     <ResultView v-if="!pane" :horizontal="!horizontal"></ResultView>
