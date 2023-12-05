@@ -1,45 +1,63 @@
 <script>
 import { Splitpanes, Pane } from 'splitpanes'
+import { reactive } from 'vue'
 export default {
-    data() {
-      return {
-        panes:[1,2]
-      };
+  data() {
+    return {
+      panes: []
+    };
+  },
+  components: {
+      Splitpanes,
+      Pane
+  },
+  props: ['container_id', 'horizontal', 'parentpane'],
+  methods:{
+    horizontalSplit(index){
+      if(this.horizontal){
+        this.panes.push({view: this.panes[this.panes.length-1].view + 1, split: false});
+        return;
+      }
+      this.panes[index].split = true;
     },
-    components: {
-        Splitpanes,
-        Pane
+    verticalSplit(index){
+      if(this.horizontal){
+        this.panes[index].split = true;
+        return;
+      }
+      this.panes.push({view: this.panes[this.panes.length-1].view + 1, split: false});
     },
-    props: ['container_id', 'horizontal'],
-    methods:{
-      horizontalSplit(pane){
-        if(this.horizontal){
-          this.panes.push(this.panes[this.panes.length-1]+1);
-          return;
-        }
-        this.panes[this.panes.indexOf(pane)]=0;
-      },
-      verticalSplit(pane){
-        if(this.horizontal){
-          this.panes[this.panes.indexOf(pane)]=0;
-          return;
-        }
-        this.panes.push(this.panes[this.panes.length-1]+1);
-      },
-      deletePane(pane){
-        this.panes.splice(this.panes.indexOf(pane),1);
+    deletePane(index){
+      //if only one top layer frame is remaining, don't allow the user to delete it
+      //todo: maybe hide the icon
+      if(!this.parentpane&&this.panes.length===1)return;
+      this.panes.splice(index, 1);
+      if(this.parentpane&&this.panes.length===1){
+        //todo: maybe rework this
+        //here we pray vue reactivity works by reference and that a vue element can delete itself
+        //im not sure if this is a hack, but it works for now
+        this.parentpane.split = false;
       }
     }
-    
+  },
+  mounted() {
+    if(this.initial){
+      for(let i=0;i<this.initial.length;i++){
+        this.panes.push({view: this.initial[i], split: false});
+      }
+      return;
+    }
+    //todo: maybe remove "view" attribute
+    this.panes.push({view: 1, split: false});
+    this.panes.push({view: 1, split: false});
+  } 
 };
 </script>
 
-
 <template>
-
 <splitpanes :horizontal="!horizontal">
-  <pane v-for="pane in panes" :key="pane">
-    <div v-if="pane" class="view-container" style="position: relative;">
+  <pane v-for="(pane,index) in panes" :key="index" ref="children">
+    <div v-if="!pane.split" class="view-container" style="position: relative;">
       <div class="view" :id="container_id"></div>
       <div id="view-options">
         <select name="Views" id="view-selection">
@@ -48,17 +66,14 @@ export default {
           <option>View 3</option>
           <option>View 4</option>
         </select>
-        <button @click="horizontalSplit(pane)"><img src="/split.svg"/></button>
-        <button @click="verticalSplit(pane)"><img src="/split.svg" style="transform:rotate(90deg);"/></button>
-        <button @click="deletePane(pane)"><img src="/close.svg"/></button>
+        <button @click="horizontalSplit(index)"><img src="/split.svg"/></button>
+        <button @click="verticalSplit(index)"><img src="/split.svg" style="transform:rotate(90deg);"/></button>
+        <button @click="deletePane(index)"><img src="/close.svg"/></button>
       </div>
     </div>
-    <ResultView v-if="!pane" :horizontal="!horizontal"></ResultView>
+    <ResultView v-if="pane.split" :horizontal="!horizontal" :parentpane="panes[index]"></ResultView>
   </pane>
-  
 </splitpanes>
-
-
 </template>
 
 <style>
