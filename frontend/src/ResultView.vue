@@ -15,6 +15,11 @@ export default {
       Pane
   },
   props: ['container_id', 'horizontal', 'parentpane'],
+  computed:{
+    allowDeletion(){
+      return this.parentpane||this.panes.length>1;
+    }
+  },
   methods:{
     horizontalSplit(pane){
       let index = this.panes.findIndex(p => p.id === pane.id);
@@ -35,8 +40,7 @@ export default {
     deletePane(pane){
       let index = this.panes.findIndex(p => p.id === pane.id);
       //if only one top layer frame is remaining, don't allow the user to delete it
-      //todo: maybe hide the icon
-      if(!this.parentpane&&this.panes.length===1)return;
+      if(!this.allowDeletion)return;
       this.panes.splice(index, 1);
       if(this.parentpane&&this.panes.length===1){
         //todo: maybe rework this
@@ -63,7 +67,7 @@ export default {
         </select>
         <button @click="horizontalSplit(pane)"><img src="/split.svg"/></button>
         <button @click="verticalSplit(pane)"><img src="/split.svg" style="transform:rotate(90deg);"/></button>
-        <button @click="deletePane(pane)"><img src="/close.svg"/></button>
+        <button v-if="allowDeletion" @click="deletePane(pane)"><img src="/close.svg"/></button>
       </div>
     </div>
     <ResultView v-if="pane.split" :horizontal="!horizontal" :parentpane="panes[index]"></ResultView>
