@@ -1,12 +1,11 @@
 <script>
 import { Splitpanes, Pane } from 'splitpanes'
-import { reactive } from 'vue'
 export default {
   data() {
     return {
       panes: [
-        {id: 0, split: false},
-        {id: 1, split: false}
+        {id: 0, split: false, selectedType:""},
+        {id: 1, split: false, selectedType:""}
       ]
     };
   },
@@ -14,7 +13,7 @@ export default {
       Splitpanes,
       Pane
   },
-  props: ['container_id', 'horizontal', 'parentpane'],
+  props: ['views', 'horizontal', 'parentpane'],
   computed:{
     allowDeletion(){
       return this.parentpane||this.panes.length>1;
@@ -44,8 +43,7 @@ export default {
       this.panes.splice(index, 1);
       if(this.parentpane&&this.panes.length===1){
         //todo: maybe rework this
-        //here we pray vue reactivity works by reference and that a vue element can delete itself
-        //im not sure if this is a hack, but it works for now
+        //here we pray vue reactivity works by reference and that a vue element can delete itself, im not sure if this is a hack, but it works for now
         this.parentpane.split = false;
       }
     }
@@ -57,20 +55,20 @@ export default {
 <splitpanes :horizontal="!horizontal">
   <pane v-for="(pane,index) in panes" :key="pane.id" ref="children">
     <div v-if="!pane.split" class="view-container" style="position: relative;">
-      <div class="view" :id="container_id"></div>
+      <div class="view"></div>
       <div id="view-options">
-        <select name="Views" id="view-selection">
-          <option>View 1</option>
-          <option>View 2</option>
-          <option>View 3</option>
-          <option>View 4</option>
+        <select v-model="pane.selectedType" name="Views" id="view-selection">
+          <option disabled value="">None</option>
+          <option v-for="(view, key) in views" :value="view.type">{{key}}</option>
         </select>
+
         <button @click="horizontalSplit(pane)"><img src="/split.svg"/></button>
         <button @click="verticalSplit(pane)"><img src="/split.svg" style="transform:rotate(90deg);"/></button>
         <button v-if="allowDeletion" @click="deletePane(pane)"><img src="/close.svg"/></button>
+
       </div>
     </div>
-    <ResultView v-if="pane.split" :horizontal="!horizontal" :parentpane="panes[index]"></ResultView>
+    <ResultView v-if="pane.split" :views="views" :horizontal="!horizontal" :parentpane="panes[index]"></ResultView>
   </pane>
 </splitpanes>
 </template>

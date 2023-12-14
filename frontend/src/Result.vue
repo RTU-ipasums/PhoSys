@@ -21,8 +21,18 @@ export default {
       figDetector: null,
       imgObj: null,
       graphObj: null,
-      frameData: [],
-      detectorData: [],
+      views:{
+        "Main view": {
+            type:"view",
+            data:[],
+            canvas:null
+          },
+        "Detector 1":{
+            type:"detector",
+            data:[],
+            canvas:null
+          }
+      },
       selectedDetector: 0,// TODO: dropdown to select the detector
       isPlaying: false,
       generating: false,
@@ -178,7 +188,7 @@ export default {
 </script>
 
 <template>
-  <ResultView :horizontal="false"/>
+  <ResultView :views="views" :horizontal="false"/>
 </template>
 
 <style scoped>
