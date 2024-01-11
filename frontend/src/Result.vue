@@ -17,10 +17,6 @@ export default {
     return {
       socket: io(import.meta.env.VITE_BACKEND_URL),
       currentFrame: 1,
-      figMain: null,
-      figDetector: null,
-      imgObj: null,
-      graphObj: null,
       views:{
         "Main view": {
             type:"view",
@@ -33,7 +29,6 @@ export default {
             canvas:null
           }
       },
-      selectedDetector: 0,// TODO: dropdown to select the detector
       isPlaying: false,
       generating: false,
       fps: 30,
