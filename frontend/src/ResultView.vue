@@ -23,10 +23,11 @@ export default {
     horizontalSplit(pane){
       let index = this.panes.findIndex(p => p.id === pane.id);
       if(this.horizontal){
-        this.panes.push({id: this.panes[this.panes.length-1].id + 1, split: false});
+        this.panes.push({id: this.panes[this.panes.length-1].id + 1, split: false, selectedType:""});
         return;
       }
       this.panes[index].split = true;
+      console.log(0, this.panes);
     },
     verticalSplit(pane){
       let index = this.panes.findIndex(p => p.id === pane.id);
@@ -34,7 +35,8 @@ export default {
         this.panes[index].split = true;
         return;
       }
-      this.panes.push({id: this.panes[this.panes.length-1].id + 1, split: false});
+      this.panes.push({id: this.panes[this.panes.length-1].id + 1, split: false, selectedType:""});
+      console.log(1, this.panes);
     },
     deletePane(pane){
       let index = this.panes.findIndex(p => p.id === pane.id);
@@ -59,6 +61,7 @@ export default {
       <div id="view-options">
         <select v-model="pane.selectedType" name="Views" id="view-selection">
           <option disabled value="">None</option>
+          <option value="" selected disabled hidden>Choose here</option>
           <option v-for="(view, key) in views" :value="view.type">{{key}}</option>
         </select>
 
