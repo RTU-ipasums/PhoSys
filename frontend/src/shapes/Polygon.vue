@@ -21,7 +21,6 @@ export default {
         },
         deletePoint(e) {
             if (!this.ctrlKeyPressed) return;
-            
             const polygon = this.$refs.polygon.getNode();
             let newPoints = polygon.points();
             const index = e.target.attrs.pointId * 2;

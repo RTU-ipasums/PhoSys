@@ -54,8 +54,8 @@ export default {
 </script>
 
 <template>
-<splitpanes :horizontal="!horizontal">
-  <pane v-for="(pane,index) in panes" :key="pane.id" ref="children">
+<splitpanes :horizontal="!horizontal" >
+  <pane v-for="(pane,index) in panes" :key="pane.id" id="pane" ref="children">
     <div v-if="!pane.split" class="view-container" style="position: relative;">
       <div class="view"></div>
       <div id="view-options">
@@ -77,6 +77,9 @@ export default {
 </template>
 
 <style>
+#pane{
+  height:50%; 
+}
 .view{
     height:100%;
     min-height: 0;
@@ -110,4 +113,5 @@ img{
 button{
   height: 100%;
 }
+
 </style>
