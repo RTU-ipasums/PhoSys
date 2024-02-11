@@ -1,19 +1,21 @@
 <script>
 import { Splitpanes, Pane } from 'splitpanes'
+import View from './View.vue'
 export default {
   data() {
     return {
       panes: [
-        {id: 0, split: false, selectedType:""},
-        {id: 1, split: false, selectedType:""}
+        {id: 0, split: false, selectedView:""},
+        {id: 1, split: false, selectedView:""}
       ]
     };
   },
   components: {
       Splitpanes,
-      Pane
+      Pane,
+      View
   },
-  props: ['views', 'horizontal', 'parentpane'],
+  props: ['views', 'horizontal', 'parentpane', 'currentFrame'],
   computed:{
     allowDeletion(){
       return this.parentpane||this.panes.length>1;
@@ -23,7 +25,7 @@ export default {
     horizontalSplit(pane){
       let index = this.panes.findIndex(p => p.id === pane.id);
       if(this.horizontal){
-        this.panes.push({id: this.panes[this.panes.length-1].id + 1, split: false, selectedType:""});
+        this.panes.push({id: this.panes[this.panes.length-1].id + 1, split: false, selectedView:""});
         return;
       }
       this.panes[index].split = true;
@@ -35,7 +37,7 @@ export default {
         this.panes[index].split = true;
         return;
       }
-      this.panes.push({id: this.panes[this.panes.length-1].id + 1, split: false, selectedType:""});
+      this.panes.push({id: this.panes[this.panes.length-1].id + 1, split: false, selectedView:""});
       console.log(1, this.panes);
     },
     deletePane(pane){
@@ -57,12 +59,13 @@ export default {
 <splitpanes :horizontal="!horizontal">
   <pane v-for="(pane,index) in panes" :key="pane.id" ref="children">
     <div v-if="!pane.split" class="view-container" style="position: relative;">
-      <div class="view"></div>
+      <!-- <div class="view"></div> -->
+      <View :view="pane.selectedView" :currentFrame="currentFrame"/>
       <div id="view-options">
-        <select v-model="pane.selectedType" name="Views" id="view-selection">
+        <select v-model="pane.selectedView" name="Views" id="view-selection">
           <option disabled value="">None</option>
           <option value="" selected disabled hidden>Choose here</option>
-          <option v-for="(view, key) in views" :value="view.type">{{key}}</option>
+          <option v-for="(view, key) in views" :value="key">{{key}}</option>
         </select>
 
         <button @click="horizontalSplit(pane)"><img src="/split.svg"/></button>

@@ -3,7 +3,7 @@ import { reactive } from 'vue'
 export const data = reactive({
     xBounds:null,
     yBounds:null,
-    frameCount:200,
+    frameCount:20,
     propertyTitle:"Global settings",
     properties:[
     {
@@ -19,6 +19,19 @@ export const data = reactive({
         value:1
     }
     ],
-    shapes: []
+    shapes: [],
+    currentFrame: 1,
+    views:{
+      "Main view": {
+          type:"view",
+          data:[],
+          canvas:null,
+        },
+      "Detector 1":{
+          type:"detector",
+          data:[],
+          canvas:null,
+        }
+    },
 })
 

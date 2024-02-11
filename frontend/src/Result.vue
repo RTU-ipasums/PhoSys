@@ -17,18 +17,6 @@ export default {
     return {
       socket: io(import.meta.env.VITE_BACKEND_URL),
       currentFrame: 1,
-      views:{
-        "Main view": {
-            type:"view",
-            data:[],
-            canvas:null
-          },
-        "Detector 1":{
-            type:"detector",
-            data:[],
-            canvas:null
-          }
-      },
       isPlaying: false,
       generating: false,
       fps: 30,
@@ -36,18 +24,49 @@ export default {
     };
   },
   computed: {
+    fview() {
+      return Object.values(data.views)[0].data;
+    },
     maxFrame() {
-      return Math.max(data.frameCount, this.frameData.length);
+      var framesLoaded = this.fview.length;
+      return Math.max(data.frameCount, framesLoaded);
     },
     isGenerating() {
-      return this.generating===true||(this.frameData.length<data.frameCount&&this.frameData.length>0);
+      var framesLoaded = this.fview.length;
+      return this.generating===true||(framesLoaded<data.frameCount&&framesLoaded>0);
     },
+    getData() {
+      return data ? data.views : null;
+    }
   },
   methods: {
     setFrame(val) {
-      if (this.frameData[0] != null) {
+      if (this.fview[0] != null) {
         this.currentFrame = val;
-        if (this.frameData.length >= val) {
+
+        for (var viewName in data.views) {
+          var view = data.views[viewName]
+          //console.log(this.currentFrame, view.data[this.currentFrame-1])
+          view.activeFrame = view.data[this.currentFrame-1];
+          /*var base64 = btoa(
+            new Uint8Array(view.activeFrame)
+              .reduce((data, byte) => data + String.fromCharCode(byte), '')
+          );
+          console.log(base64)*/
+          
+          //view.mpld.props.data = view.activeFrame;
+          //view.mpld.axes[0].elements[2].props.data = view.activeFrame;
+          if (view.type == "view") {
+            view.mpld.axes[0].elements[2].image._groups[0][0].setAttribute("href", "data:image/png;base64," + view.activeFrame);
+          }
+          else if (view.type == "detector") {
+            view.mpld.axes[0].elements[2].data = view.activeFrame;
+            toRaw(view.mpld.axes[0].elements[2].path._groups)[0][0].remove();// clear last path
+            view.mpld.axes[0].elements[2].draw();
+          }
+        }
+
+        /*if (this.frameData.length >= val) {
           this.imgObj.props.data = this.frameData[this.currentFrame-1];
           this.imgObj.image._groups[0][0].setAttribute("href", "data:image/png;base64," + this.imgObj.props.data);
 
@@ -56,11 +75,11 @@ export default {
             toRaw(this.graphObj.path._groups)[0][0].remove();// clear last path
             this.graphObj.draw();
           }
-        }
+        }*/
       }
     },
     setNextFrame() {
-      if (this.currentFrame < this.frameData.length) {
+      if (this.currentFrame < this.fview.length) {
         this.setFrame(this.currentFrame + 1);
       }
       else {
@@ -75,14 +94,14 @@ export default {
       this.setFrame(1);
     },
     setLastFrame() {
-      this.setFrame(this.frameData.length);
+      this.setFrame(this.fview.length);
     },
     togglePlay() {
       this.generating = false;
       this.isPlaying = !this.isPlaying;
-      if(!this.frameData)return;
+      if(!this.fview)return;
       if (this.isPlaying) {
-        if (this.currentFrame == this.frameData.length) {
+        if (this.currentFrame == this.fview.length) {
           this.generating = true;
           this.socket.emit('generate_frames', 1);
         }
@@ -93,17 +112,18 @@ export default {
       else { clearInterval(this.advanceInterval); }
     },
     reset() {
-      this.frameData = [];
-      this.detectorData = [];
+      data.views = [[]];
       this.currentFrame = 1;
     },
-    addFrame(frame, detectorData) {
-      this.frameData.push(frame);
-      if (detectorData.length) {
-        this.detectorData.push(detectorData);
+    addFrame(views) {
+      for (var view of Object.keys(data.views)) {
+          data.views[view].data.push(views[view].data);
       }
-
-      if (data.frameCount == this.frameData.length) {
+      
+      /*if (detectorData.length) {
+        this.detectorData.push(detectorData);
+      }*/
+      if (data.frameCount == this.fview.length) {
         this.generating = false;
         this.isPlaying = false;
 
@@ -111,13 +131,13 @@ export default {
         this.setFrame(this.currentFrame);
         
       }
-      else if ((this.frameData.length - 1 == this.currentFrame)&&this.isPlaying) {
+      else if ((this.fview.length - 1 == this.currentFrame) && this.isPlaying) {
         this.setFrame(this.currentFrame + 1);
       }
     },
     
     startGeneration() {
-      console.log(JSON.parse(JSON.stringify(data)));
+      //console.log(JSON.parse(JSON.stringify(data)));
       data.frameCount = data.frameCount;
       this.socket.close();
       this.socket = io(import.meta.env.VITE_BACKEND_URL);
@@ -128,6 +148,27 @@ export default {
         this.isPlaying = true;
       });
       this.socket.on("canvas", (inData) => {
+        data.views = inData.views;
+        for (var viewName in data.views) {
+          var view = data.views[viewName]
+          view.activeFrame = view.data[this.currentFrame-1];
+        }
+        
+        /*for (const view in data.views) {
+          view.activeFrame = view.data[this.currentFrame-1];
+        }*/
+        /*for (var view in this.views) {
+          mpld3.remove_figure(view);
+          var prevEl = document.getElementById(view);
+          if (prevEl != null) {
+            prevEl.innerHTML = ""
+          }
+          //move to component
+          this.mplds[view] = new mpld3.Figure(view, this.views[view]);
+          mpld3.figures.push(this.mplds[view]);
+          this.mplds[view].draw();
+        }
+        //
         document.getElementById("fig_detector").innerHTML = "";
         if (inData.graph != null) {
           this.figDetector = mpld3.draw_figure("fig_detector", inData.graph);
@@ -146,16 +187,16 @@ export default {
         svg.setAttribute("preserveAspectRatio", "xMinYMin meet");
         svg = document.querySelectorAll(".mpld3-figure")[0];
         svg.setAttribute("viewBox", "41 40 400 400");
-        svg.setAttribute("preserveAspectRatio", "xMinYMin slice");
+        svg.setAttribute("preserveAspectRatio", "xMinYMin slice");*/
       });
       this.socket.on("frame", frameData => {
         console.log("Got frame!!");
-        this.addFrame(frameData.visual, frameData.graph);
+        this.addFrame(frameData.views);
         if (this.generating) { this.socket.emit('generate_frames', 1); }
       });
     }
   },
-  mounted() {
+  /*mounted() {
     mpld3.register_plugin("animview", AnimViewPlugin);
     AnimViewPlugin.prototype = Object.create(mpld3.Plugin.prototype);
     AnimViewPlugin.prototype.constructor = AnimViewPlugin;
@@ -178,12 +219,12 @@ export default {
         componentThis.detectorData[0] = [graphObjT.props.data];
       }
     };
-  }
+  }*/
 }
 </script>
 
 <template>
-  <ResultView :views="views" :horizontal="false"/>
+  <ResultView :views="getData" :horizontal="false" :currentFrame="currentFrame"/>
 </template>
 
 <style scoped>

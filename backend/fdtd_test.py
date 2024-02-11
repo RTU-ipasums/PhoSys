@@ -533,17 +533,20 @@ def stepGrid(grid):
     grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]
     plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap=gCmap, format='png', vmin=1e-4, vmax=100)#TODO
     vv.seek(0)
-
-    detectorData = []
-    for detector in grid.detectors:
-        detectorData.append( 
-            [ [i, modVal(detector.E[-1][i])**2 + modVal(detector.H[-1][i])**2] for i in range(len(detector.E[0]))] 
-        )
+    
+    views = {}
+    for j in range(len(grid.detectors)):
+            views[f'Detector {j+1}'] = {
+                    'type'   : 'detector',
+                    'data'   : [ [i, modVal(grid.detectors[j].E[-1][i])**2 + modVal(grid.detectors[j].H[-1][i])**2] for i in range(len(grid.detectors[j].E[0]))]}
     #print(max(grid.detectors[0].E[-1][0]))
     #print(max([ max(grid.detectors[0].E[0][i]) for i in range(len(grid.detectors[0].E[0])) ]))
     #print(grid.detectors[0].E[0][:10])
-
-    return base64.b64encode(vv.read()), detectorData
+    views['Main view'] = {
+                'type'    : 'view',
+                'data'    : base64.b64encode(vv.read()).decode()}
+    
+    return views
 
 '''    if debug:
         filePath = Path(f'render/{startTime}/{grid.time_steps_passed}.png')
@@ -598,23 +601,36 @@ def processJson(o):
     fig.set_figwidth(o.xBounds/figSize[0]*fig.get_size_inches()[0])
     fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
 
-    dataPoints, graph = None, None
-    if len(grid.detectors):
-        graph = plt.figure(2)
+    dataPoints, graph, views = None, None, {}
+    for j in range(len(grid.detectors)):
+        graph = plt.figure(j+2)
 
-        detectorLen = len(grid.detectors[0].E[0])
-        intensity = [ modVal(grid.detectors[0].E[0][i])**2 + modVal(grid.detectors[0].H[0][i])**2 for i in range(detectorLen) ]
+        detectorLen = len(grid.detectors[j].E[0])
+        intensity = [ modVal(grid.detectors[j].E[0][i])**2 + modVal(grid.detectors[j].H[0][i])**2 for i in range(detectorLen) ]
         dataPoints = plt.plot(np.arange(0, detectorLen, 1), intensity)
         plt.yscale("log")
         plt.gca().set_ylim([1, 200])# TEMP
-        graph = mpld3.fig_to_dict(graph)
+        views[f'Detector {j+1}'] = {
+                            'type'   : 'detector',
+                            'data'   : [[ [i, modVal(grid.detectors[j].E[-1][i])**2 + modVal(grid.detectors[j].H[-1][i])**2] for i in range(len(grid.detectors[j].E[0])) ]],
+                            'canvas' : mpld3.fig_to_dict(graph)}
 
     plugins.clear(fig)
     plugins.connect(fig, plugins.Zoom(button=False), AnimView(img, dataPoints), interactive_legend)
     plot = mpld3.fig_to_dict(fig)
     fig.clear()
     plt.close()
-    return plot, graph, grid, frameCount-1
+
+    vv = io.BytesIO()
+    grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]
+    plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap=gCmap, format='png', vmin=1e-4, vmax=100)#TODO
+    vv.seek(0)
+
+    views['Main view'] = {
+                    'type'    : 'view',
+                    'data'    : [base64.b64encode(vv.read()).decode()],
+                    'canvas'  : plot}
+    return views, grid, frameCount-1
 
 def test_fdtd():
 
