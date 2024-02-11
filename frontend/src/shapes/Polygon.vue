@@ -1,6 +1,17 @@
 <script>
 export default {
-    props: ['config', 'selected'],
+    data() {
+        return {
+            hoveringOverPoint:false
+        }
+    },
+    props: ['config', 'selected', 'ctrlKeyPressed'],
+    watch: {
+        ctrlKeyPressed() {
+            if(!this.hoveringOverPoint)return;
+            this.setCursorStyle(this.hoveringOverPoint,this.ctrlKeyPressed?'copy':'move');
+        }
+    },
     methods: {
         updatePolygon() {
             const polygon = this.$refs.polygon.getNode();
@@ -17,6 +28,16 @@ export default {
             const pos=e.target.position();
             newPoints[index]=pos.x-this.config.x;
             newPoints[index+1]=pos.y-this.config.y;
+            polygon.points(newPoints);
+        },
+        deletePoint(e) {
+            if (!this.ctrlKeyPressed) return;
+            const polygon = this.$refs.polygon.getNode();
+            let newPoints = polygon.points();
+            if(newPoints.length/2<=3) return;
+            const index = e.target.attrs.pointId * 2;
+
+            newPoints.splice(index, 2);
             polygon.points(newPoints);
         },
         handleStrokeClick(e){
@@ -126,7 +147,9 @@ ref="polygon"/>
     id:'static',
     scale:getStageScale()
 }"
-@mouseover="setCursorStyle($event,'move')"
-@mouseleave="setCursorStyle($event,'default')"
-@dragmove="updatePolygonPoints"/>
+@mouseover="hoveringOverPoint=$event;setCursorStyle($event,ctrlKeyPressed?'copy':'move')"
+@mouseleave="setCursorStyle($event,'default');hoveringOverPoint=false"
+@dragmove="updatePolygonPoints"
+@click="deletePoint"
+/>
 </template>

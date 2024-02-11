@@ -388,7 +388,7 @@ export default {
         <DraggableLine v-for="item in lines" :key="item.id" :config="item" :color="'blue'" @sizeupdate="updateTransformer"/>
         <DraggableLine v-for="item in linedetectors" :key="item.id" :config="item" :color="'green'" @sizeupdate="updateTransformer"/>
         <Rectangle v-for="item in rectangles" :key="item.id" :config="item"/>
-        <Polygon v-for="item in polygons" :key="item.id" :config="item" :selected="selectedShapes.has(item)"/>
+        <Polygon v-for="item in polygons" :key="item.id" :config="item" :selected="selectedShapes.has(item)" :ctrlKeyPressed="ctrlKeyPressed"/>
         <v-transformer ref="transformer" 
         :config="{
           boundBoxFunc: snappingFunction
