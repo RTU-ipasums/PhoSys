@@ -3,7 +3,7 @@ import { reactive } from 'vue'
 export const data = reactive({
     xBounds:null,
     yBounds:null,
-    frameCount:20,
+    frameCount:200,
     propertyTitle:"Global settings",
     properties:[
     {
@@ -22,6 +22,7 @@ export const data = reactive({
     shapes: [],
     currentFrame: 1,
     views:{
+    /*
       "Main view": {
           type:"view",
           data:[],
@@ -32,6 +33,7 @@ export const data = reactive({
           data:[],
           canvas:null,
         }
+    */
     },
 })
 

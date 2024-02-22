@@ -27,6 +27,7 @@ export default {
 
         console.warn(this.dView);
         console.log(this.uuid);
+        console.log(this.dView.canvas);
         this.mpld = new mpld3.Figure(this.uuid, this.dView.canvas);
         mpld3.figures.push(this.mpld);
         this.mpld.draw();

@@ -24,16 +24,17 @@ export default {
     };
   },
   computed: {
-    fview() {
-      return Object.values(data.views)[0].data;
+    loadedFrameCount() {
+      //Number of frames in recieved data
+      let len = Object.values(data.views)[0]?.data?.length;
+      return (len)?len:0;
     },
     maxFrame() {
-      var framesLoaded = this.fview.length;
-      return Math.max(data.frameCount, framesLoaded);
+      //The maximum frame displayed on seekbar
+      return Math.max(data.frameCount, this.loadedFrameCount);
     },
     isGenerating() {
-      var framesLoaded = this.fview.length;
-      return this.generating===true||(framesLoaded<data.frameCount&&framesLoaded>0);
+      return this.generating===true||(this.loadedFrameCount<data.frameCount&&this.loadedFrameCount>0);
     },
     getData() {
       return data ? data.views : null;
@@ -41,45 +42,46 @@ export default {
   },
   methods: {
     setFrame(val) {
-      if (this.fview[0] != null) {
-        this.currentFrame = val;
+      if (this.loadedFrameCount<=0) return; 
+      this.currentFrame = val;
 
-        for (var viewName in data.views) {
-          var view = data.views[viewName]
-          //console.log(this.currentFrame, view.data[this.currentFrame-1])
-          view.activeFrame = view.data[this.currentFrame-1];
-          /*var base64 = btoa(
-            new Uint8Array(view.activeFrame)
-              .reduce((data, byte) => data + String.fromCharCode(byte), '')
-          );
-          console.log(base64)*/
-          
-          //view.mpld.props.data = view.activeFrame;
-          //view.mpld.axes[0].elements[2].props.data = view.activeFrame;
-          if (view.type == "view") {
-            view.mpld.axes[0].elements[2].image._groups[0][0].setAttribute("href", "data:image/png;base64," + view.activeFrame);
-          }
-          else if (view.type == "detector") {
-            view.mpld.axes[0].elements[2].data = view.activeFrame;
-            toRaw(view.mpld.axes[0].elements[2].path._groups)[0][0].remove();// clear last path
-            view.mpld.axes[0].elements[2].draw();
-          }
+      for (var viewName in data.views) {
+        let view = data.views[viewName];
+        if(!view.mpld)continue;
+        //console.log(this.currentFrame, view.data[this.currentFrame-1])
+        view.activeFrame = view.data[this.currentFrame-1];
+        /*var base64 = btoa(
+          new Uint8Array(view.activeFrame)
+            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+        );
+        console.log(base64)*/
+        
+        //view.mpld.props.data = view.activeFrame;
+        //view.mpld.axes[0].elements[2].props.data = view.activeFrame;
+       
+        if (view.type == "view") {
+          view.mpld.axes[0].elements[2].image._groups[0][0].setAttribute("href", "data:image/png;base64," + view.activeFrame);
         }
-
-        /*if (this.frameData.length >= val) {
-          this.imgObj.props.data = this.frameData[this.currentFrame-1];
-          this.imgObj.image._groups[0][0].setAttribute("href", "data:image/png;base64," + this.imgObj.props.data);
-
-          if (this.graphObj!=null) {
-            this.graphObj.data = this.detectorData[this.currentFrame-1][this.selectedDetector];
-            toRaw(this.graphObj.path._groups)[0][0].remove();// clear last path
-            this.graphObj.draw();
-          }
-        }*/
+        else if (view.type == "detector") {
+          view.mpld.axes[0].elements[2].data = view.activeFrame;
+          toRaw(view.mpld.axes[0].elements[2].path._groups)[0][0].remove();// clear last path
+          view.mpld.axes[0].elements[2].draw();
+        }
       }
+
+      /*if (this.frameData.length >= val) {
+        this.imgObj.props.data = this.frameData[this.currentFrame-1];
+        this.imgObj.image._groups[0][0].setAttribute("href", "data:image/png;base64," + this.imgObj.props.data);
+
+        if (this.graphObj!=null) {
+          this.graphObj.data = this.detectorData[this.currentFrame-1][this.selectedDetector];
+          toRaw(this.graphObj.path._groups)[0][0].remove();// clear last path
+          this.graphObj.draw();
+        }
+      }*/
     },
     setNextFrame() {
-      if (this.currentFrame < this.fview.length) {
+      if (this.currentFrame < this.loadedFrameCount) {
         this.setFrame(this.currentFrame + 1);
       }
       else {
@@ -94,14 +96,14 @@ export default {
       this.setFrame(1);
     },
     setLastFrame() {
-      this.setFrame(this.fview.length);
+      this.setFrame(this.loadedFrameCount);
     },
     togglePlay() {
       this.generating = false;
       this.isPlaying = !this.isPlaying;
-      if(!this.fview)return;
+      if(this.loadedFrameCount<=0)return;
       if (this.isPlaying) {
-        if (this.currentFrame == this.fview.length) {
+        if (this.currentFrame == this.loadedFrameCount) {
           this.generating = true;
           this.socket.emit('generate_frames', 1);
         }
@@ -123,7 +125,7 @@ export default {
       /*if (detectorData.length) {
         this.detectorData.push(detectorData);
       }*/
-      if (data.frameCount == this.fview.length) {
+      if (data.frameCount == this.loadedFrameCount) {
         this.generating = false;
         this.isPlaying = false;
 
@@ -131,7 +133,7 @@ export default {
         this.setFrame(this.currentFrame);
         
       }
-      else if ((this.fview.length - 1 == this.currentFrame) && this.isPlaying) {
+      else if ((this.loadedFrameCount - 1 == this.currentFrame) && this.isPlaying) {
         this.setFrame(this.currentFrame + 1);
       }
     },
