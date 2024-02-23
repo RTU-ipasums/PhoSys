@@ -5,7 +5,7 @@ export default {
   data() {
     return {
       panes: [
-        {id: 0, split: false, selectedView:""},
+        {id: 0, split: false, selectedView:this.firstSelectedView?this.firstSelectedView:""},
         {id: 1, split: false, selectedView:""}
       ]
     };
@@ -15,7 +15,7 @@ export default {
       Pane,
       View
   },
-  props: ['views', 'horizontal', 'parentpane', 'currentFrame'],
+  props: ['views', 'horizontal', 'parentpane', 'currentFrame', 'firstSelectedView'],
   computed:{
     allowDeletion(){
       return this.parentpane||this.panes.length>1;
@@ -57,7 +57,7 @@ export default {
 
 <template>
 <splitpanes :horizontal="!horizontal" >
-  <pane v-for="(pane,index) in panes" :key="pane.id" id="pane" ref="children">
+  <pane v-for="pane in panes" :key="pane.id" id="pane" ref="children">
     <div v-if="!pane.split" class="view-container" style="position: relative;">
       <!-- <div class="view"></div> -->
       <View :view="pane.selectedView" :currentFrame="currentFrame"/>
@@ -74,7 +74,7 @@ export default {
 
       </div>
     </div>
-    <ResultView v-if="pane.split" :views="views" :horizontal="!horizontal" :parentpane="panes[index]"></ResultView>
+    <ResultView v-if="pane.split" :views="views" :horizontal="!horizontal" :parentpane="pane" :firstSelectedView="pane.selectedView"></ResultView>
   </pane>
 </splitpanes>
 </template>
