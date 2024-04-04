@@ -2,6 +2,7 @@
 import { uuid } from 'vue-uuid'; 
 import { data } from './data.js'
 import * as mpld3 from "mpld3";
+import { toRaw } from 'vue'
 
 export default {
   props: {
@@ -29,15 +30,27 @@ export default {
       mpld3.figures.push(this.mpld);
       this.mpld.draw();
 
-      this.dView.mpld = this.mpld;
+      this.dView.panes.push(this);
       if (this.dView.type == "detector") {
-          this.dView.data[0] = this.mpld.axes[0].elements[2].props.data;
           this.mpld.axes[0].elements[2].props.data = this.dView.activeFrame;
       }
       else if (this.dView.type == "view") {
-          this.dView.data[0] = this.mpld.props.data;
           this.mpld.props.data = this.dView.activeFrame;
       }
+      this.setFrame();
+    },
+    setFrame() {
+        if(!this.mpld) return;
+        this.activeFrame = this.dView.data[this.currentFrame-1];
+
+        if (this.dView.type == "detector") {
+          this.mpld.axes[0].elements[2].data = this.activeFrame;
+          toRaw(this.mpld.axes[0].elements[2].path._groups)[0][0].remove();// clear last path
+          this.mpld.axes[0].elements[2].draw();
+        }       
+        else if (this.dView.type == "view") {
+          this.mpld.axes[0].elements[2].image._groups[0][0].setAttribute("href", "data:image/png;base64," + this.activeFrame);
+        }
     }
   },
   watch: {

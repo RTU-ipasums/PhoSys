@@ -4,7 +4,6 @@ import io from "socket.io-client";
 import * as mpld3 from "mpld3";
 import "./interactive-legend";
 import { data } from './data.js'
-import { toRaw } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 
 export default {
@@ -47,16 +46,9 @@ export default {
 
       for (var viewName in data.views) {
         let view = data.views[viewName];
-        if(!view.mpld)continue;
-        view.activeFrame = view.data[this.currentFrame-1];
-       
-        if (view.type == "view") {
-          view.mpld.axes[0].elements[2].image._groups[0][0].setAttribute("href", "data:image/png;base64," + view.activeFrame);
-        }
-        else if (view.type == "detector") {
-          view.mpld.axes[0].elements[2].data = view.activeFrame;
-          toRaw(view.mpld.axes[0].elements[2].path._groups)[0][0].remove();// clear last path
-          view.mpld.axes[0].elements[2].draw();
+        for (var pane in view.panes) {
+          console.log(view.panes[pane])
+          view.panes[pane].setFrame();
         }
       }
     },
@@ -128,6 +120,7 @@ export default {
         data.views = inData.views;
         for (var viewName in data.views) {
           var view = data.views[viewName]
+          view.panes = []
           view.activeFrame = view.data[this.currentFrame-1];
         }
       });
