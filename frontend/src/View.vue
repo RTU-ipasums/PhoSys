@@ -17,7 +17,6 @@ export default {
   },
   methods:{
     updateView(newView){
-      console.log(this.uuid)
       if(newView=="")return;
       var prevEl = document.getElementById(this.uuid);
       if (prevEl != null) {
