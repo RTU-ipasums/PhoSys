@@ -23,6 +23,7 @@ export const data = reactive({
 })
 
 export const internal = reactive({
+    currentFrame: 1,
     views:{
     /*
       "Main view": {

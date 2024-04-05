@@ -15,7 +15,6 @@ export default {
   data() {
     return {
       socket: io(import.meta.env.VITE_BACKEND_URL),
-      currentFrame: 1,
       isPlaying: false,
       generating: false,
       fps: 30,
@@ -42,19 +41,11 @@ export default {
   methods: {
     setFrame(val) {
       if (this.loadedFrameCount<=0) return; 
-      this.currentFrame = val;
-
-      for (var viewName in internal.views) {
-        let view = internal.views[viewName];
-        for (var pane in view.panes) {
-          console.log(view.panes[pane])
-          view.panes[pane].setFrame();
-        }
-      }
+      internal.currentFrame = val;
     },
     setNextFrame() {
-      if (this.currentFrame < this.loadedFrameCount) {
-        this.setFrame(this.currentFrame + 1);
+      if (internal.currentFrame < this.loadedFrameCount) {
+        this.setFrame(internal.currentFrame + 1);
       }
       else {
         clearInterval(this.advanceInterval)
@@ -62,7 +53,7 @@ export default {
       }
     },
     setPreviousFrame() {
-      this.setFrame(this.currentFrame-1);
+      this.setFrame(internal.currentFrame-1);
     },
     setFirstFrame() {
       this.setFrame(1);
@@ -75,7 +66,7 @@ export default {
       this.isPlaying = !this.isPlaying;
       if(this.loadedFrameCount<=0)return;
       if (this.isPlaying) {
-        if (this.currentFrame == this.loadedFrameCount) {
+        if (internal.currentFrame == this.loadedFrameCount) {
           this.generating = true;
           this.socket.emit('generate_frames', 1);
         }
@@ -87,7 +78,7 @@ export default {
     },
     reset() {
       internal.views = [[]];
-      this.currentFrame = 1;
+      internal.currentFrame = 1;
     },
     addFrame(views) {
       for (var view of Object.keys(internal.views)) {
@@ -97,12 +88,12 @@ export default {
         this.generating = false;
         this.isPlaying = false;
 
-        this.setFrame(this.currentFrame + 1);
-        this.setFrame(this.currentFrame);
+        this.setFrame(internal.currentFrame + 1);
+        this.setFrame(internal.currentFrame);
         
       }
-      else if ((this.loadedFrameCount - 1 == this.currentFrame) && this.isPlaying) {
-        this.setFrame(this.currentFrame + 1);
+      else if ((this.loadedFrameCount - 1 == internal.currentFrame) && this.isPlaying) {
+        this.setFrame(internal.currentFrame + 1);
       }
     },
     
@@ -121,7 +112,7 @@ export default {
         for (var viewName in internal.views) {
           var view = internal.views[viewName]
           view.panes = []
-          view.activeFrame = view.data[this.currentFrame-1];
+          view.activeFrame = view.data[internal.currentFrame-1];
         }
       });
       this.socket.on("frame", frameData => {
@@ -135,7 +126,7 @@ export default {
 </script>
 
 <template>
-  <ResultView :views="getData" :horizontal="false" :currentFrame="currentFrame"/>
+  <ResultView :views="getData" :horizontal="false"/>
 </template>
 
 <style scoped>

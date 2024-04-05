@@ -15,7 +15,7 @@ export default {
       Pane,
       View
   },
-  props: ['views', 'horizontal', 'parentpane', 'currentFrame', 'firstSelectedView'],
+  props: ['views', 'horizontal', 'parentpane', 'firstSelectedView'],
   computed:{
     allowDeletion(){
       return this.parentpane||this.panes.length>1;
@@ -60,7 +60,7 @@ export default {
   <pane v-for="pane in panes" :key="pane.id" id="pane" ref="children">
     <div v-if="!pane.split" class="view-container" style="position: relative;">
       <!-- <div class="view"></div> -->
-      <View :view="pane.selectedView" :currentFrame="currentFrame"/>
+      <View :view="pane.selectedView"/>
       <div id="view-options">
         <select v-model="pane.selectedView" name="Views" id="view-selection">
           <option disabled value="">None</option>

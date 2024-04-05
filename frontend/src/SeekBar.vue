@@ -1,10 +1,11 @@
 <script>
 import Result from './Result.vue'
-import { data } from './data.js'
+import { data, internal } from './data.js'
 
 export default {
     data() {
         return {
+            internal,
             data
         }
     },
@@ -29,8 +30,8 @@ export default {
     <div class="container">
         <div class="seekBar">
             <div class="seek-container">
-                <input v-if="resultView" v-model.lazy.number="resultView.currentFrame" type="number" @change="resultView.setFrame(this.resultView.currentFrame)"/>
-                <input v-if="resultView" type="range" min="1" :max="resultView.maxFrame" v-model.number="resultView.currentFrame" @change="resultView.setFrame(resultView.currentFrame)" class="slider">
+                <input v-if="internal" v-model.lazy.number="internal.currentFrame" type="number" @change="resultView.setFrame(internal.currentFrame)"/>
+                <input v-if="internal && resultView" type="range" min="1" :max="resultView.maxFrame" v-model.number="internal.currentFrame" @change="resultView.setFrame(internal.currentFrame)" class="slider">
                 <input v-model.lazy.number="data.frameCount" type="number"/>
             </div>
             <div class="controls">

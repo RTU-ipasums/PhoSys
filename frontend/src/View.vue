@@ -1,28 +1,29 @@
 <script>
 import { uuid } from 'vue-uuid'; 
-import { internal } from './data.js'
+import { data, internal } from './data.js'
 import * as mpld3 from "mpld3";
 import { toRaw } from 'vue'
 
 export default {
   props: {
-    view: "",
-    currentFrame: 1,
+    view: ""
   },
   data() {
     return {
         uuid: 'uuid'+uuid.v4(),
         mpld: null,
+        internal,
     }
   },
   methods:{
     updateView(newView){
-      if(newView=="")return;
+
       var prevEl = document.getElementById(this.uuid);
       if (prevEl != null) {
           prevEl.innerHTML = ""
           mpld3.remove_figure(this.uuid);
       }
+      if(newView=="")return;
       
       this.dView = internal.views[newView];
 
@@ -41,7 +42,7 @@ export default {
     },
     setFrame() {
         if(!this.mpld) return;
-        this.activeFrame = this.dView.data[this.currentFrame-1];
+        this.activeFrame = this.dView.data[internal.currentFrame-1];
 
         if (this.dView.type == "detector") {
           this.mpld.axes[0].elements[2].data = this.activeFrame;
@@ -55,8 +56,10 @@ export default {
   },
   watch: {
     view(newVal) {
-      
       this.updateView(newVal);
+    },
+    'internal.currentFrame': function (newVal, oldVal) {
+        this.setFrame();
     }
   },
   mounted() {
