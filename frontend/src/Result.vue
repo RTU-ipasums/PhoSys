@@ -3,7 +3,7 @@ import ResultView from './ResultView.vue'
 import io from "socket.io-client";
 import * as mpld3 from "mpld3";
 import "./interactive-legend";
-import { data } from './data.js'
+import { data, internal } from './data.js'
 import { Splitpanes, Pane } from 'splitpanes'
 
 export default {
@@ -25,7 +25,7 @@ export default {
   computed: {
     loadedFrameCount() {
       //Number of frames in recieved data
-      let len = Object.values(data.views)[0]?.data?.length;
+      let len = Object.values(internal.views)[0]?.data?.length;
       return (len)?len:0;
     },
     maxFrame() {
@@ -36,7 +36,7 @@ export default {
       return this.generating===true||(this.loadedFrameCount<data.frameCount&&this.loadedFrameCount>0);
     },
     getData() {
-      return data ? data.views : null;
+      return data ? internal.views : null;
     }
   },
   methods: {
@@ -44,8 +44,8 @@ export default {
       if (this.loadedFrameCount<=0) return; 
       this.currentFrame = val;
 
-      for (var viewName in data.views) {
-        let view = data.views[viewName];
+      for (var viewName in internal.views) {
+        let view = internal.views[viewName];
         for (var pane in view.panes) {
           console.log(view.panes[pane])
           view.panes[pane].setFrame();
@@ -86,12 +86,12 @@ export default {
       else { clearInterval(this.advanceInterval); }
     },
     reset() {
-      data.views = [[]];
+      internal.views = [[]];
       this.currentFrame = 1;
     },
     addFrame(views) {
-      for (var view of Object.keys(data.views)) {
-          data.views[view].data.push(views[view].data);
+      for (var view of Object.keys(internal.views)) {
+        internal.views[view].data.push(views[view].data);
       }
       if (data.frameCount == this.loadedFrameCount) {
         this.generating = false;
@@ -117,9 +117,9 @@ export default {
         this.isPlaying = true;
       });
       this.socket.on("canvas", (inData) => {
-        data.views = inData.views;
-        for (var viewName in data.views) {
-          var view = data.views[viewName]
+        internal.views = inData.views;
+        for (var viewName in internal.views) {
+          var view = internal.views[viewName]
           view.panes = []
           view.activeFrame = view.data[this.currentFrame-1];
         }

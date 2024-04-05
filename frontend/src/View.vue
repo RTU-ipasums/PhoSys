@@ -1,6 +1,6 @@
 <script>
 import { uuid } from 'vue-uuid'; 
-import { data } from './data.js'
+import { internal } from './data.js'
 import * as mpld3 from "mpld3";
 import { toRaw } from 'vue'
 
@@ -24,7 +24,7 @@ export default {
           mpld3.remove_figure(this.uuid);
       }
       
-      this.dView = data.views[newView];
+      this.dView = internal.views[newView];
 
       this.mpld = new mpld3.Figure(this.uuid, this.dView.canvas);
       mpld3.figures.push(this.mpld);

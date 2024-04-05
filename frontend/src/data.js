@@ -20,7 +20,9 @@ export const data = reactive({
     }
     ],
     shapes: [],
-    currentFrame: 1,
+})
+
+export const internal = reactive({
     views:{
     /*
       "Main view": {
@@ -36,4 +38,3 @@ export const data = reactive({
     */
     },
 })
-
