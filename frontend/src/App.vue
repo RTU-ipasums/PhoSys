@@ -109,7 +109,7 @@ export default {
       </button>
     </div>
 
-    <splitpanes id="splitpanes">
+    <splitpanes>
       <pane size="20" class="properties grid-item">
         <div style="padding: 10px 20px;">
           <Properties :selectedShapes="getShape()" />
@@ -170,6 +170,7 @@ ul {
   flex-direction: column;
   row-gap: 6px;
   background-color: rgba(167, 161, 161, 1);
+  min-height: 0;
 }
 
 .properties {
@@ -244,8 +245,9 @@ ul {
   font-family: Helvetica, Arial;
 }
 
-#splitpanes {
+.splitpanes {
   overflow: auto;
+  min-height:0;
 }
 
 .splitpanes__splitter {

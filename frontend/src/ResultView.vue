@@ -80,9 +80,7 @@ export default {
 </template>
 
 <style>
-#pane{
-  height:50%; 
-}
+
 .view{
     height:100%;
     min-height: 0;
