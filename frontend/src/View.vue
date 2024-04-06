@@ -25,7 +25,6 @@ export default {
       }
       if(newView=="")return;
       
-
       this.mpld = new mpld3.Figure(this.uuid, internal.views[newView].canvas);
       mpld3.figures.push(this.mpld);
       this.mpld.draw();
@@ -40,18 +39,15 @@ export default {
     },
     setFrame() {
         if(!this.mpld) return;
-
-        console.log(internal.views, internal.currentFrame)
         if(!internal.views[this.view])return;
-        this.activeFrame = internal.views[this.view].data[internal.currentFrame-1];
-
+        
         if (internal.views[this.view].type == "detector") {
-          this.mpld.axes[0].elements[2].data = this.activeFrame;
+          this.mpld.axes[0].elements[2].data = internal.views[this.view].data[internal.currentFrame-1];
           toRaw(this.mpld.axes[0].elements[2].path._groups)[0][0].remove();// clear last path
           this.mpld.axes[0].elements[2].draw();
         }       
         else if (internal.views[this.view].type == "view") {
-          this.mpld.axes[0].elements[2].image._groups[0][0].setAttribute("href", "data:image/png;base64," + this.activeFrame);
+          this.mpld.axes[0].elements[2].image._groups[0][0].setAttribute("href", "data:image/png;base64," + internal.views[this.view].data[internal.currentFrame-1]);
         }
     }
   },
