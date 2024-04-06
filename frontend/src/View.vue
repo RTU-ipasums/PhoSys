@@ -15,25 +15,29 @@ export default {
         internal,
     }
   },
+  computed:{
+    frameCount(){
+      return this.internal?.views[this.view]?.data?.length;
+    }
+  },
   methods:{
-    updateView(newView){
-      console.log("update",newView)
+    updateView(){
       var prevEl = document.getElementById(this.uuid);
       if (prevEl != null) {
           prevEl.innerHTML = ""
           mpld3.remove_figure(this.uuid);
       }
-      if(newView=="")return;
+      if(!this.view)return;
       
-      this.mpld = new mpld3.Figure(this.uuid, internal.views[newView].canvas);
+      this.mpld = new mpld3.Figure(this.uuid, internal.views[this.view].canvas);
       mpld3.figures.push(this.mpld);
       this.mpld.draw();
 
-      if (internal.views[newView].type == "detector") {
-          this.mpld.axes[0].elements[2].props.data = internal.views[newView].activeFrame;
+      if (internal.views[this.view].type == "detector") {
+          this.mpld.axes[0].elements[2].props.data = internal.views[this.view].activeFrame;
       }
-      else if (internal.views[newView].type == "view") {
-          this.mpld.props.data = internal.views[newView].activeFrame;
+      else if (internal.views[this.view].type == "view") {
+          this.mpld.props.data = internal.views[this.view].activeFrame;
       }
       this.setFrame();
     },
@@ -52,12 +56,17 @@ export default {
     }
   },
   watch: {
-    view(newVal) {
-      this.updateView(newVal);
+    view() {
+      this.updateView();
     },
     'internal.currentFrame': function (newVal, oldVal) {
         this.setFrame();
+    },
+    frameCount() {
+      if(this.frameCount==1)this.updateView();
+      
     }
+
   },
   mounted() {
     this.updateView(this.view);

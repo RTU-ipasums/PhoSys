@@ -17,6 +17,14 @@ export default {
   },
   props: ['views', 'horizontal', 'parentpane', 'firstSelectedView'],
   computed:{
+    //returns "" if view no longer exists
+    safeView(){
+      return (selectedView)=>{
+        //console.log("check views",views);
+        if(!this.views[selectedView])return "";
+        return selectedView;
+      }
+    },
     allowDeletion(){
       return this.parentpane||this.panes.length>1;
     }
@@ -60,11 +68,10 @@ export default {
   <pane v-for="pane in panes" :key="pane.id" id="pane" ref="children">
     <div v-if="!pane.split" class="view-container" style="position: relative;">
       <!-- <div class="view"></div> -->
-      <View :view="pane.selectedView"/>
+      <View :view="safeView(pane.selectedView)"/>
       <div id="view-options">
         <select v-model="pane.selectedView" name="Views" id="view-selection">
           <option disabled value="">None</option>
-          <option value="" selected disabled hidden>Choose here</option>
           <option v-for="(view, key) in views" :value="key">{{key}}</option>
         </select>
 
@@ -95,6 +102,9 @@ export default {
   gap:5px;
   padding:5px;
   background-color:rgba(167, 161, 161, 1);
+}
+#view-selection{
+  width:100px;
 }
 .view-container{
   height:100%;
