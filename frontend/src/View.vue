@@ -17,7 +17,7 @@ export default {
   },
   methods:{
     updateView(newView){
-
+      console.log("update",newView)
       var prevEl = document.getElementById(this.uuid);
       if (prevEl != null) {
           prevEl.innerHTML = ""
@@ -25,31 +25,32 @@ export default {
       }
       if(newView=="")return;
       
-      this.dView = internal.views[newView];
 
-      this.mpld = new mpld3.Figure(this.uuid, this.dView.canvas);
+      this.mpld = new mpld3.Figure(this.uuid, internal.views[newView].canvas);
       mpld3.figures.push(this.mpld);
       this.mpld.draw();
 
-      this.dView.panes.push(this);
-      if (this.dView.type == "detector") {
-          this.mpld.axes[0].elements[2].props.data = this.dView.activeFrame;
+      if (internal.views[newView].type == "detector") {
+          this.mpld.axes[0].elements[2].props.data = internal.views[newView].activeFrame;
       }
-      else if (this.dView.type == "view") {
-          this.mpld.props.data = this.dView.activeFrame;
+      else if (internal.views[newView].type == "view") {
+          this.mpld.props.data = internal.views[newView].activeFrame;
       }
       this.setFrame();
     },
     setFrame() {
         if(!this.mpld) return;
-        this.activeFrame = this.dView.data[internal.currentFrame-1];
 
-        if (this.dView.type == "detector") {
+        console.log(internal.views, internal.currentFrame)
+        if(!internal.views[this.view])return;
+        this.activeFrame = internal.views[this.view].data[internal.currentFrame-1];
+
+        if (internal.views[this.view].type == "detector") {
           this.mpld.axes[0].elements[2].data = this.activeFrame;
           toRaw(this.mpld.axes[0].elements[2].path._groups)[0][0].remove();// clear last path
           this.mpld.axes[0].elements[2].draw();
         }       
-        else if (this.dView.type == "view") {
+        else if (internal.views[this.view].type == "view") {
           this.mpld.axes[0].elements[2].image._groups[0][0].setAttribute("href", "data:image/png;base64," + this.activeFrame);
         }
     }
