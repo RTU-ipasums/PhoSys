@@ -18,7 +18,8 @@ export default {
       isPlaying: false,
       generating: false,
       fps: 30,
-      advanceInterval: null
+      advanceInterval: null,
+      internal
     };
   },
   computed: {
@@ -77,7 +78,7 @@ export default {
       else { clearInterval(this.advanceInterval); }
     },
     reset() {
-      internal.views = [[]];
+      internal.views = {};
       internal.currentFrame = 1;
     },
     addFrame(views) {
