@@ -4,6 +4,7 @@ import ResultView from './ResultView.vue'
 export default {
   data() {
     return {
+      lastid:1,
       panes: [
         {id: 0, split: false, selectedView:this.firstSelectedView?this.firstSelectedView:""},
         {id: 1, split: false, selectedView:""}
@@ -33,7 +34,8 @@ export default {
     horizontalSplit(pane){
       let index = this.panes.findIndex(p => p.id === pane.id);
       if(this.horizontal){
-        this.panes.push({id: this.panes[this.panes.length-1].id + 1, split: false, selectedView:""});
+        this.lastid++;
+        this.panes.splice(index+1, 0, {id: this.lastid, split: false, selectedView:""});
         return;
       }
       this.panes[index].split = true;
@@ -45,7 +47,8 @@ export default {
         this.panes[index].split = true;
         return;
       }
-      this.panes.push({id: this.panes[this.panes.length-1].id + 1, split: false, selectedView:""});
+      this.lastid++;
+      this.panes.splice(index+1, 0, {id: this.lastid, split: false, selectedView:""});
       console.log(1, this.panes);
     },
     deletePane(pane){
