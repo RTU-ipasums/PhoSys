@@ -88,7 +88,8 @@ export default {
       if (data.frameCount == this.loadedFrameCount) {
         this.generating = false;
         this.isPlaying = false;
-
+        this.setFrame(internal.currentFrame + 1);
+        this.setFrame(internal.currentFrame);
 
         
       }
