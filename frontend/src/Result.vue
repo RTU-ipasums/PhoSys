@@ -1,5 +1,5 @@
 <script>
-import ResultView from './ResultView.vue'
+import ResultPane from './ResultPane.vue'
 import io from "socket.io-client";
 import * as mpld3 from "mpld3";
 import "./interactive-legend";
@@ -8,7 +8,7 @@ import { Splitpanes, Pane } from 'splitpanes'
 
 export default {
   components: {
-      ResultView,
+      ResultPane,
       Splitpanes,
       Pane
   },
@@ -89,8 +89,7 @@ export default {
         this.generating = false;
         this.isPlaying = false;
 
-        this.setFrame(internal.currentFrame + 1);
-        this.setFrame(internal.currentFrame);
+
         
       }
       else if ((this.loadedFrameCount - 1 == internal.currentFrame) && this.isPlaying) {
@@ -127,7 +126,7 @@ export default {
 </script>
 
 <template>
-  <ResultView :views="getData" :horizontal="false"/>
+  <ResultPane :views="getData" :horizontal="false"/>
 </template>
 
 <style scoped>
