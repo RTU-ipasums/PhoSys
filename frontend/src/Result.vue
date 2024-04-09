@@ -89,9 +89,6 @@ export default {
         this.generating = false;
         this.isPlaying = false;
         this.setFrame(internal.currentFrame + 1);
-        this.setFrame(internal.currentFrame);
-
-        
       }
       else if ((this.loadedFrameCount - 1 == internal.currentFrame) && this.isPlaying) {
         this.setFrame(internal.currentFrame + 1);
@@ -99,7 +96,6 @@ export default {
     },
     
     startGeneration() {
-      data.frameCount = data.frameCount;
       this.socket.close();
       this.socket = io(import.meta.env.VITE_BACKEND_URL);
 

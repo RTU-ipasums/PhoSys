@@ -32,13 +32,16 @@ export default {
       this.mpld = new mpld3.Figure(this.uuid, internal.views[this.view].canvas);
       mpld3.figures.push(this.mpld);
       this.mpld.draw();
-
+      let svgEl=prevEl.firstChild.firstChild;
       if (internal.views[this.view].type == "detector") {
           this.mpld.axes[0].elements[2].props.data = internal.views[this.view].activeFrame;
       }
       else if (internal.views[this.view].type == "view") {
           this.mpld.props.data = internal.views[this.view].activeFrame;
+          svgEl.setAttribute("viewBox", "41 40 400 400");
+          svgEl.setAttribute("preserveAspectRatio", "xMinYMin slice");
       }
+    
       this.setFrame();
     },
     setFrame() {
