@@ -35,6 +35,8 @@ export default {
       let svgEl=prevEl.firstChild.firstChild;
       if (internal.views[this.view].type == "detector") {
           this.mpld.axes[0].elements[2].props.data = internal.views[this.view].activeFrame;
+          svgEl.setAttribute("viewBox", "41 40 400 400");
+          svgEl.setAttribute("preserveAspectRatio", "none");
       }
       else if (internal.views[this.view].type == "view") {
           this.mpld.props.data = internal.views[this.view].activeFrame;
@@ -80,5 +82,16 @@ export default {
 </script>
 
 <template>
-    <div :id=this.uuid ref="canvas"></div>
+    <div :id=this.uuid class="result-view-container" ref="canvas"></div>
 </template>
+
+<style>
+.result-view-container{
+  width:100%;
+  height:100%;
+}
+.result-view-container>*{
+  width:100%;
+  height:100%;
+}
+</style>
