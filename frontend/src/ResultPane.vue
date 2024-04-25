@@ -16,14 +16,33 @@ export default {
       Pane,
       ResultView
   },
-  props: ['views', 'horizontal', 'parentpane', 'firstSelectedView'],
+  props: ['views', 'selectedViews','horizontal', 'parentpane', 'firstSelectedView'],
   computed:{
     //returns "" if view no longer exists
     safeView(){
-      return (selectedView)=>{
-        //console.log("check views",views);
-        if(!this.views[selectedView])return "";
-        return selectedView;
+      //todo: this is kinda cursed
+      //todo: split map incrementing into seperate func and reuse it in this and "updateCount"
+      return (pane)=>{
+        if(!this.views[pane.selectedView]){
+          for(let key of Object.keys(this.views)){
+
+            if(!this.selectedViews[key]){
+              if(!(key in this.selectedViews)){
+                this.selectedViews[key]=0;
+              }
+
+              this.selectedViews[key]++;
+              if(pane.selectedView){
+                this.selectedViews[pane.selectedView]--;
+              }
+
+              pane.selectedView=key; 
+            }
+          }
+          return ""
+        }
+
+        return pane.selectedView;
       }
     },
     allowDeletion(){
@@ -61,6 +80,21 @@ export default {
         //here we pray vue reactivity works by reference and that a vue element can delete itself, im not sure if this is a hack, but it works for now
         this.parentpane.split = false;
       }
+    },
+    updateCount(ev, pane){
+      const newValue = ev.target.value;
+      const oldValue = pane.selectedView;
+      
+      if(oldValue){
+        this.selectedViews[oldValue]--;
+      }
+      if(newValue){
+        if(!(newValue in this.selectedViews)){
+          this.selectedViews[newValue]=0;
+        }
+        this.selectedViews[newValue]++;
+      }
+      pane.selectedView=newValue;
     }
   }
 };
@@ -71,9 +105,9 @@ export default {
   <pane v-for="pane in panes" :key="pane.id" id="pane" ref="children">
     <div v-if="!pane.split" class="view-container" style="position: relative;">
       <!-- <div class="view"></div> -->
-      <ResultView :view="safeView(pane.selectedView)"/>
+      <ResultView :view="safeView(pane)"/>
       <div id="view-options">
-        <select v-model="pane.selectedView" name="Views" id="view-selection">
+        <select :value="pane.selectedView" @change="updateCount($event,pane)" name="Views" id="view-selection">
           <option disabled value="">None</option>
           <option v-for="(view, key) in views" :value="key">{{key}}</option>
         </select>
@@ -84,7 +118,7 @@ export default {
 
       </div>
     </div>
-    <ResultPane v-if="pane.split" :views="views" :horizontal="!horizontal" :parentpane="pane" :firstSelectedView="pane.selectedView"></ResultPane>
+    <ResultPane v-if="pane.split" :views="views" :selectedViews="selectedViews" :horizontal="!horizontal" :parentpane="pane" :firstSelectedView="pane.selectedView"></ResultPane>
   </pane>
 </splitpanes>
 </template>

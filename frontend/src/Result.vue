@@ -19,7 +19,10 @@ export default {
       generating: false,
       fps: 30,
       advanceInterval: null,
-      internal
+      internal,
+      selectedViews: {
+        //"View name": numberOfOpenPanes
+      }
     };
   },
   computed: {
@@ -123,7 +126,7 @@ export default {
 </script>
 
 <template>
-  <ResultPane :views="getData" :horizontal="false"/>
+  <ResultPane :views="getData" :selectedViews="selectedViews" :horizontal="false"/>
 </template>
 
 <style scoped>
