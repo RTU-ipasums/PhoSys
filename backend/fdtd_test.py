@@ -591,18 +591,9 @@ def processJson(o):
     #grid.step()
     grid.run(1, progress_bar=False)
 
-    plt.autoscale() 
-    fig, img, interactive_legend = visualize(grid, elements, z=0)
-
-    #Thread(target=stepGrid, args=[grid, 30]).start()
-    #stepGrid(grid, 30)
-
-    figSize = fig.get_size_inches()*fig.dpi
-    fig.set_figwidth(o.xBounds/figSize[0]*fig.get_size_inches()[0])
-    fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
-
     dataPoints, graph, views = None, None, {}
     for j in range(len(grid.detectors)):
+        plt.clf()
         graph = plt.figure(j+2)
 
         detectorLen = len(grid.detectors[j].E[0])
@@ -614,6 +605,16 @@ def processJson(o):
                             'type'   : 'detector',
                             'data'   : [[ [i, modVal(grid.detectors[j].E[-1][i])**2 + modVal(grid.detectors[j].H[-1][i])**2] for i in range(len(grid.detectors[j].E[0])) ]],
                             'canvas' : mpld3.fig_to_dict(graph)}
+
+    plt.autoscale() 
+    fig, img, interactive_legend = visualize(grid, elements, z=0)
+
+    #Thread(target=stepGrid, args=[grid, 30]).start()
+    #stepGrid(grid, 30)
+
+    figSize = fig.get_size_inches()*fig.dpi
+    fig.set_figwidth(o.xBounds/figSize[0]*fig.get_size_inches()[0])
+    fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
 
     plugins.clear(fig)
     plugins.connect(fig, plugins.Zoom(button=False), AnimView(img, dataPoints), interactive_legend)
