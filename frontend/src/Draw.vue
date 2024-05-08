@@ -4,11 +4,13 @@ import { getCenter, getDistance, isTouchEnabled, scaleBy, newObject, radToDeg, d
 import DraggableLine from './shapes/DraggableLine.vue'
 import Rectangle from './shapes/Rectangle.vue'
 import Circle from './shapes/Circle.vue'
+import Polygon from './shapes/Polygon.vue'
 export default {
   components: {
     DraggableLine,
     Rectangle,
-    Circle
+    Circle,
+    Polygon
   },
   data() {
     return {
@@ -38,6 +40,16 @@ export default {
     lines() {
       return data.shapes.filter((r) => {
         return r.name.split('_')[0] === "linesource";
+      });
+    },
+    linedetectors() {
+      return data.shapes.filter((r) => {
+        return r.name.split('_')[0] === "linedetector";
+      });
+    },
+    polygons() {
+      return data.shapes.filter((r) => {
+        return r.name.split('_')[0] === "polygon";
       });
     }
   },
@@ -126,6 +138,7 @@ export default {
         y: pointerY - mousePointTo.y * newScale,
       }
       stage.position(newPos);
+      this.scaleStaticShapes();
       stage.batchDraw();
     },
     handleStageMouseDown(e) {
@@ -153,7 +166,6 @@ export default {
     handleStageClick(e) {
       // clicked on stage - clear selection
       if (e.target === this.$refs.stage.getStage()) {
-        
         this.selectedShapes.clear();
         this.updateTransformer();
         return;
@@ -264,12 +276,26 @@ export default {
         this.selectedShapes.clear();
       }
       this.selectedShapes.add(data.shapes.at(-1));
-      Promise.resolve(this.selectedShapes).then(this.updateTransformer);
+
+      Promise.resolve(this.selectedShapes).then(()=>{
+        this.updateTransformer();
+        this.scaleStaticShapes();
+      });
     },
     deleteSelectedShapes() {
       data.shapes = data.shapes.filter((shape) =>!this.selectedShapes.has(shape));
       this.selectedShapes.clear();
       this.updateTransformer();
+    },
+    scaleStaticShapes(){
+      const stage = this.$refs.stage.getStage();
+      let shapes = stage.find('#static');
+      for (const shape of shapes) {
+        shape.scale({
+          x:1/stage.scaleX(),
+          y:1/stage.scaleY()
+        })
+      }
     }
   },
   mounted() {
@@ -359,9 +385,10 @@ export default {
         }" />
 
         <Circle v-for="item in circles" :key="item.id" :config="item"/>
-        <DraggableLine v-for="item in lines" :key="item.id" :config="item" @sizeupdate="updateTransformer"/>
+        <DraggableLine v-for="item in lines" :key="item.id" :config="item" :color="'blue'" @sizeupdate="updateTransformer"/>
+        <DraggableLine v-for="item in linedetectors" :key="item.id" :config="item" :color="'green'" @sizeupdate="updateTransformer"/>
         <Rectangle v-for="item in rectangles" :key="item.id" :config="item"/>
-
+        <Polygon v-for="item in polygons" :key="item.id" :config="item" :selected="selectedShapes.has(item)" :ctrlKeyPressed="ctrlKeyPressed"/>
         <v-transformer ref="transformer" 
         :config="{
           boundBoxFunc: snappingFunction

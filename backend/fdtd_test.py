@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as ptc
 import numpy as np
 from scipy.ndimage import rotate
+from skimage import draw
 
 import fdtd, sys
 from pathlib import Path
@@ -45,6 +46,9 @@ def gAt(inpt, default:float, min=None, max=None):
     if (max!=None) and (conv > max) : return default
     return conv if inpt else default
 
+def modVal(v):
+    return math.sqrt(v[0]**2 + v[1]**2 + v[2]**2)
+
 def visualize(
     grid,
     elements,
@@ -81,8 +85,8 @@ def visualize(
         folder: path to folder to save frames
     """
 
-    fig = plt.figure()
-    plt.figure().clear()
+    fig = plt.figure(1)
+    plt.figure(1).clear()
     plt.close()
     plt.cla()
     plt.clf()
@@ -250,15 +254,16 @@ def visualize(
 
         if detector.__class__.__name__ == "BlockDetector":
             # BlockDetector
-            plt.plot(
+            leg.append((plt.plot(
                 [_x[0], _x[0], _x[1], _x[1], _x[0]],
                 [_y[0], _y[1], _y[1], _y[0], _y[0]],
                 lw=3,
                 color=detcolor,
-            )
+            ), "Detectors"))
         else:
             # LineDetector
-            plt.plot(_x, _y, lw=3, color=detcolor)
+            leg.append((plt.plot(
+                _x, _y, lw=3, color=detcolor), "Detectors"))
 
     # Boundaries
     for boundary in grid.boundaries:
@@ -352,7 +357,18 @@ def visualize(
     plt.figlegend()
     plt.tight_layout()
 
-    interactive_legend = plugins.InteractiveLegendPlugin([ob[0] for ob in leg], [ob[1] for ob in leg])
+    legUnique = []
+    for ob in leg:# remove duplicates
+        unique = True
+        for checkOb in legUnique:
+            if ob[1] == checkOb[1]:
+                checkOb[0].append(ob[0][0])
+                unique = False
+                break
+        if unique:
+            legUnique.append(ob)
+
+    interactive_legend = plugins.InteractiveLegendPlugin([ob[0] for ob in legUnique], [ob[1] for ob in legUnique], legend_offset=(-150, 15))
 
     return plt.gcf(), img, interactive_legend
 
@@ -376,9 +392,10 @@ for propKey, propValue in properties.items():
     properties[propKey] = Property(propKey, *propValue)
 
 class AnimView(plugins.PluginBase):
-    def __init__(self, img):
+    def __init__(self, img, dataPoints):
         self.dict_ = {"type": "animview",
-                      "idimg": utils.get_id(img)}
+                      "idimg": utils.get_id(img),
+                      "idgraph": (utils.get_id(dataPoints) if dataPoints else 0)}
 
 class CanvasEl:
     def __init__(self, o) -> None:
@@ -446,7 +463,27 @@ class RectObj(PermObj):
             edgecolor="none",
             facecolor=objcolor,
         )
-
+class PolygonObj(PermObj):
+    def __init__(self, o) -> None:
+        super(PolygonObj, self).__init__(o)
+        self.xPoints, self.yPoints, self.points = [], [], []
+        for i in range(int(len(o.points)/2)):
+            self.xPoints.append(o.points[i*2]+o.x)
+            self.yPoints.append(o.points[i*2+1]+o.y)
+            self.points.append( (o.points[i*2]+o.x, o.points[i*2+1]+o.y) )
+    def addFdtd(self, grid):
+        rr, cc = draw.polygon(self.yPoints, self.xPoints)
+        for i in range(len(rr)):
+            grid[cc[i]:cc[i]+1, rr[i]:rr[i]+1, 0:ZMAX] = fdtd.AbsorbingObject(permittivity=self.permittivity, conductivity=self.conductivity, name=f'{self.name}_{i}')
+        #grid[tuple(rr.astype(int)), tuple(cc.astype(int)), 0:ZMAX] = fdtd.AbsorbingObject(permittivity=self.permittivity, conductivity=self.conductivity, name=self.name)
+    def patch(self):
+        return ptc.Polygon(
+            self.points,
+            linewidth=0,
+            edgecolor="none",
+            facecolor=objcolor,
+        )
+    
 class Source(CanvasEl):
     def __init__(self, o) -> None:
         self.reqProps = ['amplitude', 'wavelength', 'phase shift']
@@ -470,25 +507,53 @@ class Pointsource(Source):
     def addFdtd(self, grid):
         grid[int(self.x), int(self.y), 0] = fdtd.PointSource(period=self.wavelength / SPEED_LIGHT, amplitude=self.amplitude, phase_shift=self.phase_shift, name=self.name)
 
+class LineDetector(CanvasEl):
+    def __init__(self, o) -> None:
+        self.reqProps = []
+        super(LineDetector, self).__init__(o)
+        self.x1 = int(o.points[0]+gAt(o.x, 0))
+        self.y1 = int(o.points[1]+gAt(o.y, 0))
+        self.x2 = int(o.points[2]+gAt(o.x, 0))
+        self.y2 = int(o.points[3]+gAt(o.y, 0))
+    def addFdtd(self, grid):
+        grid[self.x1:self.x2, self.y1:self.y2, 0:ZMAX] = fdtd.LineDetector(name=self.name)
+
 elementMapping = {
     'object':RectObj,
+    'polygon':PolygonObj,
     'linesource':Linesource,
-    'pointsource':Pointsource
+    'pointsource':Pointsource,
+    'linedetector':LineDetector,
 }
 
 def stepGrid(grid):
     grid.step()
+
     vv = io.BytesIO()
     grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]
     plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap=gCmap, format='png', vmin=1e-4, vmax=100)#TODO
     vv.seek(0)
+    
+    views = {}
+    for j in range(len(grid.detectors)):
+            views[f'Detector {j+1}'] = {
+                    'type'   : 'detector',
+                    'data'   : [ [i, modVal(grid.detectors[j].E[-1][i])**2 + modVal(grid.detectors[j].H[-1][i])**2] for i in range(len(grid.detectors[j].E[0]))]}
+    #print(max(grid.detectors[0].E[-1][0]))
+    #print(max([ max(grid.detectors[0].E[0][i]) for i in range(len(grid.detectors[0].E[0])) ]))
+    #print(grid.detectors[0].E[0][:10])
+    views['Main view'] = {
+                'type'    : 'view',
+                'data'    : base64.b64encode(vv.read()).decode()}
+    
+    return views
 
-    if debug:
+'''    if debug:
         filePath = Path(f'render/{startTime}/{grid.time_steps_passed}.png')
         filePath.touch(exist_ok= True)
         with open(filePath, 'wb') as f:
-            f.write(vv.getbuffer())
-    return base64.b64encode(vv.read())
+            f.write(vv.getbuffer())'''
+
 
 def processJson(o):
     if debug:
@@ -526,6 +591,21 @@ def processJson(o):
     #grid.step()
     grid.run(1, progress_bar=False)
 
+    dataPoints, graph, views = None, None, {}
+    for j in range(len(grid.detectors)):
+        plt.clf()
+        graph = plt.figure(j+2)
+
+        detectorLen = len(grid.detectors[j].E[0])
+        intensity = [ modVal(grid.detectors[j].E[0][i])**2 + modVal(grid.detectors[j].H[0][i])**2 for i in range(detectorLen) ]
+        dataPoints = plt.plot(np.arange(0, detectorLen, 1), intensity)
+        plt.yscale("log")
+        plt.gca().set_ylim([1, 200])# TEMP
+        views[f'Detector {j+1}'] = {
+                            'type'   : 'detector',
+                            'data'   : [[ [i, modVal(grid.detectors[j].E[-1][i])**2 + modVal(grid.detectors[j].H[-1][i])**2] for i in range(len(grid.detectors[j].E[0])) ]],
+                            'canvas' : mpld3.fig_to_dict(graph)}
+
     plt.autoscale() 
     fig, img, interactive_legend = visualize(grid, elements, z=0)
 
@@ -537,11 +617,21 @@ def processJson(o):
     fig.set_figheight(o.yBounds/figSize[1]*fig.get_size_inches()[1])
 
     plugins.clear(fig)
-    plugins.connect(fig, plugins.Zoom(button=False), AnimView(img), interactive_legend)
-    outJson = mpld3.fig_to_dict(fig)
+    plugins.connect(fig, plugins.Zoom(button=False), AnimView(img, dataPoints), interactive_legend)
+    plot = mpld3.fig_to_dict(fig)
     fig.clear()
     plt.close()
-    return outJson, grid, frameCount-1
+
+    vv = io.BytesIO()
+    grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)[:, :, 0]
+    plt.imsave(vv, bd.numpy(grid_energy).transpose(), cmap=gCmap, format='png', vmin=1e-4, vmax=100)#TODO
+    vv.seek(0)
+
+    views['Main view'] = {
+                    'type'    : 'view',
+                    'data'    : [base64.b64encode(vv.read()).decode()],
+                    'canvas'  : plot}
+    return views, grid, frameCount-1
 
 def test_fdtd():
 

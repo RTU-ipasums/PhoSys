@@ -1,6 +1,6 @@
 <script>
 export default {
-    props: ['config'],
+    props: ['config', 'color'],
     methods: {
     updateLine() {
         const point1pos = this.$refs.point1obj.getNode().getPosition();
@@ -32,8 +32,9 @@ ref="group">
         points: config.points,
         strokeWidth: 5,
         opacity: 0.5,
-        stroke: 'blue',
-        perfectDrawEnabled: false
+        stroke: color,
+        perfectDrawEnabled: false,
+        strokeScaleEnabled:false
     }"
     @dragmove="updateLine" 
     @transformend="updateLine"
@@ -49,6 +50,7 @@ ref="group">
         opacity: 0.5,
         perfectDrawEnabled: false,
         draggable: true,
+        id:'static'
     }" 
     @dragend="$emit('sizeupdate')"
     @dragmove="updateLine" 
@@ -65,6 +67,7 @@ ref="group">
         opacity: 0.5,
         perfectDrawEnabled: false,
         draggable: true,
+        id:'static'
     }"
     @dragend="$emit('sizeupdate')"
     @dragmove="updateLine" 

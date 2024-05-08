@@ -19,5 +19,23 @@ export const data = reactive({
         value:1
     }
     ],
-    shapes: []
+    shapes: [],
+})
+
+export const internal = reactive({
+    currentFrame: 1,
+    views:{
+    /*
+      "Main view": {
+          type:"view",
+          data:[],
+          canvas:null,
+        },
+      "Detector 1":{
+          type:"detector",
+          data:[],
+          canvas:null,
+        }
+    */
+    },
 })

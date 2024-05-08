@@ -44,3 +44,4 @@ waitress==2.1.2
 Werkzeug==2.2.2
 zope.event==4.6
 zope.interface==5.5.2
+scikit-image==0.21.0

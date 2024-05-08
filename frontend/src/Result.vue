@@ -1,44 +1,55 @@
 <script>
+import ResultPane from './ResultPane.vue'
 import io from "socket.io-client";
 import * as mpld3 from "mpld3";
 import "./interactive-legend";
-import { data } from './data.js'
-import { toRaw } from 'vue'
+import { data, internal } from './data.js'
+import { Splitpanes, Pane } from 'splitpanes'
 
 export default {
+  components: {
+      ResultPane,
+      Splitpanes,
+      Pane
+  },
   data() {
     return {
-      socket: io(),
-      currentFrame: 1,
-      imgObj: null,
-      frameData: [],
+      socket: io(import.meta.env.VITE_BACKEND_URL),
       isPlaying: false,
       generating: false,
       fps: 30,
       advanceInterval: null,
+      internal,
+      selectedViews: {
+        //"View name": numberOfOpenPanes
+      }
     };
   },
   computed: {
+    loadedFrameCount() {
+      //Number of frames in recieved data
+      let len = Object.values(internal.views)[0]?.data?.length;
+      return (len)?len:0;
+    },
     maxFrame() {
-      return Math.max(data.frameCount, this.frameData.length);
+      //The maximum frame displayed on seekbar
+      return Math.max(data.frameCount, this.loadedFrameCount);
     },
     isGenerating() {
-      return this.generating===true||(this.frameData.length<data.frameCount&&this.frameData.length>0);
+      return this.generating===true||(this.loadedFrameCount<data.frameCount&&this.loadedFrameCount>0);
     },
+    getData() {
+      return data ? internal.views : null;
+    }
   },
   methods: {
     setFrame(val) {
-      if (this.frameData[0] != null) {
-        this.currentFrame = val;
-        if (this.frameData.length >= val) {
-          this.imgObj.props.data = this.frameData[this.currentFrame-1];
-          this.imgObj.image._groups[0][0].setAttribute("href", "data:image/png;base64," + this.imgObj.props.data);
-        }
-      }
+      if (this.loadedFrameCount<=0) return; 
+      internal.currentFrame = val;
     },
     setNextFrame() {
-      if (this.currentFrame < this.frameData.length) {
-        this.setFrame(this.currentFrame + 1);
+      if (internal.currentFrame < this.loadedFrameCount) {
+        this.setFrame(internal.currentFrame + 1);
       }
       else {
         clearInterval(this.advanceInterval)
@@ -46,20 +57,20 @@ export default {
       }
     },
     setPreviousFrame() {
-      this.setFrame(this.currentFrame-1);
+      this.setFrame(internal.currentFrame-1);
     },
     setFirstFrame() {
       this.setFrame(1);
     },
     setLastFrame() {
-      this.setFrame(this.frameData.length);
+      this.setFrame(this.loadedFrameCount);
     },
     togglePlay() {
       this.generating = false;
       this.isPlaying = !this.isPlaying;
-      if(!this.frameData)return;
+      if(this.loadedFrameCount<=0)return;
       if (this.isPlaying) {
-        if (this.currentFrame == this.frameData.length) {
+        if (internal.currentFrame == this.loadedFrameCount) {
           this.generating = true;
           this.socket.emit('generate_frames', 1);
         }
@@ -70,28 +81,24 @@ export default {
       else { clearInterval(this.advanceInterval); }
     },
     reset() {
-      this.frameData = [];
-      this.currentFrame = 1;
+      internal.views = {};
+      internal.currentFrame = 1;
     },
-    addFrame(frame) {
-      this.frameData.push(frame);
-     
-      if (data.frameCount == this.frameData.length) {
+    addFrame(views) {
+      for (var view of Object.keys(internal.views)) {
+        internal.views[view].data.push(views[view].data);
+      }
+      if (data.frameCount == this.loadedFrameCount) {
         this.generating = false;
         this.isPlaying = false;
-
-        this.setFrame(this.currentFrame + 1);
-        this.setFrame(this.currentFrame);
-        
+        this.setFrame(internal.currentFrame + 1);
       }
-      else if ((this.frameData.length - 1 == this.currentFrame)&&this.isPlaying) {
-        this.setFrame(this.currentFrame + 1);
+      else if ((this.loadedFrameCount - 1 == internal.currentFrame) && this.isPlaying) {
+        this.setFrame(internal.currentFrame + 1);
       }
     },
     
     startGeneration() {
-      console.log(structuredClone(toRaw(data)));
-      data.frameCount = data.frameCount;
       this.socket.close();
       this.socket = io(import.meta.env.VITE_BACKEND_URL);
 
@@ -100,58 +107,37 @@ export default {
         this.reset();
         this.isPlaying = true;
       });
-      this.socket.on("canvas", (drawObj) => {
-        console.log(drawObj);
-        document.getElementById("fig_main").innerHTML = "";
-        mpld3.draw_figure("fig_main", drawObj);
-        let svg = document.querySelector(".mpld3-figure");
-        svg.setAttribute("viewBox", "41 40 400 400");
-        svg.setAttribute("preserveAspectRatio", "xMinYMin slice");
+      this.socket.on("canvas", (inData) => {
+        internal.views = inData.views;
+        for (var viewName in internal.views) {
+          var view = internal.views[viewName]
+          view.panes = []
+          view.activeFrame = view.data[internal.currentFrame-1];
+        }
       });
-      this.socket.on("frame", (imgdata) => {
+      this.socket.on("frame", frameData => {
         console.log("Got frame!!");
-        this.addFrame(imgdata);
+        this.addFrame(frameData.views);
         if (this.generating) { this.socket.emit('generate_frames', 1); }
       });
-    },
+    }
   },
-  mounted() {
-    mpld3.register_plugin("animview", AnimViewPlugin);
-    AnimViewPlugin.prototype = Object.create(mpld3.Plugin.prototype);
-    AnimViewPlugin.prototype.constructor = AnimViewPlugin;
-    AnimViewPlugin.prototype.requiredProps = ["idimg"];
-    AnimViewPlugin.prototype.defaultProps = {}
-    function AnimViewPlugin(fig, props) {
-      mpld3.Plugin.call(this, fig, props);
-    };
-    let componentThis=this;
-    AnimViewPlugin.prototype.draw = function() {
-      let imgobjT = mpld3.get_element(this.props.idimg, this.fig);
-      console.log(imgobjT);
-      componentThis.imgObj = imgobjT;
-      componentThis.frameData[0] = imgobjT.props.data;
-    };
-  }
 }
 </script>
 
 <template>
-  <div id="fig_main"></div>
+  <ResultPane :views="getData" :selectedViews="selectedViews" :horizontal="false"/>
 </template>
 
-<style>
-.mpld3-figure {
-  flex: 1;
+<style scoped>
+li{
+  line-height: 0;
   height: 100%;
 }
-
-#fig_main {
-  min-height: 0;
+button{
   height: 100%;
 }
-
-#fig_main>* {
+img{
   height: 100%;
-  display: flex;
 }
 </style>

@@ -24,6 +24,31 @@ export const defaultObject = {
         },
     ]
 };
+export const defaultPolygon = {
+    rotation: 0,
+    x: 150,
+    y: 150,
+    points: [50,0,100,100,0,100],
+    scaleX: 1,
+    scaleY: 1,
+    propertyTitle: "Polygon object",
+    properties: [
+        {
+            propertyName: "Permittivity",
+            units: "su",
+            min: 1,
+            max: 100,
+            value: 25
+        },
+        {
+            propertyName: "Conductivity, S/m",
+            units: "S/m",
+            min: 0,
+            max: 30000,
+            value: 0
+        },
+    ]
+};
 export const defaultPointsource = {
     x: 150,
     y: 150,
@@ -93,4 +118,11 @@ export const defaultLinesource = {
         value: 0
     }
     ]
+}
+
+export const defaultLinedetector = {
+    x:100,
+    y:100,
+    points:[0,0,100,100],
+    propertyTitle: "Line detector"
 }

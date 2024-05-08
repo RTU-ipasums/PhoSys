@@ -28,8 +28,9 @@ cors = CORS(api)
 @socketio.on('sim_data')
 @cross_origin()
 def handl_sim(inJson):
-    res, grid, count = processJson(DefaultMunch.fromDict(inJson))
-    emit('canvas', res)
+    views, grid, count = processJson(DefaultMunch.fromDict(inJson))
+    emit('canvas', {"views":views})
+    print(views)
     session['grid'] = grid
 
     generate_frames(count)
@@ -43,7 +44,8 @@ def generate_frames(count):
     @copy_current_request_context
     def sendStep():
         for i in range(count):
-            emit('frame', stepGrid(grid).decode())
+            views = stepGrid(grid)# TODO
+            emit('frame', {"views":views})
             gevent.sleep(0.0000001)# idk why
 
     gevent.spawn(sendStep)

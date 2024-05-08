@@ -77,44 +77,55 @@ export default {
 </script>
 
 <template>
-  <div class="u-i-container">
-    <nav class="grid-item top-bar">
-      <div class="tool-buttons">
-        <img class="logo" title="Phosys" alt="logo" src="/logo.png" />
-        <img class="bar-button" @click="saveSimulationData()" title="Save simulation to file" alt="open"
-          src="/save.png" />
-        <img class="bar-button" @click="openSimulationData()" title="Open simulation from file" alt="open"
-          src="/folder.png" />
-        <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultObject, 'object')" title="Add object" alt="object"
-          src="/object.png" />
-        <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPointsource, 'pointsource')" title="Add point lightsource" alt="point lightsource"
-          src="/light.png" />
-        <img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinesource, 'linesource')" title="Add line lightsource" alt="line lightsource"
-          src="/linesource.png" />
+  <div class="ui-container">
+    <div class="grid-item top-bar">
+      <div class="tool-buttons-wrapper">
+        <div class="tool-buttons">
+          <img class="logo" title="Phosys" alt="logo" src="/logo.png" />
+        </div>
+        <ul class="tool-buttons">
+          <li><button><img class="bar-button" @click="saveSimulationData()" title="Save simulation to file" alt="open"
+                src="/save.png" /></button></li>
+          <li><button><img class="bar-button" @click="openSimulationData()" title="Open simulation from file" alt="open"
+                src="/folder.png" /></button></li>
+        </ul>
+        <ul class="tool-buttons">
+          <li><button id="object-button"><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultObject, 'object')"
+                title="Add object" alt="object" src="/object.png" /></button></li>
+          <li><button id="polygon-button"><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPolygon, 'polygon')"
+                title="Add polygon" alt="polygon" src="/polygon.png" /></button></li>
+        </ul>
+        <ul class="tool-buttons">
+          <li><button id="pointsource-button"><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultPointsource, 'pointsource')"
+                title="Add point lightsource" alt="point lightsource" src="/light.png" /></button></li>
+          <li><button id="linesource-button"><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinesource, 'linesource')"
+                title="Add line lightsource" alt="line lightsource" src="/linesource.png" /></button></li>
+          <li><button id="linedetector-button"><img class="bar-button" @click="$refs.draw.addShape(defaults.defaultLinedetector, 'linedetector')"
+                title="Add line detector" alt="line detector" src="/linedetector.png" /></button></li>
+        </ul>
       </div>
-      <button class="run-button" @click="$refs.result.startGeneration()" title="Start simulation"><i class="fa-solid fa-play"
-          data-v-cb817a9a=""></i>&nbsp;LAUNCH</button>
-    </nav>
+      <button class="run-button" @click="$refs.result.startGeneration()" title="Start simulation">
+        <i class="fa-solid fa-play"></i>&nbsp;LAUNCH
+      </button>
+    </div>
 
-    <splitpanes id="splitpanes">
+    <splitpanes>
       <pane size="20" class="properties grid-item">
-        <Properties :selectedShapes="getShape()" />
+        <div style="padding: 10px 20px;">
+          <Properties :selectedShapes="getShape()" />
+        </div>
+        
       </pane>
       <pane>
-        <div class="editor-canvas-container">
-          <div class="grid-item editor" id="editor" ref="flexeditor">
-            <Draw ref="draw" />
-          </div>
-          <div class="grid-item canvas" id="canvas">
-            <Result ref="result" />
-            <SeekBar :resultView="$refs.result"/>
-          </div>
+        <div class="grid-item editor" id="editor" ref="flexeditor">
+          <Draw ref="draw" />
         </div>
       </pane>
-
+      <pane class="grid-item canvas" id="canvas">
+        <Result ref="result" />
+        <SeekBar :resultView="$refs.result" />
+      </pane>
     </splitpanes>
-
-
   </div>
 </template>
 
@@ -127,68 +138,70 @@ export default {
   padding: 0;
 }
 
-.logo {
-  border-right: 2px solid gray;
-  padding-right: 10px;
-}
-
 body {
   color: #2c3e50;
   line-height: 1.6;
 }
 
-.editor-canvas-container {
-  display: flex;
-  width: 100%;
-  gap: 6px;
-  height: 100%;
+button {
+  background: none;
+  padding: 0;
+  font: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+.editor {
+  height: 100%
+}
+
+ul {
+  list-style: none;
 }
 
 .grid-item {
   background-color: rgba(255, 255, 255, 1);
 }
 
-.editor-canvas-container>* {
-  flex: 1;
-  height: 100%;
-  width: 0;
-}
-
-.u-i-container {
+.ui-container {
   height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
   row-gap: 6px;
   background-color: rgba(167, 161, 161, 1);
+  min-height: 0;
 }
 
 .properties {
   text-align: center;
-  padding: 10px 20px;
 }
 
 .canvas {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   z-index: 1;
+}
+
+.tool-buttons-wrapper {
+  display: flex;
+  height: 47px;
 }
 
 .tool-buttons {
   display: flex;
   gap: 10px;
-  min-width: 0px;
+  padding-left: 10px;
 }
 
-.tool-buttons>* {
-  flex: 0;
+.tool-buttons-wrapper img {
+  /* necessary for firefox for some reason */
+  height: 47px;
 }
 
-.bar-button {
-  cursor: pointer;
-  max-height: 100%;
-  max-width: 100%;
+.tool-buttons:not(:last-child) {
+  border-right: 2px solid gray;
+  padding-right: 10px;
 }
 
 .top-bar {
@@ -232,12 +245,13 @@ body {
   font-family: Helvetica, Arial;
 }
 
-#splitpanes {
+.splitpanes {
   overflow: auto;
+  min-height:0;
 }
 
 .splitpanes__splitter {
   min-width: 6px !important;
+  min-height: 6px !important;
   background: rgba(167, 161, 161, 1);
-}
-</style>
+}</style>

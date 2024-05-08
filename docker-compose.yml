@@ -1,18 +1,27 @@
 version: '3.7'
 
+##### Services #####
 services:
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     #depends_on:
     #  - cache
-    entrypoint: ['/usr/src/app/entrypoint.sh']
     ports:
       - 5001:5000
     environment:
       - FLASK_ENV=production
+    networks:
+      - api_bridge
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 5002:80
     networks:
       - api_bridge
     restart: always
