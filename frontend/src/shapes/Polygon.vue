@@ -130,7 +130,8 @@ ref="polygon"/>
 }"
 @mouseover="setCursorStyle($event,'copy')"
 @mouseleave="setCursorStyle($event,'default')"
-@click="handleStrokeClick"/>
+@click="handleStrokeClick"
+@tap="handleStrokeClick"/>
 
 <v-rect v-if="selected" v-for="(point, index) in circlePoints" :key="index" :config="{
     x:point.x+config.x,
